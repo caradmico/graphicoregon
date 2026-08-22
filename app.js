@@ -23,24 +23,11 @@ const REGIONS = [
     name: "Fine Art",
     kind: "art",
     axis: "West · −X loft",
-    pos: [-128, 30, 8],
-    look: [-150, 28, -4],
+    pos: [-110, 32, 22],
+    look: [-148, 20, -10],
     meta: "Oil · acrylic · ink · digital · charcoal",
     title: "Fine art and illustration",
-    body: "A working studio practice — figures, portraits, still lifes, coast studies, and prints. Open to commissions. Moon-phase studies hang further west; extra still lifes sit in the south wing.",
-    href: "https://graphicoregon.com/sample-page/",
-    linkLabel: "Open the studio page"
-  },
-  {
-    id: "moons",
-    name: "Moon Phases",
-    kind: "art",
-    axis: "West · −X, further loft",
-    pos: [-198, 38, -72],
-    look: [-214, 36, -88],
-    meta: "Fine art · 2025 studio set",
-    title: "Moon-phase set",
-    body: "Eight public moon-phase studies from the Graphic Oregon studio library (June and July 2025 uploads): new, waxing crescent, first quarter, waxing gibbous, full, waning gibbous, last quarter, waning crescent.",
+    body: "A working studio practice — figures, portraits, still lifes, coast studies, prints, and studio photographs. Open to commissions. Extra still lifes sit in the south wing.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
   },
@@ -86,39 +73,39 @@ const REGIONS = [
   {
     id: "nano",
     name: "Nanoactuator Design",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X",
     pos: [138, 12, 42],
     look: [152, 10, 28],
     meta: "Research · 2024",
     title: "Open-Source Nanoactuator Design",
-    body: "A cost-effective nanoactuator built from hard-disk-drive mechanics, measured with a Michelson interferometer. Off-the-shelf parts and a low-cost optical table are used to open nanometer-scale positioning to more labs.",
+    body: "A cost-effective nanoactuator built from hard-disk-drive mechanics, measured with a Michelson interferometer. Apparatus photos and figures from the paper hang in this neighborhood.",
     href: "https://graphicoregon.com/open-source-nanoactuator-design-utilizing-hard-disk-drive-components-precision-displacement-measurement-with-a-michelson-interferometer/",
     linkLabel: "Open the nanoactuator paper"
   },
   {
     id: "eval",
     name: "Program Evaluation",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X",
     pos: [168, 9, 8],
     look: [184, 8, -6],
     meta: "Research · inclusive arts",
     title: "Program Evaluation Methods",
-    body: "Evaluation methods for inclusive art programs — a practical guide for measuring participation, equity, and outcomes.",
+    body: "Evaluation methods for inclusive art programs. Figures from the guide — focus-group tools and the OSLP SWOC — hang in this neighborhood.",
     href: "https://graphicoregon.com/program-evaluation-methods/",
     linkLabel: "Open the evaluation guide"
   },
   {
     id: "lane",
     name: "Lane Arts Asset Map",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X",
     pos: [128, 14, -62],
     look: [142, 12, -78],
     meta: "Research · Lane Arts Council",
     title: "Lane Arts Council Arts Asset Map User Guide",
-    body: "A user guide to the Lane Arts Council arts asset map, written while coordinating arts equity research in Lane County.",
+    body: "A user guide to the Lane Arts Council arts asset map. Interface screenshots and map figures from the guide hang here.",
     href: "https://graphicoregon.com/lane-arts-council-arts-asset-map-user-guide/",
     linkLabel: "Open the asset map guide"
   },
@@ -138,91 +125,91 @@ const REGIONS = [
   {
     id: "nehalem",
     name: "East Fork Nehalem",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [158, -14, -22],
     look: [172, -14, -36],
     meta: "Research · habitat assessment",
     title: "East Fork Nehalem Watershed Assessment",
-    body: "Watershed assessment for the East Fork Nehalem — habitat, sediment, and restoration context on Oregon’s North Coast.",
+    body: "Watershed assessment for the East Fork Nehalem. Maps and figures from the report hang in this neighborhood.",
     href: "https://graphicoregon.com/east-fork-nehalem-watershed-assessment/",
     linkLabel: "Open the Nehalem assessment"
   },
   {
     id: "tillamook-bay",
     name: "Tillamook Bay Restoration",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [186, -12, 32],
     look: [200, -12, 18],
     meta: "Research · restoration plan",
     title: "Tillamook Bay Watershed Habitat Restoration Plan",
-    body: "Habitat restoration planning for the Tillamook Bay watershed, including computational ecological restoration priorities.",
+    body: "Habitat restoration planning for the Tillamook Bay watershed. CERP priority maps from the report hang in this neighborhood.",
     href: "https://graphicoregon.com/tillamook-bay-watershed-habitat-restoration-plan/",
     linkLabel: "Open the restoration plan"
   },
   {
     id: "nestucca",
     name: "Upper Nestucca",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [148, -16, 68],
     look: [162, -16, 54],
     meta: "Research · sediment and habitat",
     title: "Upper Nestucca Sediment and Habitat Study",
-    body: "Sediment and habitat study for the Upper Nestucca, part of a coastal assessment series for land managers and restoration partners.",
+    body: "Sediment and habitat study for the Upper Nestucca. Maps and field figures from the report hang in this neighborhood.",
     href: "https://graphicoregon.com/upper-nestucca-sediment-and-habitat-study/",
     linkLabel: "Open the Nestucca study"
   },
   {
     id: "siuslaw",
     name: "North Fork Siuslaw",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [202, -14, -6],
     look: [216, -14, -20],
     meta: "Research · sediment and habitat",
     title: "North Fork Siuslaw Sediment and Habitat Assessment",
-    body: "Sediment and habitat assessment for the North Fork Siuslaw watershed. MidCoast Watershed Council, 2009. Distinct from the 2009 headwater and road-condition assessment further out.",
+    body: "Sediment and habitat assessment for the North Fork Siuslaw watershed. MidCoast Watershed Council, 2009. Maps from the report hang here. Distinct from the 2009 headwater and road-condition assessment further out.",
     href: "https://graphicoregon.com/north-fork-siuslaw-sediment-and-habitat-assessment/",
     linkLabel: "Open the Siuslaw assessment"
   },
   {
     id: "tillamook-river",
     name: "Tillamook River",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [172, -18, -52],
     look: [186, -18, -66],
     meta: "Research · limiting factors",
     title: "Tillamook River Limiting Factors Assessment",
-    body: "Limiting-factors assessment for salmonid habitat in the Tillamook River basin.",
+    body: "Limiting-factors assessment for salmonid habitat in the Tillamook River basin. Creek maps from the report hang in this neighborhood.",
     href: "https://graphicoregon.com/tillamook-river-limiting-factors-assessment/",
     linkLabel: "Open the Tillamook River assessment"
   },
   {
     id: "necanicum",
     name: "Necanicum Habitat Mapping",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [196, -10, 72],
     look: [210, -10, 58],
     meta: "Research · habitat mapping",
     title: "Necanicum Habitat Mapping",
-    body: "Habitat mapping for the Necanicum watershed, published as a map package for restoration and land-use work.",
+    body: "Habitat mapping for the Necanicum watershed. Maps from the published map package hang as objects in this neighborhood.",
     href: "https://graphicoregon.com/necanicum-habitat-mapping/",
     linkLabel: "Open the Necanicum maps"
   },
   {
     id: "nhmp",
     name: "Hazard Mitigation Plan",
-    kind: "research",
+    kind: "exploded",
     axis: "East · +X, ground −Y",
     pos: [142, -6, -92],
     look: [156, -6, -106],
     meta: "Research · Tillamook County",
     title: "Tillamook County Natural Hazard Mitigation Plan",
-    body: "Natural hazard mitigation planning for Tillamook County — mapping risk so communities can prepare.",
+    body: "Natural hazard mitigation planning for Tillamook County. Figures from the plan hang in this neighborhood.",
     href: "https://graphicoregon.com/tillamook-county-natural-hazard-mitigation-plan/",
     linkLabel: "Open the hazard mitigation plan"
   },
@@ -335,8 +322,8 @@ const REGIONS = [
     name: "Journalism & Writing",
     kind: "write",
     axis: "North · +Z",
-    pos: [6, 14, 160],
-    look: [6, 11, 222],
+    pos: [6, 14, 148],
+    look: [6, 12, 196],
     meta: "Writing · 2012–present",
     title: "Journalism and editing",
     body: "Assistant editor at the Tillamook County Pioneer, with live Cara Mico bylines in this hall. Earlier work: Seaside Signal (fifteen 2019 stories), Cannon Beach Gazette titles from the CV, HipFish Monthly issue PDFs, and two Portland Mercury pieces. Freelance newspaper work since November 2012.",
@@ -348,8 +335,8 @@ const REGIONS = [
     name: "Cannon Beach Gazette",
     kind: "write",
     axis: "North · +Z, further",
-    pos: [10, 12, 308],
-    look: [10, 10, 328],
+    pos: [10, 12, 288],
+    look: [10, 11, 322],
     meta: "Writing · Gazette 2019",
     title: "Cannon Beach Gazette, 2019",
     body: "Titles from the published CV. The Gazette pages are not recovered live except the puffin reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.",
@@ -417,7 +404,7 @@ const REGIONS = [
     look: [0, 94, -2],
     meta: "Fellowships and awards",
     title: "Fellowships and awards",
-    body: "Recology Artist Residency, Astoria Visual Arts Alliance, 2018. Arts Research Travel Grant, University of Oregon, 2017. Studio Art Scholarship, Otis College of Art and Design, 2002. Studio Art Scholarship, Pratt, 2002 (declined).",
+    body: "Recology Artist Residency, Astoria Visual Arts Alliance, 2018. Arts Research Travel Grant, University of Oregon, 2017. Studio Art Scholarship, Otis College of Art and Design, 2002.",
     href: "https://graphicoregon.com/experience/",
     linkLabel: "Open the Experience page"
   },
@@ -430,7 +417,7 @@ const REGIONS = [
     look: [14, -10, -168],
     meta: "Website design and management",
     title: "Website work",
-    body: "HTML/CSS, responsive applications, and long-term site management. Named work from the Graphic Oregon studio list. Screenshots from the studio gallery hang here. Named contract domains sit further south.",
+    body: "HTML/CSS, responsive applications, and long-term site management. Named work from the Graphic Oregon studio list. Screenshots from the studio gallery hang here, with a moon-phase widget as a client website object — not studio art. Named contract domains sit further south.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   },
@@ -451,7 +438,7 @@ const REGIONS = [
 
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
-  { label: "Art · west −X", ids: ["art", "moons", "studies"] },
+  { label: "Art · west −X", ids: ["art", "studies"] },
   { label: "Research · east +X", ids: ["iau", "iloa", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
   { label: "Writing · north +Z", ids: ["journalism", "gazette"] },
   { label: "Credentials · above +Y", ids: ["credentials", "aitutor", "service", "talks", "awards"] },
@@ -536,18 +523,38 @@ const ARTWORKS = [
   ["assets/art/street-scene.jpg", "Street scene, charcoal, conté, marker"],
   ["assets/art/composition-study.jpg", "Composition study"],
   ["assets/art/male-portrait.jpg", "Portrait, oil pastel and charcoal"],
-  ["assets/art/mixed-media-gouache.jpg", "Mixed media, gouache on Canson"]
-];
-
-const MOON_ART = [
-  ["assets/art/new-moon.jpg", "New moon"],
-  ["assets/art/waxing-crescent.jpg", "Waxing crescent"],
-  ["assets/art/first-quarter-moon.jpg", "First quarter"],
-  ["assets/art/waxing-gibbous.jpg", "Waxing gibbous"],
-  ["assets/art/full-moon.jpg", "Full moon"],
-  ["assets/art/waning-gibbous.jpg", "Waning gibbous"],
-  ["assets/art/last-quarter.jpg", "Last quarter"],
-  ["assets/art/waning-crescent.jpg", "Waning crescent"]
+  ["assets/art/mixed-media-gouache.jpg", "Mixed media, gouache on Canson"],
+  ["assets/art/0517232026.jpg", "0517232026"],
+  ["assets/art/0716231323.jpg", "0716231323"],
+  ["assets/art/0730230642.jpg", "0730230642"],
+  ["assets/art/20180506_122928-2.jpg", "20180506_122928-2"],
+  ["assets/art/20181111_133449.jpg", "20181111_133449"],
+  ["assets/art/20181121_150820-2.jpg", "20181121_150820-2"],
+  ["assets/art/20181202_131855-2.jpg", "20181202_131855-2"],
+  ["assets/art/20190629_203228-1.jpg", "20190629_203228-1"],
+  ["assets/art/2020-08-21-1.jpg", "2020-08-21-1"],
+  ["assets/art/20200504_131719-1.jpg", "20200504_131719-1"],
+  ["assets/art/20200701_195408.jpg", "20200701_195408"],
+  ["assets/art/20200724_204038-2.jpg", "20200724_204038-2"],
+  ["assets/art/20201024_233425.jpg", "20201024_233425"],
+  ["assets/art/20201024_233433.jpg", "20201024_233433"],
+  ["assets/art/20201024_233453.jpg", "20201024_233453"],
+  ["assets/art/20201024_233510.jpg", "20201024_233510"],
+  ["assets/art/20201024_233520.jpg", "20201024_233520"],
+  ["assets/art/20201025_145436.jpg", "20201025_145436"],
+  ["assets/art/20201206_134723.jpg", "20201206_134723"],
+  ["assets/art/20201206_134739.jpg", "20201206_134739"],
+  ["assets/art/IMG_20151029_091758.jpg", "IMG_20151029_091758"],
+  ["assets/art/IMG_20200214_214207-2.jpg", "IMG_20200214_214207-2"],
+  ["assets/art/IMG_3195.jpg", "IMG_3195"],
+  ["assets/art/IMG_3197.jpg", "IMG_3197"],
+  ["assets/art/IMG_3198.jpg", "IMG_3198"],
+  ["assets/art/IMG_3201.jpg", "IMG_3201"],
+  ["assets/art/IMG_3207.jpg", "IMG_3207"],
+  ["assets/art/IMG_3208.jpg", "IMG_3208"],
+  ["assets/art/IMG_3210.jpg", "IMG_3210"],
+  ["assets/art/still-life-2-2.jpg", "still-life-2"],
+  ["assets/art/NA7y1.jpg", "NA7y1"]
 ];
 
 const STUDY_ART = [
@@ -571,6 +578,115 @@ const MAPS = [
   ["assets/maps/08-jackson-creek.jpg", "Map 8 — Jackson Creek geology"],
   ["assets/maps/16-restoration-projects.jpg", "Map 16 — Restoration projects"]
 ];
+
+
+const RESEARCH_FIGS = {
+  nano: [
+    ["assets/research/nano/01.jpg", "Page 28"],
+    ["assets/research/nano/02.jpg", "Page 29"],
+    ["assets/research/nano/03.jpg", "Page 10"],
+    ["assets/research/nano/04.jpg", "Page 10"],
+    ["assets/research/nano/05.jpg", "Page 10"],
+    ["assets/research/nano/06.jpg", "Michelson interferometer"]
+  ],
+  eval: [
+    ["assets/research/eval/01.jpg", "Figure 2 — inclusion and exclusion"],
+    ["assets/research/eval/02.jpg", "Figure 2 — Focus group voucher"],
+    ["assets/research/eval/03.jpg", "Figure 3 — Focus group questions"],
+    ["assets/research/eval/04.jpg", "Figure 5 — OSLP Arts & Culture SWOC Analysis"]
+  ],
+  lane: [
+    ["assets/research/lane/01.jpg", "Arts Asset Map User Guide"],
+    ["assets/research/lane/02.jpg", "Page 7"],
+    ["assets/research/lane/03.jpg", "Login screen"],
+    ["assets/research/lane/04.jpg", "Page 12"],
+    ["assets/research/lane/05.jpg", "Page 13"],
+    ["assets/research/lane/06.jpg", "Page 13"],
+    ["assets/research/lane/07.jpg", "Page 14"],
+    ["assets/research/lane/08.jpg", "Page 14"],
+    ["assets/research/lane/09.jpg", "Page 14"],
+    ["assets/research/lane/10.jpg", "Using the map"]
+  ],
+  nehalem: [
+    ["assets/research/nehalem/01.jpg", "Select EMAP and AQI reference data"],
+    ["assets/research/nehalem/02.jpg", "Map 4a — Points of Use / Diversion"],
+    ["assets/research/nehalem/03.jpg", "Page 20"],
+    ["assets/research/nehalem/04.jpg", "Watershed Assessment"],
+    ["assets/research/nehalem/05.jpg", "Page 72"],
+    ["assets/research/nehalem/06.jpg", "Map 1a — Overview"],
+    ["assets/research/nehalem/07.jpg", "Map 9 — Fish verification and presence"],
+    ["assets/research/nehalem/08.jpg", "Page 22"],
+    ["assets/research/nehalem/09.jpg", "Watershed Assessment"],
+    ["assets/research/nehalem/10.jpg", "Chapter 9 — Fish Habitat and Distribution"]
+  ],
+  "tillamook-bay": [
+    ["assets/research/tillamook-bay/01.jpg", "Top outreach priorities"],
+    ["assets/research/tillamook-bay/02.jpg", "Top 10 priorities"],
+    ["assets/research/tillamook-bay/03.jpg", "Top 10 priorities"],
+    ["assets/research/tillamook-bay/04.jpg", "Top 10 priorities"],
+    ["assets/research/tillamook-bay/05.jpg", "Priorities 11–94"],
+    ["assets/research/tillamook-bay/06.jpg", "Priorities 11–94"],
+    ["assets/research/tillamook-bay/07.jpg", "Priorities 11–94 — Bewley"],
+    ["assets/research/tillamook-bay/08.jpg", "Map — page 338"],
+    ["assets/research/tillamook-bay/09.jpg", "Top 10 priorities"],
+    ["assets/research/tillamook-bay/10.jpg", "Map — page 346"]
+  ],
+  nestucca: [
+    ["assets/research/nestucca/01.jpg", "Water quality impairment by fine sediment"],
+    ["assets/research/nestucca/02.jpg", "Sediment, shade, and complexity"],
+    ["assets/research/nestucca/03.jpg", "Physical habitat study"],
+    ["assets/research/nestucca/04.jpg", "Page 18"],
+    ["assets/research/nestucca/05.jpg", "Page 90"],
+    ["assets/research/nestucca/06.jpg", "Map 1 — Nestucca River Watershed"],
+    ["assets/research/nestucca/07.jpg", "Shade assessment"],
+    ["assets/research/nestucca/08.jpg", "Summary of watershed metrics"],
+    ["assets/research/nestucca/09.jpg", "Page 21"],
+    ["assets/research/nestucca/10.jpg", "Sediment benchmarks"]
+  ],
+  siuslaw: [
+    ["assets/research/siuslaw/01.jpg", "Map 5 — Reference locations"],
+    ["assets/research/siuslaw/02.jpg", "Map 1 — Landuse and ownership"],
+    ["assets/research/siuslaw/03.jpg", "North Fork Siuslaw Sediment"],
+    ["assets/research/siuslaw/04.jpg", "North Fork Siuslaw Sediment and Habitat Assessment"],
+    ["assets/research/siuslaw/05.jpg", "Page 62"],
+    ["assets/research/siuslaw/06.jpg", "Page 71"],
+    ["assets/research/siuslaw/07.jpg", "Map 6 — Bank condition listing"],
+    ["assets/research/siuslaw/08.jpg", "Page 12"],
+    ["assets/research/siuslaw/09.jpg", "Page 65"],
+    ["assets/research/siuslaw/10.jpg", "Page 76"]
+  ],
+  "tillamook-river": [
+    ["assets/research/tillamook-river/01.jpg", "Map 3i — Munson Creek"],
+    ["assets/research/tillamook-river/02.jpg", "Habitat Assessment and Limiting Factors Analysis"],
+    ["assets/research/tillamook-river/03.jpg", "Page 105"],
+    ["assets/research/tillamook-river/04.jpg", "Map 3f — Killam Creek"],
+    ["assets/research/tillamook-river/05.jpg", "Map 3m — Bewley Creek"],
+    ["assets/research/tillamook-river/06.jpg", "Habitat Assessment and Limiting Factors Analysis"],
+    ["assets/research/tillamook-river/07.jpg", "Habitat Assessment and Limiting Factors Analysis"],
+    ["assets/research/tillamook-river/08.jpg", "Page 102"],
+    ["assets/research/tillamook-river/09.jpg", "Map 3h — Simmons Creek"],
+    ["assets/research/tillamook-river/10.jpg", "Map 3b — Mainstem Tillamook"]
+  ],
+  necanicum: [
+    ["assets/research/necanicum/01.jpg", "Neacoxie public ownership"],
+    ["assets/research/necanicum/02.jpg", "Neacoxie wetlands"],
+    ["assets/research/necanicum/03.jpg", "Necanicum and Neacoxie properties"],
+    ["assets/research/necanicum/04.jpg", "Necanicum vegetation"],
+    ["assets/research/necanicum/05.jpg", "Necanicum geology"],
+    ["assets/research/necanicum/06.jpg", "Necanicum mass movement"],
+    ["assets/research/necanicum/07.jpg", "Necanicum potential contamination"],
+    ["assets/research/necanicum/08.jpg", "Necanicum public ownership"],
+    ["assets/research/necanicum/09.jpg", "Necanicum roads"],
+    ["assets/research/necanicum/10.jpg", "Necanicum wetlands"]
+  ],
+  nhmp: [
+    ["assets/research/nhmp/01.jpg", "Tillamook County Natural Hazard Mitigation Plan"],
+    ["assets/research/nhmp/02.jpg", "Tillamook County Natural Hazard Mitigation Plan, 2017"],
+    ["assets/research/nhmp/03.jpg", "Page 25"],
+    ["assets/research/nhmp/04.jpg", "Page 30"],
+    ["assets/research/nhmp/05.jpg", "Tillamook County Natural Hazard Mitigation Plan"]
+  ]
+};
 
 const WEBSHOTS = [
   "assets/web/site-01.jpg",
@@ -627,8 +743,7 @@ const CERTS = [
 const AWARDS = [
   ["Recology Artist Residency", "Astoria Visual Arts Alliance, 2018"],
   ["Arts Research Travel Grant", "University of Oregon, 2017"],
-  ["Studio Art Scholarship", "Otis College of Art and Design, 2002"],
-  ["Studio Art Scholarship", "Pratt, 2002 (declined)"]
+  ["Studio Art Scholarship", "Otis College of Art and Design, 2002"]
 ];
 
 const SERVICE = [
@@ -649,40 +764,40 @@ const TALKS = [
 ];
 
 const PIONEER_PIECES = [
-  ["Author archive", "Cara Mico, assistant editor. The Pioneer author page mixes other writers — sample Cara bylines hang beside this card.", "https://www.tillamookcountypioneer.net/author/assistant-editor/"],
+  ["Author archive", "Cara Mico, assistant editor. The Pioneer author page mixes other writers — sample Cara bylines hang beside this card.", "https://www.tillamookcountypioneer.net/author/assistant-editor/", "assets/news/pioneer-archive.jpg"],
   ["A New View: Space", "By Cara Mico. Hubble, JWST, and whether colonization is realistic.", "https://www.tillamookcountypioneer.net/a-new-view-space/"],
-  ["Space Just Got a Little Closer", "By Cara Mico, Assistant Editor. A Pioneer science piece on nearer space.", "https://www.tillamookcountypioneer.net/space-just-got-a-little-closer/"],
+  ["Space Just Got a Little Closer", "By Cara Mico, Assistant Editor. A Pioneer science piece on nearer space.", "https://www.tillamookcountypioneer.net/space-just-got-a-little-closer/", "assets/news/pioneer-space-just-got-a-little-closer.jpg"],
   ["The Return of Sea Otters to Haystack Rock", "By Cara Mico. Sea otters returning to Haystack Rock.", "https://www.tillamookcountypioneer.net/the-return-of-sea-otters-to-haystack-rock/"],
   ["Understanding AI Language Models", "By Cara Mico. An introductory guide to AI language models.", "https://www.tillamookcountypioneer.net/understanding-ai-language-models-an-introductory-guide/"],
   ["Climate Change on the Oregon Coast", "By Cara Mico. A three-part series on climate change on the Oregon coast.", "https://www.tillamookcountypioneer.net/climate-change-on-the-oregon-coast-3-part-series/"],
   ["Near Space Corporation in Tillamook", "By Cara Mico, Assistant Editor. Near Space Corporation test flights out of Tillamook.", "https://www.tillamookcountypioneer.net/near-space-corporation-in-tillamook-bringing-humans-closer-to-the-void/"],
   ["On the Future of Artificial Intelligence", "By Cara Mico, Assistant Editor. How AI can help humanity.", "https://www.tillamookcountypioneer.net/on-the-future-of-artificial-intelligence-and-how-it-can-help-humanity/"],
   ["Spy vs. Spy — Balloon War", "By Cara Mico, Assistant Editor. Balloon incidents and sky news.", "https://www.tillamookcountypioneer.net/spy-vs-spy-balloon-war/"],
-  ["The Data of Immigration", "By Cara Mico, Assistant Editor. A data look at immigration.", "https://www.tillamookcountypioneer.net/the-data-of-immigration/"],
+  ["The Data of Immigration", "By Cara Mico, Assistant Editor. A data look at immigration.", "https://www.tillamookcountypioneer.net/the-data-of-immigration/", "assets/news/pioneer-data-of-immigration.jpg"],
   ["Homelessness in Tillamook County and on the West Coast", "By Cara Mico, Assistant Editor. How Tillamook County diverges from larger West Coast cities.", "https://www.tillamookcountypioneer.net/homelessness-in-tillamook-county-and-on-the-west-coast/"],
   ["A Hidden Gem: The Minor Peak of Saddle Mountain", "Posted by Cara Mico, Assistant Editor. The minor peak of Saddle Mountain in Oregon’s coastal range.", "https://www.tillamookcountypioneer.net/a-hidden-gem-the-minor-peak-of-saddle-mountain/"]
 ];
 
 const SEASIDE_PIECES = [
-  ["Hum and Swish", "Seaside Signal, September 21, 2019", "https://seasidesignal.com/2019/09/21/hum-and-swish/"],
-  ["Cleaning up on the diamond", "Seaside Signal, September 18, 2019", "https://seasidesignal.com/2019/09/18/cleaning-up-on-the-diamond/"],
-  ["Preparedness forum invites community involvement", "Seaside Signal, September 10, 2019", "https://seasidesignal.com/2019/09/10/preparedness-forum-invites-community-involvement/"],
-  ["Pickleball headed to Gearhart", "Seaside Signal, August 27, 2019", "https://seasidesignal.com/2019/08/27/pickleball-headed-to-gearhart/"],
-  ["Jeepers creepers, birding event at Circle Creek", "Seaside Signal, August 13, 2019", "https://seasidesignal.com/2019/08/13/jeepers-creepers-birding-event-at-circle-creek/"],
-  ["Social justice motivates artist May Wallace", "Seaside Signal, August 2, 2019", "https://seasidesignal.com/2019/08/02/social-justice-motivates-artist-may-wallace/"],
-  ["NCLC volunteers go deep into the weeds", "Seaside Signal, August 1, 2019", "https://seasidesignal.com/2019/08/01/nclc-volunteers-go-deep-into-the-weeds/"],
-  ["Fresh picked! Farmers Market in Seaside", "Seaside Signal, July 25, 2019", "https://seasidesignal.com/2019/07/25/fresh-picked-farmers-market-in-seaside/"],
-  ["Making ‘scents’ at Beach Books", "Seaside Signal, July 9, 2019", "https://seasidesignal.com/2019/07/09/making-scents-at-beach-books/"],
-  ["Hypertufa workshop promotes local species", "Seaside Signal, July 1, 2019", "https://seasidesignal.com/2019/07/01/hypertufa-workshop-promotes-local-species/"],
-  ["Ode to the Tides", "Seaside Signal, June 19, 2019", "https://seasidesignal.com/2019/06/19/ode-to-the-tides/"],
-  ["The food all around us", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/the-food-all-around-us/"],
-  ["‘Preserving pollinators’ on the North Coast", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/preserving-pollinators-on-the-north-coast/"],
-  ["Firehouse committee zeroes in on High Point site", "Seaside Signal, May 22, 2019", "https://seasidesignal.com/2019/05/22/firehouse-committee-zeroes-in-on-high-point-site/"],
-  ["Sparking change, one piece of plastic at a time", "Seaside Signal, May 21, 2019", "https://seasidesignal.com/2019/05/21/sparking-change-one-piece-of-plastic-at-a-time/"]
+  ["Hum and Swish", "Seaside Signal, September 21, 2019", "https://seasidesignal.com/2019/09/21/hum-and-swish/", "assets/news/signal-hum-and-swish.jpg"],
+  ["Cleaning up on the diamond", "Seaside Signal, September 18, 2019", "https://seasidesignal.com/2019/09/18/cleaning-up-on-the-diamond/", "assets/news/signal-cleaning-up-diamond.jpg"],
+  ["Preparedness forum invites community involvement", "Seaside Signal, September 10, 2019", "https://seasidesignal.com/2019/09/10/preparedness-forum-invites-community-involvement/", "assets/news/signal-preparedness-forum.jpg"],
+  ["Pickleball headed to Gearhart", "Seaside Signal, August 27, 2019", "https://seasidesignal.com/2019/08/27/pickleball-headed-to-gearhart/", "assets/news/signal-pickleball.jpg"],
+  ["Jeepers creepers, birding event at Circle Creek", "Seaside Signal, August 13, 2019", "https://seasidesignal.com/2019/08/13/jeepers-creepers-birding-event-at-circle-creek/", "assets/news/signal-jeepers-creepers.jpg"],
+  ["Social justice motivates artist May Wallace", "Seaside Signal, August 2, 2019", "https://seasidesignal.com/2019/08/02/social-justice-motivates-artist-may-wallace/", "assets/news/signal-may-wallace.jpg"],
+  ["NCLC volunteers go deep into the weeds", "Seaside Signal, August 1, 2019", "https://seasidesignal.com/2019/08/01/nclc-volunteers-go-deep-into-the-weeds/", "assets/news/signal-nclc-weeds.jpg"],
+  ["Fresh picked! Farmers Market in Seaside", "Seaside Signal, July 25, 2019", "https://seasidesignal.com/2019/07/25/fresh-picked-farmers-market-in-seaside/", "assets/news/signal-farmers-market.jpg"],
+  ["Making ‘scents’ at Beach Books", "Seaside Signal, July 9, 2019", "https://seasidesignal.com/2019/07/09/making-scents-at-beach-books/", "assets/news/signal-beach-books.jpg"],
+  ["Hypertufa workshop promotes local species", "Seaside Signal, July 1, 2019", "https://seasidesignal.com/2019/07/01/hypertufa-workshop-promotes-local-species/", "assets/news/signal-hypertufa.jpg"],
+  ["Ode to the Tides", "Seaside Signal, June 19, 2019", "https://seasidesignal.com/2019/06/19/ode-to-the-tides/", "assets/news/signal-ode-to-the-tides.jpg"],
+  ["The food all around us", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/the-food-all-around-us/", "assets/news/signal-food-all-around.jpg"],
+  ["‘Preserving pollinators’ on the North Coast", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/preserving-pollinators-on-the-north-coast/", "assets/news/signal-preserving-pollinators.jpg"],
+  ["Firehouse committee zeroes in on High Point site", "Seaside Signal, May 22, 2019", "https://seasidesignal.com/2019/05/22/firehouse-committee-zeroes-in-on-high-point-site/", "assets/news/signal-firehouse.jpg"],
+  ["Sparking change, one piece of plastic at a time", "Seaside Signal, May 21, 2019", "https://seasidesignal.com/2019/05/21/sparking-change-one-piece-of-plastic-at-a-time/", "assets/news/signal-sparking-change.jpg"]
 ];
 
 const GAZETTE_PIECES = [
-  ["Program seeks to protect puffin population", "Cannon Beach Gazette, March 16, 2019. Gazette URL is 404. Sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.", "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/"],
+  ["Program seeks to protect puffin population", "Cannon Beach Gazette, March 16, 2019. Gazette URL is 404. Sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.", "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/", "assets/news/gazette-puffin.jpg"],
   ["Preparation is the Watchword", "Cannon Beach Gazette, May 3, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
   ["Beauty and the Beast at Coaster Theater Spring Camp", "Cannon Beach Gazette, May 2, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
   ["Site Plan for Larger Tree Work Required", "Cannon Beach Gazette, April 17, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
@@ -708,10 +823,10 @@ const GAZETTE_PIECES = [
 ];
 
 const HIPFISH = [
-  ["When Albums Were Art", "HipFish Monthly, July 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/07/716.pdf"],
-  ["Of Dust and the River: Tim Hurd", "HipFish Monthly, October 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/10/1016.pdf"],
-  ["The New NCRD Theater", "HipFish Monthly, January 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/01/117.pdf"],
-  ["Riverbend Players / Cole Porter", "HipFish Monthly, May 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/05/517.pdf"]
+  ["When Albums Were Art", "HipFish Monthly, July 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/07/716.pdf", "assets/news/hipfish-716.jpg"],
+  ["Of Dust and the River: Tim Hurd", "HipFish Monthly, October 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/10/1016.pdf", "assets/news/hipfish-1016.jpg"],
+  ["The New NCRD Theater", "HipFish Monthly, January 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/01/117.pdf", "assets/news/hipfish-117.jpg"],
+  ["Riverbend Players / Cole Porter", "HipFish Monthly, May 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/05/517.pdf", "assets/news/hipfish-517.jpg"]
 ];
 
 const MERCURY = [
@@ -736,7 +851,7 @@ const cam = {
   pos: new THREE.Vector3(0, 12, 32),
   vel: new THREE.Vector3()
 };
-const bounds = { x: [-280, 380], y: [-52, 120], z: [-280, 400] };
+const bounds = { x: [-320, 380], y: [-52, 120], z: [-280, 420] };
 
 function smoothstep(k) {
   k = THREE.MathUtils.clamp(k, 0, 1);
@@ -826,6 +941,47 @@ function makeCard(title, body) {
     new THREE.PlaneGeometry(7.2, 4.5),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
   );
+}
+
+function makeClipCard(title, body, tex) {
+  const w = 1024, h = 720;
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "rgba(12,20,24,0.92)";
+  ctx.fillRect(0, 0, w, h);
+  if (tex && tex.image) {
+    const img = tex.image;
+    const boxW = w - 16, boxH = 430;
+    const ia = img.width / img.height;
+    const ba = boxW / boxH;
+    let dw, dh;
+    if (ia > ba) { dw = boxW; dh = boxW / ia; }
+    else { dh = boxH; dw = boxH * ia; }
+    const dx = 8 + (boxW - dw) / 2;
+    const dy = 8 + (boxH - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+  ctx.strokeStyle = "rgba(42,168,160,0.75)";
+  ctx.lineWidth = 5;
+  ctx.strokeRect(4, 4, w - 8, h - 8);
+  ctx.fillStyle = "#d4b05a";
+  ctx.font = "600 40px Georgia, serif";
+  ctx.textAlign = "left";
+  wrapLeft(ctx, title, 40, 478, w - 80, 46, 2);
+  ctx.fillStyle = "#e8efe8";
+  ctx.font = "28px Georgia, serif";
+  wrapLeft(ctx, body, 40, 578, w - 80, 36, 3);
+  const canvasTex = new THREE.CanvasTexture(c);
+  canvasTex.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(7.2, 5.05),
+    new THREE.MeshBasicMaterial({ map: canvasTex, transparent: true, side: THREE.DoubleSide })
+  );
+}
+
+function faceArrival(mesh) {
+  mesh.rotation.y = Math.PI;
 }
 
 function wrapLeft(ctx, text, x, y, max, lh, maxLines) {
@@ -1184,8 +1340,8 @@ function placeClickCard(mesh, regionId, extra) {
   clickables.push(mesh);
 }
 
-function hallCard(piece, hrefLabel) {
-  const m = makeCard(piece[0], piece[1]);
+function hallCard(piece, hrefLabel, tex) {
+  const m = tex ? makeClipCard(piece[0], piece[1], tex) : makeCard(piece[0], piece[1]);
   return { mesh: m, extra: {
     title: piece[0],
     body: piece[1],
@@ -1194,15 +1350,22 @@ function hallCard(piece, hrefLabel) {
   } };
 }
 
-function populateJournalism() {
-  const origin = REGIONS.find((r) => r.id === "journalism").pos;
-  const ox = origin[0], oy = origin[1], oz = origin[2];
+async function loadOptional(url) {
+  if (!url) return null;
+  try { return await loadTexture(url); }
+  catch (err) { return null; }
+}
+
+async function populateJournalism() {
+  const region = REGIONS.find((r) => r.id === "journalism");
+  const ox = region.look[0], oy = region.look[1], oz = region.look[2];
 
   const intro = makeCard(
     "Tillamook County Pioneer",
     "Assistant editor, 2022–present. The author archive mixes other writers. Sample Cara Mico bylines are the cards in this hall — click any card for the live piece."
   );
-  intro.position.set(ox - 14, oy + 2, oz + 16);
+  intro.position.set(ox - 14, oy + 2, oz);
+  faceArrival(intro);
   placeClickCard(intro, "journalism", {
     title: "Tillamook County Pioneer",
     body: "Assistant editor since June 2022. Live Cara bylines only — the Pioneer author page also lists other writers.",
@@ -1211,66 +1374,83 @@ function populateJournalism() {
     links: PIONEER_PIECES.map(([t, , u]) => [t, u])
   });
 
-  PIONEER_PIECES.forEach((piece, i) => {
-    const { mesh, extra } = hallCard(piece, "Open this Pioneer piece");
+  for (let i = 0; i < PIONEER_PIECES.length; i++) {
+    const piece = PIONEER_PIECES[i];
+    const tex = await loadOptional(piece[3]);
+    const { mesh, extra } = hallCard(piece, "Open this Pioneer piece", tex);
     const col = i % 4;
     const row = Math.floor(i / 4);
-    mesh.position.set(ox - 18 + col * 12, oy + 3 - row * 6.8, oz + 32);
+    mesh.position.set(ox - 18 + col * 12, oy + 3 - row * 6.8, oz + 16);
+    faceArrival(mesh);
     placeClickCard(mesh, "journalism", extra);
-  });
+  }
 
   const seasideIntro = makeCard(
     "Seaside Signal — 2019",
     "Fifteen live bylines from the 2019 Signal list. Each card opens the published story."
   );
-  seasideIntro.position.set(ox, oy + 8, oz + 62);
+  seasideIntro.position.set(ox, oy + 8, oz + 48);
+  faceArrival(seasideIntro);
   placeClickCard(seasideIntro, "journalism", {
     title: "Seaside Signal, 2019",
     body: "Fifteen verified live stories. Click a card or use the links in this panel.",
     links: SEASIDE_PIECES.map(([t, , u]) => [t, u])
   });
 
-  SEASIDE_PIECES.forEach((piece, i) => {
-    const { mesh, extra } = hallCard(piece, "Open this Signal story");
+  for (let i = 0; i < SEASIDE_PIECES.length; i++) {
+    const piece = SEASIDE_PIECES[i];
+    const tex = await loadOptional(piece[3]);
+    const { mesh, extra } = hallCard(piece, "Open this Signal story", tex);
     const col = i % 5;
     const row = Math.floor(i / 5);
-    mesh.position.set(ox - 24 + col * 12, oy + 3 - row * 6.8, oz + 78);
+    mesh.position.set(ox - 24 + col * 12, oy + 3 - row * 6.8, oz + 64);
+    faceArrival(mesh);
     placeClickCard(mesh, "journalism", extra);
-  });
+  }
 
-  HIPFISH.forEach((piece, i) => {
-    const { mesh, extra } = hallCard(piece, "Open this HipFish issue PDF");
-    mesh.position.set(ox - 16 + (i % 2) * 16, oy + 2 - Math.floor(i / 2) * 6.4, oz + 108);
+  for (let i = 0; i < HIPFISH.length; i++) {
+    const piece = HIPFISH[i];
+    const tex = await loadOptional(piece[3]);
+    const { mesh, extra } = hallCard(piece, "Open this HipFish issue PDF", tex);
+    mesh.position.set(ox - 16 + (i % 2) * 16, oy + 2 - Math.floor(i / 2) * 6.4, oz + 94);
+    faceArrival(mesh);
     placeClickCard(mesh, "journalism", extra);
-  });
+  }
 
-  MERCURY.forEach((piece, i) => {
-    const { mesh, extra } = hallCard(piece, "Open this Mercury story");
-    mesh.position.set(ox - 10 + i * 16, oy + 2, oz + 128);
+  for (let i = 0; i < MERCURY.length; i++) {
+    const piece = MERCURY[i];
+    const tex = await loadOptional(piece[3]);
+    const { mesh, extra } = hallCard(piece, "Open this Mercury story", tex);
+    mesh.position.set(ox - 10 + i * 16, oy + 2, oz + 114);
+    faceArrival(mesh);
     placeClickCard(mesh, "journalism", extra);
-  });
+  }
 
   const freelance = makeCard(
     "Freelance newspapers, since 2012",
     "From the Experience page: arts, environment, and emergency preparedness since November 2012. Papers in this room are the CV set — Pioneer, Seaside Signal, Cannon Beach Gazette, HipFish Monthly, and the Portland Mercury."
   );
-  freelance.position.set(ox, oy - 4, oz + 144);
+  freelance.position.set(ox, oy - 4, oz + 130);
+  faceArrival(freelance);
   placeClickCard(freelance, "journalism", {
     title: "Freelance journalist, Nov 2012–present",
     body: "Arts, environment, and emergency preparedness. Assistant editor at the Tillamook County Pioneer. Other papers named here are from the published CV only."
   });
 }
 
-function populateGazette() {
-  const origin = REGIONS.find((r) => r.id === "gazette").pos;
-  const ox = origin[0], oy = origin[1], oz = origin[2];
-  GAZETTE_PIECES.forEach((piece, i) => {
-    const { mesh, extra } = hallCard(piece, piece[2] ? "Open the Gazette puffin reprint" : "");
+async function populateGazette() {
+  const region = REGIONS.find((r) => r.id === "gazette");
+  const ox = region.look[0], oy = region.look[1], oz = region.look[2];
+  for (let i = 0; i < GAZETTE_PIECES.length; i++) {
+    const piece = GAZETTE_PIECES[i];
+    const tex = await loadOptional(piece[3]);
+    const { mesh, extra } = hallCard(piece, piece[2] ? "Open the Gazette puffin reprint" : "", tex);
     const col = i % 5;
     const row = Math.floor(i / 5);
-    mesh.position.set(ox - 24 + col * 12, oy + 4 - row * 6.8, oz + 14);
+    mesh.position.set(ox - 24 + col * 12, oy + 4 - row * 6.8, oz);
+    faceArrival(mesh);
     placeClickCard(mesh, "gazette", extra);
-  });
+  }
 }
 
 function populateCredentials() {
@@ -1425,6 +1605,33 @@ function populateResearchCard(id) {
   });
 }
 
+async function explodeResearch(id, figs) {
+  const r = REGIONS.find((x) => x.id === id);
+  if (!r || !figs.length) return;
+  const [lx, ly, lz] = r.look;
+  const texs = await Promise.all(figs.map(([u]) => loadTexture(u)));
+  texs.forEach((tex, i) => {
+    const plane = imagePlane(tex, 6.2);
+    const a = (i / figs.length) * Math.PI * 1.7 - 0.85;
+    const rad = 13;
+    plane.position.set(
+      lx + Math.cos(a) * rad,
+      ly + ((i % 3) - 1) * 3.1,
+      lz + Math.sin(a) * rad * 0.5
+    );
+    plane.lookAt(r.pos[0], r.pos[1], r.pos[2]);
+    plane.userData.regionId = id;
+    plane.userData.title = figs[i][1];
+    scene.add(plane);
+    clickables.push(plane);
+    const cap = makeLabel(figs[i][1], { w: 900, h: 160, pw: 5.2, ph: 0.85, font: "500 38px Georgia, serif" });
+    cap.position.copy(plane.position);
+    cap.position.y -= 3.6;
+    cap.lookAt(r.pos[0], r.pos[1], r.pos[2]);
+    scene.add(cap);
+  });
+}
+
 async function populate() {
   REGIONS.forEach(addBeacon);
   addWorldGuides();
@@ -1458,27 +1665,16 @@ async function populate() {
     scene.add(cap);
   });
 
-  const artOrigin = REGIONS.find((r) => r.id === "art").pos;
+  const artLook = REGIONS.find((r) => r.id === "art").look;
   const artTex = await Promise.all(ARTWORKS.map(([u]) => loadTexture(u)));
   artTex.forEach((tex, i) => {
-    const cols = 5;
+    const cols = 8;
     const col = i % cols;
     const row = Math.floor(i / cols);
     hangArt(tex, ARTWORKS[i][1], "art", [
-      artOrigin[0] - 24 + col * 10.4,
-      artOrigin[1] + 10 - row * 8.6,
-      artOrigin[2] - 18 - (row % 2) * 5
-    ]);
-  });
-
-  const moonOrigin = REGIONS.find((r) => r.id === "moons").pos;
-  const moonTex = await Promise.all(MOON_ART.map(([u]) => loadTexture(u)));
-  moonTex.forEach((tex, i) => {
-    const ang = (i / MOON_ART.length) * Math.PI * 2;
-    hangArt(tex, MOON_ART[i][1], "moons", [
-      moonOrigin[0] + Math.cos(ang) * 16,
-      moonOrigin[1] + Math.sin(i) * 1.6,
-      moonOrigin[2] - 8 + Math.sin(ang) * 16
+      artLook[0] - 37 + col * 10.6,
+      artLook[1] + 16 - row * 8.2,
+      artLook[2] - 4 - (row % 2) * 7 - (col % 2) * 3
     ]);
   });
 
@@ -1513,9 +1709,18 @@ async function populate() {
     scene.add(plaque);
     clickables.push(plaque);
   });
+  const moonWidget = makeCard(
+    "Moon-phase widget",
+    "A client website object — a moon-phase display built for a commissioned site. Those photographs are not studio art and are not hung in the loft."
+  );
+  moonWidget.position.set(webOrigin[0] + 18, webOrigin[1] + 2, webOrigin[2] - 8);
+  placeClickCard(moonWidget, "websites", {
+    title: "Moon-phase widget",
+    body: "A moon-phase widget made as a website/client object. The phase photographs were for that widget, not Fine Art."
+  });
 
-  populateJournalism();
-  populateGazette();
+  await populateJournalism();
+  await populateGazette();
   populateCredentials();
   populateAwards();
   populateIloa();
@@ -1525,6 +1730,10 @@ async function populate() {
   populateContracts();
 
   ["willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"].forEach(populateResearchCard);
+
+  for (const id of Object.keys(RESEARCH_FIGS)) {
+    await explodeResearch(id, RESEARCH_FIGS[id]);
+  }
 
   const arrival = makeLabel("Art west  ·  Research east  ·  Writing north  ·  Credentials above", {
     w: 1800, h: 220, pw: 22, ph: 2.4, font: "500 48px Georgia, serif"
