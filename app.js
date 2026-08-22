@@ -998,6 +998,11 @@ let bubbleCool = 0;
 const bubbles = [];
 const clock = new THREE.Clock();
 const _billboardAt = new THREE.Vector3();
+const _worldUp = new THREE.Vector3(0, 1, 0);
+const _camRight = new THREE.Vector3();
+const _camTrueUp = new THREE.Vector3();
+const _camBack = new THREE.Vector3();
+const _camMat = new THREE.Matrix4();
 const cam = {
   pos: new THREE.Vector3(0, 15, -72),
   vel: new THREE.Vector3()
@@ -2357,7 +2362,7 @@ function addRackWall(x, y, z, rotY, lintel) {
 }
 
 function addArrivalAnchors() {
-  addPortico(-42, 0, -6, 0, "STUDIO");
+  addPortico(-42, 0, -6, 0, "PLAZA");
   addRackWall(46, 0, 18, Math.PI, "RESEARCH");
   addPortico(0, 0, 54, Math.PI / 2, "WRITING");
 }
@@ -2604,8 +2609,8 @@ function bindInput() {
     if (e.deltaMode === 1) dy *= 16;
     if (e.deltaMode === 2) dy *= 400;
     dy = THREE.MathUtils.clamp(dy, -140, 140);
-    scrollBoost += -dy * 0.022;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -10, 10);
+    scrollBoost += -dy * 0.012;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -4, 4);
   }, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
@@ -2685,7 +2690,13 @@ function tick() {
 
   const aim = lookDir();
   camera.position.copy(cam.pos);
-  camera.lookAt(cam.pos.x + aim.x * 20, cam.pos.y + aim.y * 20, cam.pos.z + aim.z * 20);
+  _camRight.crossVectors(_worldUp, aim);
+  if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
+  else _camRight.normalize();
+  _camTrueUp.crossVectors(aim, _camRight).normalize();
+  _camBack.copy(aim).negate();
+  _camMat.makeBasis(_camRight, _camTrueUp, _camBack);
+  camera.quaternion.setFromRotationMatrix(_camMat);
 
   updateShip(dt);
   updateBubbles(dt);
