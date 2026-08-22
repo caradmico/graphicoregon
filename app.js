@@ -46,7 +46,7 @@ const REGIONS = [
     noBeacon: true,
     meta: "Lobby",
     title: "Lobby",
-    body: "Dark ink halls, teal rim light, gold labels. Corridors run north to portraits, south to still life and the gift shop, and west toward coast, prints, and the studio.",
+    body: "West studio halls. Corridors run north to portraits, south to still life and the gift shop, and west toward coast, prints, and the studio.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
   },
@@ -1041,9 +1041,13 @@ const MERCURY = [
 
 const clickables = [];
 const SHOP_CLICK_RANGE = 8;
-const OUTDOOR_AMBIENT = 0.58;
-const INDOOR_AMBIENT = 1.08;
-let scene, camera, renderer, avatar, shipMesh, suitMesh, sceneAmbient;
+const OUTDOOR_AMBIENT = 0.34;
+const INDOOR_AMBIENT = 0.16;
+const OUTDOOR_HEMI = 0.44;
+const INDOOR_HEMI = 0.08;
+const OUTDOOR_KEY = 0.3;
+const INDOOR_KEY = 0.05;
+let scene, camera, renderer, avatar, shipMesh, suitMesh, sceneAmbient, sceneHemi, sceneKey;
 let lookYaw = 0;
 let lookPitch = -0.12;
 let dragging = false;
@@ -1147,6 +1151,8 @@ function applyIndoorCamera(dt) {
   if (sceneAmbient) {
     sceneAmbient.intensity = THREE.MathUtils.lerp(OUTDOOR_AMBIENT, INDOOR_AMBIENT, indoorBlend);
   }
+  if (sceneHemi) sceneHemi.intensity = THREE.MathUtils.lerp(OUTDOOR_HEMI, INDOOR_HEMI, indoorBlend);
+  if (sceneKey) sceneKey.intensity = THREE.MathUtils.lerp(OUTDOOR_KEY, INDOOR_KEY, indoorBlend);
   if (indoorBlend < 0.01) return;
   const targetY = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
   cam.pos.y += (targetY - cam.pos.y) * indoorBlend * (1 - Math.exp(-dt * 7.5));
@@ -2189,12 +2195,13 @@ async function explodeResearch(id, figs) {
 }
 
 
-const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x1c2a32 });
-const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x162028 });
-const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x121a20 });
-const STUDIO_TEAL = new THREE.MeshBasicMaterial({ color: teal });
-const STUDIO_GOLD = new THREE.MeshBasicMaterial({ color: gold });
-const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x161e24 });
+const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x6e7c74 });
+const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x3a443e });
+const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x526058 });
+const STUDIO_TEAL = new THREE.MeshLambertMaterial({ color: 0x2a5854 });
+const STUDIO_GOLD = new THREE.MeshLambertMaterial({ color: 0x7a6640 });
+const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x1c1e1a });
+const STUDIO_FRAME = new THREE.MeshLambertMaterial({ color: 0x3a3832 });
 
 function musBox(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -2231,19 +2238,17 @@ function framedArt(tex, maxW, rotDeg) {
   const w = aspect >= 1 ? maxW : maxW * aspect;
   const h = aspect >= 1 ? maxW / aspect : maxW;
   const g = new THREE.Group();
-  const back = musBox(w + 0.22, h + 0.22, 0.08, STUDIO_GOLD);
-  back.position.z = -0.06;
-  const plate = musBox(w + 0.04, h + 0.04, 0.03, STUDIO_DARK);
-  plate.position.z = -0.02;
+  const back = musBox(w + 0.18, h + 0.18, 0.07, STUDIO_FRAME);
+  back.position.z = -0.05;
+  const plate = musBox(w + 0.03, h + 0.03, 0.03, STUDIO_DARK);
+  plate.position.z = -0.015;
   const pic = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    bothSides(new THREE.MeshStandardMaterial({
+    bothSides(new THREE.MeshLambertMaterial({
       map,
       emissive: 0xffffff,
       emissiveMap: map,
-      emissiveIntensity: 0.78,
-      roughness: 0.92,
-      metalness: 0
+      emissiveIntensity: 0.45
     }))
   );
   pic.position.z = 0.01;
@@ -2268,9 +2273,9 @@ function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
   const cap = makeLabel(title, {
     w: 900, h: 140, pw: 3.4, ph: 0.55,
     font: "500 40px Georgia, serif",
-    color: "#e8d29a",
-    stroke: "rgba(212,176,90,0.85)",
-    bg: "rgba(10,16,20,0.82)"
+    color: "#c8d4cc",
+    stroke: "rgba(42,80,76,0.35)",
+    bg: "rgba(10,16,14,0.55)"
   });
   cap.position.set(pos[0], pos[1] - 2.15, pos[2]);
   cap.rotation.y = rotY;
@@ -2317,9 +2322,9 @@ function hallTitle(text, pos, rotY) {
   const lab = makeLabel(text, {
     w: 1400, h: 220, pw: 8.6, ph: 1.3,
     font: "600 64px Georgia, serif",
-    color: "#e8d29a",
-    stroke: "rgba(42,168,160,0.7)",
-    bg: "rgba(10,16,20,0.55)"
+    color: "#d4ddd6",
+    stroke: "rgba(42,80,76,0.4)",
+    bg: "rgba(10,16,14,0.4)"
   });
   lab.position.set(...pos);
   lab.rotation.y = rotY || 0;
@@ -2394,16 +2399,22 @@ function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
   rimHall(x0, x1, z0, z1, y0, y1);
 }
 
+function aimStudioDir(color, intensity, from, to) {
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(from[0], from[1], from[2]);
+  light.target.position.set(to[0], to[1], to[2]);
+  studioParent().add(light);
+  studioParent().add(light.target);
+  return light;
+}
+
 function addStudioGalleryLight() {
-  const hemi = new THREE.HemisphereLight(0xeaf6f4, 0x1a2830, 2.1);
+  const hemi = new THREE.HemisphereLight(0xf0eee4, 0x3a443c, 1.35);
   studioParent().add(hemi);
-  const skylight = new THREE.DirectionalLight(0xfff6e8, 1.2);
-  skylight.position.set(ax(-200), 22, 6);
-  studioParent().add(skylight);
-  const fill = new THREE.DirectionalLight(0xc8e8e4, 0.48);
-  fill.position.set(ax(-168), 11, -20);
-  studioParent().add(fill);
-  const studioAmbient = new THREE.AmbientLight(0xa8c4c0, 0.62);
+  aimStudioDir(0xf3efe4, 0.82, [-188, 20, 22], [-220, 1, -18]);
+  aimStudioDir(0xdce6e0, 0.42, [-150, 10, 0], [-220, 4, 0]);
+  aimStudioDir(0xe8e4d8, 0.34, [-207, 12, 48], [-207, 4, -28]);
+  const studioAmbient = new THREE.AmbientLight(0xc4d0c8, 0.55);
   studioParent().add(studioAmbient);
 }
 
@@ -3302,18 +3313,11 @@ async function main() {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   sceneAmbient = new THREE.AmbientLight(0x6f8a88, OUTDOOR_AMBIENT);
   scene.add(sceneAmbient);
-  const key = new THREE.PointLight(0x2aa8a0, 22, 140);
-  key.position.set(8, 22, 16);
-  scene.add(key);
-  const rim = new THREE.PointLight(0xd4b05a, 16, 180);
-  rim.position.set(-40, 28, -20);
-  scene.add(rim);
-  const east = new THREE.PointLight(0x2aa8a0, 20, 340);
-  east.position.set(rx(220), 8, 10);
-  scene.add(east);
-  const far = new THREE.PointLight(0xd4b05a, 14, 260);
-  far.position.set(ax(-150), 22, 0);
-  scene.add(far);
+  sceneHemi = new THREE.HemisphereLight(0x7a9a96, 0x0c1416, OUTDOOR_HEMI);
+  scene.add(sceneHemi);
+  sceneKey = new THREE.DirectionalLight(0xd0e0dc, OUTDOOR_KEY);
+  sceneKey.position.set(40, 80, -60);
+  scene.add(sceneKey);
 
   addStars();
   setupNav();
@@ -3327,6 +3331,7 @@ async function main() {
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
     renderer.setSize(innerWidth, innerHeight);
   });
   tick();
