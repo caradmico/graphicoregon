@@ -1070,9 +1070,9 @@ function bindInput() {
     let dy = e.deltaY;
     if (e.deltaMode === 1) dy *= 16;
     if (e.deltaMode === 2) dy *= 400;
-    dy = THREE.MathUtils.clamp(dy, -28, 28);
-    scrollBoost += -dy * 0.011;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -6.5, 6.5);
+    dy = THREE.MathUtils.clamp(dy, -18, 18);
+    scrollBoost += -dy * 0.0035;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -2.2, 2.2);
   }, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
@@ -1126,8 +1126,8 @@ function tick() {
     if (keys.q) cam.vel.y -= speed * 0.75 * dt;
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
     if (scrollBoost) {
-      cam.vel.addScaledVector(dir, scrollBoost * dt * 9);
-      scrollBoost *= Math.exp(-dt * 5.2);
+      cam.vel.addScaledVector(dir, scrollBoost * dt * 5);
+      scrollBoost *= Math.exp(-dt * 6.4);
       if (Math.abs(scrollBoost) < 0.012) scrollBoost = 0;
     }
     cam.vel.multiplyScalar(Math.exp(-dt * 2.15));
