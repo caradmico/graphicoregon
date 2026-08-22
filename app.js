@@ -2822,8 +2822,8 @@ function bindInput() {
     if (e.deltaMode === 2) { dy *= 800; dx *= 800; }
     const unitY = THREE.MathUtils.clamp(dy / 100, -1, 1);
     const unitX = THREE.MathUtils.clamp(dx / 100, -1, 1);
-    scrollBoost -= unitY * 78;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -130, 130);
+    scrollBoost -= unitY * 3;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -12, 12);
     if (Math.abs(dx) > 0.5) {
       strafeBoost += unitX * 62;
       strafeBoost = THREE.MathUtils.clamp(strafeBoost, -110, 110);
