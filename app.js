@@ -10,8 +10,8 @@ const REGIONS = [
     name: "Arrival",
     kind: "intro",
     axis: "South of origin · looking north",
-    pos: [0, 15, -72],
-    look: [0, 8, 22],
+    pos: [0, 22, -140],
+    look: [0, 12, 200],
     meta: "Graphic Oregon",
     title: "Technical design solutions",
     body: "Art west. Research east. Writing north. Credentials above. Websites south.",
@@ -564,6 +564,48 @@ const REGIONS = [
   }
 ];
 
+// Spread wings away from arrival. Rooms, paintings, and cards stay human-sized;
+// only region origins, hops, and world guides move.
+const WORLD_SPREAD = 4;
+const _spreadN = WORLD_SPREAD - 1;
+const ART_SHIFT = [-128 * _spreadN, 0, 0];
+const RESEARCH_SHIFT = [140 * _spreadN, 0, 0];
+const WRITE_SHIFT = [0, 0, 160 * _spreadN];
+const WEB_SHIFT = [0, 0, -148 * _spreadN];
+const CREDS_SHIFT = [0, 50 * _spreadN, 0];
+
+function shiftForKind(kind) {
+  if (kind === "art") return ART_SHIFT;
+  if (kind === "exploded" || kind === "research") return RESEARCH_SHIFT;
+  if (kind === "write") return WRITE_SHIFT;
+  if (kind === "web") return WEB_SHIFT;
+  if (kind === "creds") return CREDS_SHIFT;
+  return [0, 0, 0];
+}
+
+function addShift(p, s) {
+  return [p[0] + s[0], p[1] + s[1], p[2] + s[2]];
+}
+
+function ax(x) { return x + ART_SHIFT[0]; }
+function rx(x) { return x + RESEARCH_SHIFT[0]; }
+function wz(z) { return z + WRITE_SHIFT[2]; }
+function sz(z) { return z + WEB_SHIFT[2]; }
+function cy(y) { return y + CREDS_SHIFT[1]; }
+
+REGIONS.forEach((r) => {
+  const s = shiftForKind(r.kind);
+  r.pos = addShift(r.pos, s);
+  r.look = addShift(r.look, s);
+  if (r.mark) r.mark = addShift(r.mark, s);
+  if (r.hops) {
+    r.hops = r.hops.map((h) => ({
+      pos: addShift(h.pos, s),
+      look: addShift(h.look, s)
+    }));
+  }
+});
+
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
   { label: "Art · west", ids: ["art", "lobby", "portraits", "still-life", "coast", "prints", "studio", "shop"] },
@@ -992,7 +1034,7 @@ let dragging = false;
 let lastX = 0;
 let lastY = 0;
 let keys = {};
-let scrollBoost = 0;
+let scrollBoost = 0; // wheel dolly along look, units/sec — signed, symmetric
 let flight = null;
 let bubbleCool = 0;
 const bubbles = [];
@@ -1004,10 +1046,14 @@ const _camTrueUp = new THREE.Vector3();
 const _camBack = new THREE.Vector3();
 const _camMat = new THREE.Matrix4();
 const cam = {
-  pos: new THREE.Vector3(0, 15, -72),
+  pos: new THREE.Vector3(...REGIONS[0].pos),
   vel: new THREE.Vector3()
 };
-const bounds = { x: [-320, 380], y: [-52, 120], z: [-280, 420] };
+const bounds = {
+  x: [-320 + ART_SHIFT[0] - 120, 380 + RESEARCH_SHIFT[0] + 140],
+  y: [-60, 120 + CREDS_SHIFT[1] + 50],
+  z: [-280 + WEB_SHIFT[2] - 140, 420 + WRITE_SHIFT[2] + 280]
+};
 
 function smoothstep(k) {
   k = THREE.MathUtils.clamp(k, 0, 1);
@@ -1253,30 +1299,30 @@ function addStars() {
   const n = 4200;
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 1600;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 800;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 1600;
+    pos[i * 3] = (Math.random() - 0.5) * 4200;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 1800;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 4200;
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   scene.add(new THREE.Points(g, new THREE.PointsMaterial({
-    color: 0xcfe8e4, size: 0.6, sizeAttenuation: true, transparent: true, opacity: 0.82
+    color: 0xcfe8e4, size: 0.85, sizeAttenuation: true, transparent: true, opacity: 0.82
   })));
 }
 
 function addWorldGuides() {
-  const grid = new THREE.GridHelper(560, 56, 0x1a6f6a, 0x143238);
+  const grid = new THREE.GridHelper(2200, 80, 0x1a6f6a, 0x143238);
   grid.position.y = -28;
   scene.add(grid);
 
   const marks = [
-    ["SKY", 0, 108, 0, 22, 4],
+    ["SKY", 0, cy(108), 0, 22, 4],
     ["GROUND", 0, -36, 0, 18, 3.2],
-    ["ART  ·  WEST  −X", -250, 22, 0, 28, 3.4],
-    ["RESEARCH  ·  EAST  +X", 360, 16, 0, 32, 3.4],
-    ["WRITING  ·  NORTH  +Z", 0, 22, 380, 28, 3.4],
-    ["WEBSITES  ·  SOUTH  −Z", 0, -8, -260, 28, 3.4],
-    ["CREDENTIALS  ·  ABOVE  +Y", 0, 108, -40, 26, 3.2]
+    ["ART  ·  WEST  −X", ax(-250), 22, 0, 28, 3.4],
+    ["RESEARCH  ·  EAST  +X", rx(360), 16, 0, 32, 3.4],
+    ["WRITING  ·  NORTH  +Z", 0, 22, wz(380), 28, 3.4],
+    ["WEBSITES  ·  SOUTH  −Z", 0, -8, sz(-260), 28, 3.4],
+    ["CREDENTIALS  ·  ABOVE  +Y", 0, cy(108), -40, 26, 3.2]
   ];
   marks.forEach(([t, x, y, z, pw, ph]) => {
     const lab = makeLabel(t, {
@@ -1288,13 +1334,18 @@ function addWorldGuides() {
     scene.add(lab);
   });
 
+  const plaza = REGIONS.find((r) => r.id === "art");
+  const research = REGIONS.find((r) => r.id === "iau");
+  const writing = REGIONS.find((r) => r.id === "journalism");
+  const creds = REGIONS.find((r) => r.id === "credentials");
+  const web = REGIONS.find((r) => r.id === "websites");
   const hubs = [
     [0, 8, 0],
-    [-128, 10, 0],
-    [140, 4, 0],
-    [6, 14, 160],
-    [0, 58, -8],
-    [14, -10, -148]
+    plaza.pos,
+    [research.pos[0], 4, 0],
+    writing.pos,
+    creds.pos,
+    web.pos
   ];
   hubs.slice(1).forEach((h) => {
     const g = new THREE.BufferGeometry().setFromPoints([
@@ -1866,10 +1917,20 @@ function musBox(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 }
 
+let studioRoot = null;
+function studioParent() {
+  if (!studioRoot) {
+    studioRoot = new THREE.Group();
+    studioRoot.position.set(ART_SHIFT[0], ART_SHIFT[1], ART_SHIFT[2]);
+    scene.add(studioRoot);
+  }
+  return studioRoot;
+}
+
 function musSlab(x, y, z, w, h, d, mat) {
   const m = musBox(w, h, d, mat || STUDIO_WALL);
   m.position.set(x, y, z);
-  scene.add(m);
+  studioParent().add(m);
   return m;
 }
 
@@ -1909,7 +1970,7 @@ function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
   piece.userData.regionId = regionId;
   piece.userData.title = title;
   piece.userData.stay = true;
-  scene.add(piece);
+  studioParent().add(piece);
   clickables.push(piece);
   const cap = makeLabel(title, {
     w: 900, h: 140, pw: 3.4, ph: 0.55,
@@ -1920,7 +1981,7 @@ function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
   });
   cap.position.set(pos[0], pos[1] - 2.15, pos[2]);
   cap.rotation.y = rotY;
-  scene.add(cap);
+  studioParent().add(cap);
 }
 
 function hangHall(works, hall, regionId) {
@@ -1969,7 +2030,7 @@ function hallTitle(text, pos, rotY) {
   });
   lab.position.set(...pos);
   lab.rotation.y = rotY || 0;
-  scene.add(lab);
+  studioParent().add(lab);
 }
 
 function addDoorway(regionId, pos, rotY, label) {
@@ -1988,7 +2049,7 @@ function addDoorway(regionId, pos, rotY, label) {
   g.position.set(...pos);
   g.rotation.y = rotY || 0;
   g.userData.regionId = regionId;
-  scene.add(g);
+  studioParent().add(g);
   clickables.push(g);
   return g;
 }
@@ -2043,7 +2104,7 @@ function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
 function addStudioLight(x, y, z, color, intensity, dist) {
   const l = new THREE.PointLight(color, intensity, dist);
   l.position.set(x, y, z);
-  scene.add(l);
+  studioParent().add(l);
 }
 
 function makeGarmentStand(tex, kind) {
@@ -2126,7 +2187,7 @@ function buildStudioShell() {
   });
   name.position.set(-154.4, 14.4, 0);
   name.rotation.y = Math.PI / 2;
-  scene.add(name);
+  studioParent().add(name);
 
   // small outdoor sculpture garden
   [[-136, 0, 18], [-136, 0, -18], [-144, 0, 22]].forEach((p, i) => {
@@ -2134,7 +2195,7 @@ function buildStudioShell() {
     const stone = musBox(0.7 + i * 0.08, 1.6 + (i % 2) * 0.5, 0.55, STUDIO_DARK);
     stone.position.set(p[0], 1.7, p[2]);
     stone.rotation.y = 0.2 * i;
-    scene.add(stone);
+    studioParent().add(stone);
   });
 }
 
@@ -2212,10 +2273,10 @@ function populateStudioGeometry() {
 
   const counter = musBox(1.6, 1.15, 5.2, STUDIO_DARK);
   counter.position.set(-159.1, 0.7, -24.5);
-  scene.add(counter);
+  studioParent().add(counter);
   const top = musBox(1.7, 0.1, 5.3, STUDIO_GOLD);
   top.position.set(-159.1, 1.3, -24.5);
-  scene.add(top);
+  studioParent().add(top);
   const sign = makeLabel("sassmeharder.com", {
     w: 1400, h: 220, pw: 5.6, ph: 0.9,
     font: "600 56px Georgia, serif"
@@ -2228,7 +2289,7 @@ function populateStudioGeometry() {
   sign.userData.href = "https://sassmeharder.com/";
   sign.userData.linkLabel = "Open sassmeharder.com";
   sign.userData.openUrl = "https://sassmeharder.com/";
-  scene.add(sign);
+  studioParent().add(sign);
   clickables.push(sign);
 
   const brand = makeLabel("Shirts with Sass", {
@@ -2238,7 +2299,7 @@ function populateStudioGeometry() {
   });
   brand.position.set(-170, 8.3, -39.3);
   brand.rotation.y = Math.PI;
-  scene.add(brand);
+  studioParent().add(brand);
 }
 
 async function populateStudioArt() {
@@ -2275,7 +2336,7 @@ async function populateStudioArt() {
     stand.userData.linkLabel = "Open this product";
     stand.userData.openUrl = p.href;
     stand.userData.stay = true;
-    scene.add(stand);
+    studioParent().add(stand);
     clickables.push(stand);
     const tag = makeLabel(p.title, {
       w: 1000, h: 160, pw: 3.6, ph: 0.55,
@@ -2283,7 +2344,7 @@ async function populateStudioArt() {
     });
     tag.position.set(stand.position.x, 0.85, stand.position.z + 0.95);
     tag.rotation.y = 0;
-    scene.add(tag);
+    studioParent().add(tag);
   });
 }
 
@@ -2293,7 +2354,7 @@ function hopList(region) {
   const end = hops[hops.length - 1];
   const endPos = new THREE.Vector3(...end.pos);
   if (cam.pos.distanceTo(endPos) < 18) return [end];
-  if (cam.pos.x < -150 && hops.length > 1) return hops.slice(1);
+  if (cam.pos.x < ax(-150) && hops.length > 1) return hops.slice(1);
   return hops;
 }
 
@@ -2308,7 +2369,7 @@ function beginHop(toPos, toLook) {
     toYaw: aim.yaw,
     toPitch: aim.pitch,
     t: 0,
-    dur: THREE.MathUtils.clamp(0.85 + dist / 78, 1.15, 3.8)
+    dur: THREE.MathUtils.clamp(1.5 + dist / 260, 1.5, 5)
   };
 }
 
@@ -2362,13 +2423,19 @@ function addRackWall(x, y, z, rotY, lintel) {
 }
 
 function addArrivalAnchors() {
-  addPortico(-42, 0, -6, 0, "PLAZA");
-  addRackWall(46, 0, 18, Math.PI, "RESEARCH");
-  addPortico(0, 0, 54, Math.PI / 2, "WRITING");
+  addPortico(ax(-42), 0, -6, 0, "PLAZA");
+  addRackWall(rx(46), 0, 18, Math.PI, "RESEARCH");
+  addPortico(0, 0, wz(54), Math.PI / 2, "WRITING");
+}
+
+function netartsWallOrigin() {
+  const r = REGIONS.find((x) => x.id === "netarts");
+  const mark = r.mark || r.look;
+  return { wx: mark[0], wy: r.pos[1], wz: mark[2] };
 }
 
 function populateNetartsWall() {
-  const wx = 108, wy = -2, wz = 16;
+  const { wx, wy, wz } = netartsWallOrigin();
   const board = musBox(28.6, 22.4, 0.35, STUDIO_DARK);
   board.position.set(wx, wy + 1.2, wz - 0.28);
   scene.add(board);
@@ -2388,7 +2455,7 @@ function populateNetartsWall() {
 }
 
 async function populateNetartsMaps() {
-  const wx = 108, wy = -2, wz = 16;
+  const { wx, wy, wz } = netartsWallOrigin();
   const mapTex = await Promise.all(MAPS.map(([u]) => loadTexture(u)));
   mapTex.forEach((tex, i) => {
     if (!tex) return;
@@ -2451,7 +2518,7 @@ async function populateWebShots() {
 function populateImmediate() {
   REGIONS.forEach(addBeacon);
   addWorldGuides();
-  constellation([98, 20, -50]);
+  constellation(REGIONS.find((r) => r.id === "iau").look);
   addArrivalAnchors();
   populateNetartsWall();
   populateStudioGeometry();
@@ -2468,7 +2535,7 @@ function populateImmediate() {
   const arrival = makeLabel("Art west  ·  Research east  ·  Writing north", {
     w: 1800, h: 200, pw: 28, ph: 2.2, font: "500 52px Georgia, serif"
   });
-  arrival.position.set(0, 7.2, 6);
+  arrival.position.set(REGIONS[0].pos[0], 8.6, REGIONS[0].pos[2] + 52);
   arrival.userData.billboard = true;
   scene.add(arrival);
 
@@ -2607,10 +2674,10 @@ function bindInput() {
     if (flight) flight = null;
     let dy = e.deltaY;
     if (e.deltaMode === 1) dy *= 16;
-    if (e.deltaMode === 2) dy *= 400;
-    dy = THREE.MathUtils.clamp(dy, -140, 140);
-    scrollBoost += -dy * 0.012;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -4, 4);
+    if (e.deltaMode === 2) dy *= 800;
+    const unit = THREE.MathUtils.clamp(dy / 100, -1, 1);
+    scrollBoost -= unit * 78;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -130, 130);
   }, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
@@ -2677,9 +2744,9 @@ function tick() {
     if (keys.q) cam.vel.y -= speed * 0.75 * dt;
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
     if (scrollBoost) {
-      cam.vel.addScaledVector(dir, scrollBoost * dt * 8);
-      scrollBoost *= Math.exp(-dt * 4.6);
-      if (Math.abs(scrollBoost) < 0.04) scrollBoost = 0;
+      cam.pos.addScaledVector(dir, scrollBoost * dt);
+      scrollBoost *= Math.exp(-dt * 2.05);
+      if (Math.abs(scrollBoost) < 0.35) scrollBoost = 0;
     }
     cam.vel.multiplyScalar(Math.exp(-dt * 2.15));
     cam.pos.addScaledVector(cam.vel, 1);
@@ -2718,8 +2785,8 @@ function tick() {
 async function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(ink);
-  scene.fog = new THREE.FogExp2(0x0a1216, 0.00105);
-  camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 2000);
+  scene.fog = new THREE.FogExp2(0x0a1216, 0.00036);
+  camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 4800);
   camera.position.copy(cam.pos);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
@@ -2733,10 +2800,10 @@ async function main() {
   rim.position.set(-40, 28, -20);
   scene.add(rim);
   const east = new THREE.PointLight(0x2aa8a0, 20, 340);
-  east.position.set(220, 8, 10);
+  east.position.set(rx(220), 8, 10);
   scene.add(east);
   const far = new THREE.PointLight(0xd4b05a, 14, 260);
-  far.position.set(-150, 22, 0);
+  far.position.set(ax(-150), 22, 0);
   scene.add(far);
 
   addStars();
