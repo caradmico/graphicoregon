@@ -10,23 +10,23 @@ const REGIONS = [
     name: "Arrival",
     kind: "intro",
     axis: "Origin · 0, 0, 0",
-    pos: [0, 12, 32],
-    look: [-72, 12, 4],
+    pos: [0, 16, 36],
+    look: [20, 10, 8],
     meta: "Graphic Oregon",
     title: "Technical design solutions",
-    body: "A small craft marks your place. The museum is west — a building you can see from here, then fly into. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
+    body: "A small craft marks your place. Art is west — a building you can see from here, then fly into. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   },
   {
     id: "art",
-    name: "Museum",
+    name: "Plaza",
     kind: "art",
     axis: "West · −X plaza",
     pos: [-128, 10, 0],
     look: [-168, 9, 0],
     meta: "Oil · acrylic · charcoal · prints",
-    title: "Museum",
+    title: "Plaza",
     body: "A hall you fly into. The plaza faces the entrance. A second hop through the doorway takes you into the lobby, then corridors lead to portraits, still life, coast, prints, studio work, and the gift shop.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
@@ -44,8 +44,8 @@ const REGIONS = [
       { pos: [-176, 4.3, 0], look: [-206, 3.6, 0] }
     ],
     noBeacon: true,
-    meta: "Museum lobby",
-    title: "Museum lobby",
+    meta: "Lobby",
+    title: "Lobby",
     body: "Dark ink halls, teal rim light, gold labels. Corridors run north to portraits, south to still life and the gift shop, and west toward coast, prints, and the studio.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
@@ -564,7 +564,7 @@ const REGIONS = [
 
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
-  { label: "Museum · west −X", ids: ["art", "lobby", "portraits", "still-life", "coast", "prints", "studio", "shop"] },
+  { label: "Art · west", ids: ["art", "lobby", "portraits", "still-life", "coast", "prints", "studio", "shop"] },
   { label: "Research · east +X", ids: ["iau", "iloa", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
   { label: "Writing · north +Z", ids: ["journalism", "gazette"] },
   { label: "Credentials · above +Y", ids: ["credentials", "aitutor", "service", "talks", "awards"] },
@@ -995,8 +995,9 @@ let flight = null;
 let bubbleCool = 0;
 const bubbles = [];
 const clock = new THREE.Clock();
+const _billboardAt = new THREE.Vector3();
 const cam = {
-  pos: new THREE.Vector3(0, 12, 32),
+  pos: new THREE.Vector3(0, 16, 36),
   vel: new THREE.Vector3()
 };
 const bounds = { x: [-320, 380], y: [-52, 120], z: [-280, 420] };
@@ -1046,8 +1047,26 @@ function makeLabel(text, opts = {}) {
   wrapText(ctx, text, w / 2, h / 2, w - 80, opts.lh || 72);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide });
+  const mat = bothSides(new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
   return new THREE.Mesh(new THREE.PlaneGeometry(opts.pw || 8, opts.ph || 2), mat);
+}
+
+function bothSides(mat) {
+  mat.side = THREE.DoubleSide;
+  const prev = mat.onBeforeCompile;
+  mat.onBeforeCompile = (shader) => {
+    if (prev) prev(shader);
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "texture2D( map, vMapUv )",
+      "texture2D( map, gl_FrontFacing ? vMapUv : vec2( 1.0 - vMapUv.x, vMapUv.y ) )"
+    );
+  };
+  return mat;
+}
+
+function markBillboard(mesh) {
+  mesh.userData.billboard = true;
+  return mesh;
 }
 
 function wrapText(ctx, text, x, y, max, lh) {
@@ -1087,7 +1106,7 @@ function makeCard(title, body) {
   tex.colorSpace = THREE.SRGBColorSpace;
   return new THREE.Mesh(
     new THREE.PlaneGeometry(7.2, 4.5),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
+    bothSides(new THREE.MeshBasicMaterial({ map: tex, transparent: true }))
   );
 }
 
@@ -1124,7 +1143,7 @@ function makeClipCard(title, body, tex) {
   canvasTex.colorSpace = THREE.SRGBColorSpace;
   return new THREE.Mesh(
     new THREE.PlaneGeometry(7.2, 5.05),
-    new THREE.MeshBasicMaterial({ map: canvasTex, transparent: true, side: THREE.DoubleSide })
+    bothSides(new THREE.MeshBasicMaterial({ map: canvasTex, transparent: true }))
   );
 }
 
@@ -1175,7 +1194,7 @@ function makeJobCard(role, org, dates, body) {
   tex.colorSpace = THREE.SRGBColorSpace;
   return new THREE.Mesh(
     new THREE.PlaneGeometry(7.6, 4.85),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
+    bothSides(new THREE.MeshBasicMaterial({ map: tex, transparent: true }))
   );
 }
 
@@ -1197,7 +1216,7 @@ function imagePlane(tex, maxW) {
   const h = aspect >= 1 ? maxW / aspect : maxW;
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })
+    bothSides(new THREE.MeshBasicMaterial({ map: tex }))
   );
   const frame = new THREE.Mesh(
     new THREE.PlaneGeometry(w + 0.12, h + 0.12),
@@ -1231,7 +1250,7 @@ function addWorldGuides() {
   const marks = [
     ["SKY", 0, 108, 0, 22, 4],
     ["GROUND", 0, -36, 0, 18, 3.2],
-    ["MUSEUM  ·  WEST  −X", -250, 22, 0, 28, 3.4],
+    ["ART  ·  WEST  −X", -250, 22, 0, 28, 3.4],
     ["RESEARCH  ·  EAST  +X", 360, 16, 0, 32, 3.4],
     ["WRITING  ·  NORTH  +Z", 0, 22, 380, 28, 3.4],
     ["WEBSITES  ·  SOUTH  −Z", 0, -8, -260, 28, 3.4],
@@ -1268,7 +1287,9 @@ function addWorldGuides() {
 
 function addBeacon(region) {
   if (region.noBeacon) return;
-  const geo = new THREE.SphereGeometry(0.42, 24, 24);
+  const field = region.kind !== "art" && region.id !== "arrival";
+  const orbR = field ? 1.25 : 0.55;
+  const geo = new THREE.SphereGeometry(orbR, 24, 24);
   const mat = new THREE.MeshBasicMaterial({ color: region.kind === "exploded" ? gold : teal });
   const orb = new THREE.Mesh(geo, mat);
   orb.position.set(...region.pos);
@@ -1276,14 +1297,33 @@ function addBeacon(region) {
   scene.add(orb);
   clickables.push(orb);
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(1.2, 1.38, 48),
-    new THREE.MeshBasicMaterial({ color: gold, side: THREE.DoubleSide, transparent: true, opacity: 0.45 })
+    new THREE.RingGeometry(field ? 2.7 : 1.35, field ? 3.15 : 1.55, 48),
+    new THREE.MeshBasicMaterial({ color: gold, side: THREE.DoubleSide, transparent: true, opacity: field ? 0.78 : 0.5 })
   );
   ring.rotation.x = Math.PI / 2;
-  ring.position.set(region.pos[0], region.pos[1] - 1.8, region.pos[2]);
+  ring.position.set(region.pos[0], region.pos[1] - (field ? 3.4 : 2.0), region.pos[2]);
   scene.add(ring);
-  const title = makeLabel(region.name, { pw: 8.4, ph: 1.7, font: "600 56px Georgia, serif" });
-  title.position.set(region.pos[0], region.pos[1] + 2.4, region.pos[2]);
+  if (field) {
+    const halo = new THREE.Mesh(
+      new THREE.RingGeometry(4.2, 4.55, 48),
+      new THREE.MeshBasicMaterial({ color: teal, side: THREE.DoubleSide, transparent: true, opacity: 0.32 })
+    );
+    halo.rotation.x = Math.PI / 2;
+    halo.position.set(region.pos[0], region.pos[1] - 3.4, region.pos[2]);
+    scene.add(halo);
+    const shaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.07, 0.07, 26, 8),
+      new THREE.MeshBasicMaterial({ color: gold, transparent: true, opacity: 0.3, side: THREE.DoubleSide })
+    );
+    shaft.position.set(region.pos[0], region.pos[1] + 10, region.pos[2]);
+    scene.add(shaft);
+  }
+  const title = makeLabel(region.name, {
+    pw: field ? 13.2 : 8.4,
+    ph: field ? 2.5 : 1.7,
+    font: field ? "600 68px Georgia, serif" : "600 56px Georgia, serif"
+  });
+  title.position.set(region.pos[0], region.pos[1] + (field ? 3.8 : 2.4), region.pos[2]);
   title.userData.regionId = region.id;
   title.userData.billboard = true;
   scene.add(title);
@@ -1352,11 +1392,13 @@ function hangArt(tex, title, regionId, pos) {
   plane.position.set(...pos);
   plane.userData.regionId = regionId;
   plane.userData.title = title;
+  plane.userData.billboard = true;
   scene.add(plane);
   clickables.push(plane);
   const cap = makeLabel(title, { w: 900, h: 160, pw: 4.6, ph: 0.8, font: "500 42px Georgia, serif" });
   cap.position.copy(plane.position);
   cap.position.y -= 3.0;
+  cap.userData.billboard = true;
   scene.add(cap);
 }
 
@@ -1468,6 +1510,7 @@ function constellation(origin) {
   names.forEach(([t, x, y, z]) => {
     const lab = makeLabel(t, { w: 900, h: 180, pw: 5.5, ph: 1.1, font: "500 48px Georgia, serif", stroke: "rgba(42,168,160,0.7)" });
     lab.position.set(x, y, z);
+    lab.userData.billboard = true;
     group.add(lab);
   });
   IAU_CARDS.forEach((card, i) => {
@@ -1476,6 +1519,7 @@ function constellation(origin) {
     m.position.set(Math.cos(ang) * 16, 2 + (i % 3) * 1.4, -10 + Math.sin(ang) * 12);
     m.lookAt(0, 3, 0);
     m.userData.regionId = "iau";
+    m.userData.billboard = true;
     group.add(m);
     clickables.push(m);
   });
@@ -1484,6 +1528,7 @@ function constellation(origin) {
 
 function placeClickCard(mesh, regionId, extra) {
   mesh.userData.regionId = regionId;
+  mesh.userData.billboard = true;
   Object.assign(mesh.userData, extra || {});
   scene.add(mesh);
   clickables.push(mesh);
@@ -1656,6 +1701,7 @@ function populateAwards() {
     medal.userData.regionId = "awards";
     medal.userData.title = a[0];
     medal.userData.body = a[1];
+    medal.userData.billboard = true;
     scene.add(medal);
     clickables.push(medal);
     const lab = makeLabel(a[0] + " — " + a[1], {
@@ -1771,12 +1817,14 @@ async function explodeResearch(id, figs) {
     plane.lookAt(r.pos[0], r.pos[1], r.pos[2]);
     plane.userData.regionId = id;
     plane.userData.title = figs[i][1];
+    plane.userData.billboard = true;
     scene.add(plane);
     clickables.push(plane);
     const cap = makeLabel(figs[i][1], { w: 900, h: 160, pw: 5.2, ph: 0.85, font: "500 38px Georgia, serif" });
     cap.position.copy(plane.position);
     cap.position.y -= 3.6;
     cap.lookAt(r.pos[0], r.pos[1], r.pos[2]);
+    cap.userData.billboard = true;
     scene.add(cap);
   });
 }
@@ -1820,7 +1868,7 @@ function framedArt(tex, maxW, rotDeg) {
   plate.position.z = -0.02;
   const pic = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    new THREE.MeshBasicMaterial({ map })
+    bothSides(new THREE.MeshBasicMaterial({ map }))
   );
   pic.position.z = 0.01;
   g.add(back, plate, pic);
@@ -1982,7 +2030,7 @@ function makeGarmentStand(tex, kind) {
   g.add(post);
   const form = new THREE.Group();
   form.position.y = 2.15;
-  const print = new THREE.MeshBasicMaterial({ map: tex });
+  const print = bothSides(new THREE.MeshBasicMaterial({ map: tex }));
   if (kind === "skirt") {
     const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.46, 0.24, 12), MUSEUM_DARK);
     waist.position.y = 0.55;
@@ -2043,7 +2091,7 @@ function buildMuseumShell() {
   musSlab(-140, 0.07, -14, 18, 0.08, 0.18, MUSEUM_TEAL);
   musSlab(-140, 0.07, 14, 18, 0.08, 0.18, MUSEUM_TEAL);
 
-  const name = makeLabel("MUSEUM", {
+  const name = makeLabel("STUDIO", {
     w: 1400, h: 280, pw: 16, ph: 2.6,
     font: "600 120px Georgia, serif",
     color: "#e8d29a",
@@ -2257,12 +2305,14 @@ async function populate() {
     plane.lookAt(nx, ny, nz - 6);
     plane.userData.regionId = "netarts";
     plane.userData.title = MAPS[i][1];
+    plane.userData.billboard = true;
     scene.add(plane);
     clickables.push(plane);
     const cap = makeLabel(MAPS[i][1], { w: 900, h: 160, pw: 5.2, ph: 0.9, font: "500 40px Georgia, serif" });
     cap.position.copy(plane.position);
     cap.position.y -= 3.8;
     cap.lookAt(nx, ny, nz - 6);
+    cap.userData.billboard = true;
     scene.add(cap);
   });
 
@@ -2277,6 +2327,7 @@ async function populate() {
     plane.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] + 5 - row * 7.2, webOrigin[2] - 16);
     plane.userData.regionId = "websites";
     plane.userData.title = "Website gallery";
+    plane.userData.billboard = true;
     scene.add(plane);
     clickables.push(plane);
   });
@@ -2286,12 +2337,13 @@ async function populate() {
     const row = Math.floor(i / 3);
     plaque.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] - 10 - row * 2.0, webOrigin[2] - 4);
     plaque.userData.regionId = "websites";
+    plaque.userData.billboard = true;
     scene.add(plaque);
     clickables.push(plaque);
   });
   const moonWidget = makeCard(
     "Moon-phase widget",
-    "A client website object — a moon-phase display built for a commissioned site. Those photographs are not studio art and are not hung in the museum."
+    "A client website object — a moon-phase display built for a commissioned site. Those photographs are not studio art and are not hung in the west halls."
   );
   moonWidget.position.set(webOrigin[0] + 18, webOrigin[1] + 2, webOrigin[2] - 8);
   placeClickCard(moonWidget, "websites", {
@@ -2315,10 +2367,11 @@ async function populate() {
     await explodeResearch(id, RESEARCH_FIGS[id]);
   }
 
-  const arrival = makeLabel("Museum west  ·  Research east  ·  Writing north  ·  Credentials above", {
+  const arrival = makeLabel("Art west  ·  Research east  ·  Writing north  ·  Credentials above", {
     w: 1800, h: 220, pw: 22, ph: 2.4, font: "500 48px Georgia, serif"
   });
   arrival.position.set(0, 2.4, 4);
+  arrival.userData.billboard = true;
   scene.add(arrival);
 
   ship = makeShip();
@@ -2532,7 +2585,10 @@ function tick() {
   updateBubbles(dt);
 
   scene.traverse((obj) => {
-    if (obj.userData && obj.userData.billboard) obj.lookAt(camera.position);
+    if (obj.userData && obj.userData.billboard) {
+      obj.getWorldPosition(_billboardAt);
+      obj.lookAt(camera.position.x, _billboardAt.y, camera.position.z);
+    }
   });
 
   const region = nearestRegion(cam.pos);
@@ -2545,7 +2601,7 @@ function tick() {
 async function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(ink);
-  scene.fog = new THREE.FogExp2(0x0a1216, 0.0018);
+  scene.fog = new THREE.FogExp2(0x0a1216, 0.00105);
   camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
   camera.position.copy(cam.pos);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true, powerPreference: "high-performance" });
@@ -2559,7 +2615,7 @@ async function main() {
   const rim = new THREE.PointLight(0xd4b05a, 16, 180);
   rim.position.set(-40, 28, -20);
   scene.add(rim);
-  const east = new THREE.PointLight(0x2aa8a0, 14, 260);
+  const east = new THREE.PointLight(0x2aa8a0, 20, 340);
   east.position.set(220, 8, 10);
   scene.add(east);
   const far = new THREE.PointLight(0xd4b05a, 10, 220);
