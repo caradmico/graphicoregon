@@ -2968,8 +2968,37 @@ function walkToPiece(region, extra) {
   return true;
 }
 
+function walkIntoWing(region, extra) {
+  const eye = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
+  const toPos = new THREE.Vector3(...region.pos);
+  toPos.y = eye;
+  const toLook = toPos.clone();
+  if (region.id === "portraits" || region.id === "prints") toLook.x -= 14;
+  else if (region.id === "still-life" || region.id === "studio") toLook.x += 10;
+  else if (region.id === "coast") toLook.x -= 12;
+  else {
+    const aim = new THREE.Vector3(...region.look).sub(toPos);
+    aim.y = 0;
+    if (aim.lengthSq() > 1e-6) aim.normalize();
+    else aim.set(-1, 0, 0);
+    toLook.copy(toPos).addScaledVector(aim, 8);
+  }
+  artFocus = null;
+  flight = beginHop(toPos, toLook);
+  flight.dur = THREE.MathUtils.clamp(cam.pos.distanceTo(toPos) / 28, 0.55, 1.35);
+  flight.queue = [];
+  cam.vel.set(0, 0, 0);
+  scrollBoost = 0;
+  strafeBoost = 0;
+  showRegion(region, extra);
+}
+
 function flyTo(region, extra) {
-  if (WALK_WINGS.has(region.id) && isIndoors() && walkToPiece(region, extra)) return;
+  if (WALK_WINGS.has(region.id) && (isIndoors() || studioIndoorT(cam.pos) > 0.2)) {
+    if (walkToPiece(region, extra)) return;
+    walkIntoWing(region, extra);
+    return;
+  }
   artFocus = null;
   const hops = hopList(region).map((h) => ({
     pos: new THREE.Vector3(...h.pos),
