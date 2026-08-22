@@ -2677,7 +2677,7 @@ function tick() {
     if (keys.q) cam.vel.y -= speed * 0.75 * dt;
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
     if (scrollBoost) {
-      cam.vel.addScaledVector(dir, scrollBoost * dt * 8);
+      cam.vel.addScaledVector(dir, scrollBoost * dt * 24);
       scrollBoost *= Math.exp(-dt * 4.6);
       if (Math.abs(scrollBoost) < 0.04) scrollBoost = 0;
     }
