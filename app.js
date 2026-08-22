@@ -11,38 +11,164 @@ const REGIONS = [
     kind: "intro",
     axis: "Origin · 0, 0, 0",
     pos: [0, 12, 32],
-    look: [0, 8, 0],
+    look: [-72, 12, 4],
     meta: "Graphic Oregon",
     title: "Technical design solutions",
-    body: "A small craft marks your place. Art is west. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
+    body: "A small craft marks your place. The museum is west — a building you can see from here, then fly into. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   },
   {
     id: "art",
-    name: "Fine Art",
+    name: "Museum",
     kind: "art",
-    axis: "West · −X loft",
-    pos: [-110, 32, 22],
-    look: [-148, 20, -10],
-    meta: "Oil · acrylic · ink · digital · charcoal",
-    title: "Fine art and illustration",
-    body: "A working studio practice — figures, portraits, still lifes, coast studies, prints, and studio photographs. Open to commissions. Extra still lifes sit in the south wing.",
+    axis: "West · −X plaza",
+    pos: [-128, 10, 0],
+    look: [-168, 9, 0],
+    meta: "Oil · acrylic · charcoal · prints",
+    title: "Museum",
+    body: "A hall you fly into. The plaza faces the entrance. A second hop through the doorway takes you into the lobby, then corridors lead to portraits, still life, coast, prints, studio work, and the gift shop.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
   },
   {
-    id: "studies",
-    name: "Studio Studies",
+    id: "lobby",
+    name: "Lobby",
     kind: "art",
-    axis: "West · −X, south wing",
-    pos: [-168, 18, 78],
-    look: [-184, 16, 62],
-    meta: "Still life · portrait · unfinished",
-    title: "Further studio studies",
-    body: "Additional public works from the Fine Art page: extra still lifes, another oil portrait, and an unfinished study. Titles follow the studio filenames.",
+    axis: "West · −X inside",
+    pos: [-176, 4.3, 0],
+    look: [-206, 3.6, 0],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-176, 4.3, 0], look: [-206, 3.6, 0] }
+    ],
+    noBeacon: true,
+    meta: "Museum lobby",
+    title: "Museum lobby",
+    body: "Dark ink halls, teal rim light, gold labels. Corridors run north to portraits, south to still life and the gift shop, and west toward coast, prints, and the studio.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
+  },
+  {
+    id: "portraits",
+    name: "Portraits & figures",
+    kind: "art",
+    axis: "West · −X, north wing",
+    pos: [-176, 4.1, 30],
+    look: [-176, 3.5, 56],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-176, 4.3, 6], look: [-176, 4.0, 20] },
+      { pos: [-176, 4.1, 30], look: [-176, 3.5, 56] }
+    ],
+    noBeacon: true,
+    meta: "Oil · acrylic · charcoal · graphite",
+    title: "Portraits and figures",
+    body: "Figures, nudes, and self-portraits hung on the walls. Titles follow the studio filenames and mediums.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "still-life",
+    name: "Still life",
+    kind: "art",
+    axis: "West · −X, south wing",
+    pos: [-208, 4.1, -30],
+    look: [-208, 3.5, -52],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-176, 4.3, 0], look: [-200, 4.0, -18] },
+      { pos: [-208, 4.1, -30], look: [-208, 3.5, -52] }
+    ],
+    noBeacon: true,
+    meta: "Acrylic · charcoal · graphite · pencil",
+    title: "Still life",
+    body: "Still lifes and a cloth study, hung on the walls. Titles follow the studio filenames.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "coast",
+    name: "Coast",
+    kind: "art",
+    axis: "West · −X, far wing",
+    pos: [-230, 4.1, 0],
+    look: [-250, 3.5, 0],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-200, 4.3, 0], look: [-230, 4.0, 0] },
+      { pos: [-230, 4.1, 0], look: [-250, 3.5, 0] }
+    ],
+    noBeacon: true,
+    meta: "Neahkahnie · Ocean · Nehalem",
+    title: "Coast",
+    body: "Neahkahnie, Ocean, Nehalem, and camera-roll landscapes that are clearly coast. Hung on the walls of this hall.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "prints",
+    name: "Prints",
+    kind: "art",
+    axis: "West · −X, northwest wing",
+    pos: [-234, 4.1, 26],
+    look: [-234, 3.5, 40],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-220, 4.3, 0], look: [-234, 4.0, 18] },
+      { pos: [-234, 4.1, 26], look: [-234, 3.5, 40] }
+    ],
+    noBeacon: true,
+    meta: "Linoleum · mono · gouache",
+    title: "Prints",
+    body: "Linoleum print, mono print, and mixed-media gouache. Three works on the far wall.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "studio",
+    name: "Studio",
+    kind: "art",
+    axis: "West · −X, southwest wing",
+    pos: [-236, 4.1, -32],
+    look: [-236, 3.5, -58],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-220, 4.3, 0], look: [-236, 4.0, -20] },
+      { pos: [-236, 4.1, -32], look: [-236, 3.5, -58] }
+    ],
+    noBeacon: true,
+    meta: "Animals · studio · dated photographs",
+    title: "Studio",
+    body: "Animals, jelly, violet flame, ghost, broken, unfinished, and leftover dated photographs. Titles follow the filenames.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "shop",
+    name: "Gift shop",
+    kind: "art",
+    axis: "West · −X, off the lobby",
+    pos: [-170, 4.2, -21.5],
+    look: [-170, 3.5, -36],
+    hops: [
+      { pos: [-128, 10, 0], look: [-168, 9, 0] },
+      { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
+      { pos: [-170, 4.3, -10], look: [-170, 4.0, -20] },
+      { pos: [-170, 4.2, -21.5], look: [-170, 3.5, -36] }
+    ],
+    noBeacon: true,
+    meta: "sassmeharder · Shirts with Sass",
+    title: "Gift shop",
+    body: "sassmeharder / Shirts with Sass. Click a stand to open the live product. Four graphic tees up front; skirts, hoodie, dress, and longsleeve along the wall.",
+    href: "https://sassmeharder.com/",
+    linkLabel: "Open sassmeharder.com"
   },
   {
     id: "iau",
@@ -438,7 +564,7 @@ const REGIONS = [
 
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
-  { label: "Art · west −X", ids: ["art", "studies"] },
+  { label: "Museum · west −X", ids: ["art", "lobby", "portraits", "still-life", "coast", "prints", "studio", "shop"] },
   { label: "Research · east +X", ids: ["iau", "iloa", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
   { label: "Writing · north +Z", ids: ["journalism", "gazette"] },
   { label: "Credentials · above +Y", ids: ["credentials", "aitutor", "service", "talks", "awards"] },
@@ -492,78 +618,100 @@ const WEB_CONTRACTS = [
   ["PK Jones", "Currently developing marketing strategy for oil painter PK Jones. Named on the published CV. No public contract URL listed.", ""]
 ];
 
-const ARTWORKS = [
-  ["assets/art/neahkahnie.jpg", "Neahkahnie"],
-  ["assets/art/nehalem.jpg", "Nehalem"],
-  ["assets/art/violet-flame.jpg", "Violet Flame"],
-  ["assets/art/ocean.jpg", "Ocean"],
-  ["assets/art/bird.jpg", "Bird"],
-  ["assets/art/cat.jpg", "Cat"],
-  ["assets/art/dog.jpg", "Dog"],
-  ["assets/art/ghost.jpg", "Ghost"],
-  ["assets/art/broken.jpg", "Broken"],
-  ["assets/art/large-jelly.jpg", "Large Jelly"],
+const PORTRAITS = [
   ["assets/art/female-figure-oil.jpg", "Female figure, oil on paper"],
   ["assets/art/female-figure-charcoal.jpg", "Female figure, charcoal"],
   ["assets/art/female-nude-charcoal.jpg", "Figure study, charcoal"],
   ["assets/art/female-portrait-acrylic.jpg", "Portrait, acrylic"],
   ["assets/art/female-portrait-oil.jpg", "Portrait, oil"],
   ["assets/art/female-portrait-oil-3.jpg", "Portrait, oil"],
+  ["assets/art/female-portrait-oil-4.jpg", "Portrait, oil"],
   ["assets/art/leg-in-water.jpg", "Leg in water, oil on paper"],
   ["assets/art/self-portrait-acrylic.jpg", "Self-portrait, acrylic"],
   ["assets/art/self-portrait-charcoal.jpg", "Self-portrait, charcoal"],
   ["assets/art/self-portrait-graphite.jpg", "Self-portrait, graphite"],
   ["assets/art/monochromatic-self-portrait.jpg", "Monochromatic self-portrait, oil"],
+  ["assets/art/male-portrait.jpg", "Portrait, oil pastel and charcoal"],
+  ["assets/art/IMG_20200214_214207-2.jpg", "IMG_20200214_214207-2", -90],
+  ["assets/art/20201206_134723.jpg", "20201206_134723", -90],
+  ["assets/art/20201206_134739.jpg", "20201206_134739", -90],
+  ["assets/art/IMG_3195.jpg", "IMG_3195"],
+  ["assets/art/IMG_3197.jpg", "IMG_3197"],
+  ["assets/art/IMG_3198.jpg", "IMG_3198"],
+  ["assets/art/IMG_3201.jpg", "IMG_3201"],
+  ["assets/art/0517232026.jpg", "0517232026"],
+  ["assets/art/0716231323.jpg", "0716231323", -90]
+];
+
+const STILL_LIFE = [
   ["assets/art/still-life-acrylic.jpg", "Still life, acrylic"],
   ["assets/art/still-life-charcoal.jpg", "Still life, charcoal"],
+  ["assets/art/still-life-charcoal-3.jpg", "Still life, charcoal"],
+  ["assets/art/still-life-charcoal-4.jpg", "Still life, charcoal"],
   ["assets/art/still-life-graphite.jpg", "Still life, graphite"],
+  ["assets/art/still-life-pencil.jpg", "Still life, pencil"],
+  ["assets/art/still-life-1.jpg", "Still life"],
+  ["assets/art/still-life-2-2.jpg", "still-life-2"],
   ["assets/art/cloth-study.jpg", "Cloth study, charcoal"],
+  ["assets/art/IMG_3210.jpg", "IMG_3210"]
+];
+
+const COAST = [
+  ["assets/art/neahkahnie.jpg", "Neahkahnie"],
+  ["assets/art/ocean.jpg", "Ocean"],
+  ["assets/art/nehalem.jpg", "Nehalem"],
+  ["assets/art/20180506_122928-2.jpg", "20180506_122928-2"],
+  ["assets/art/20181121_150820-2.jpg", "20181121_150820-2"],
+  ["assets/art/20201024_233510.jpg", "20201024_233510"],
+  ["assets/art/IMG_3208.jpg", "IMG_3208"],
+  ["assets/art/20201025_145436.jpg", "20201025_145436"]
+];
+
+const PRINTS = [
   ["assets/art/linoleum-print.jpg", "Linoleum print"],
   ["assets/art/mono-print.jpg", "Mono print"],
+  ["assets/art/mixed-media-gouache.jpg", "Mixed media, gouache on Canson"]
+];
+
+const STUDIO = [
+  ["assets/art/bird.jpg", "Bird"],
+  ["assets/art/cat.jpg", "Cat"],
+  ["assets/art/dog.jpg", "Dog"],
+  ["assets/art/large-jelly.jpg", "Large Jelly"],
+  ["assets/art/violet-flame.jpg", "Violet Flame"],
+  ["assets/art/ghost.jpg", "Ghost"],
+  ["assets/art/broken.jpg", "Broken"],
+  ["assets/art/unfinished.jpg", "Unfinished"],
   ["assets/art/street-scene.jpg", "Street scene, charcoal, conté, marker"],
   ["assets/art/composition-study.jpg", "Composition study"],
-  ["assets/art/male-portrait.jpg", "Portrait, oil pastel and charcoal"],
-  ["assets/art/mixed-media-gouache.jpg", "Mixed media, gouache on Canson"],
-  ["assets/art/0517232026.jpg", "0517232026"],
-  ["assets/art/0716231323.jpg", "0716231323"],
-  ["assets/art/0730230642.jpg", "0730230642"],
-  ["assets/art/20180506_122928-2.jpg", "20180506_122928-2"],
   ["assets/art/20181111_133449.jpg", "20181111_133449"],
-  ["assets/art/20181121_150820-2.jpg", "20181121_150820-2"],
   ["assets/art/20181202_131855-2.jpg", "20181202_131855-2"],
   ["assets/art/20190629_203228-1.jpg", "20190629_203228-1"],
   ["assets/art/2020-08-21-1.jpg", "2020-08-21-1"],
   ["assets/art/20200504_131719-1.jpg", "20200504_131719-1"],
   ["assets/art/20200701_195408.jpg", "20200701_195408"],
   ["assets/art/20200724_204038-2.jpg", "20200724_204038-2"],
+  ["assets/art/IMG_20151029_091758.jpg", "IMG_20151029_091758"],
+  ["assets/art/0730230642.jpg", "0730230642"],
+  ["assets/art/NA7y1.jpg", "NA7y1"],
   ["assets/art/20201024_233425.jpg", "20201024_233425"],
   ["assets/art/20201024_233433.jpg", "20201024_233433"],
   ["assets/art/20201024_233453.jpg", "20201024_233453"],
-  ["assets/art/20201024_233510.jpg", "20201024_233510"],
   ["assets/art/20201024_233520.jpg", "20201024_233520"],
-  ["assets/art/20201025_145436.jpg", "20201025_145436"],
-  ["assets/art/20201206_134723.jpg", "20201206_134723"],
-  ["assets/art/20201206_134739.jpg", "20201206_134739"],
-  ["assets/art/IMG_20151029_091758.jpg", "IMG_20151029_091758"],
-  ["assets/art/IMG_20200214_214207-2.jpg", "IMG_20200214_214207-2"],
-  ["assets/art/IMG_3195.jpg", "IMG_3195"],
-  ["assets/art/IMG_3197.jpg", "IMG_3197"],
-  ["assets/art/IMG_3198.jpg", "IMG_3198"],
-  ["assets/art/IMG_3201.jpg", "IMG_3201"],
-  ["assets/art/IMG_3207.jpg", "IMG_3207"],
-  ["assets/art/IMG_3208.jpg", "IMG_3208"],
-  ["assets/art/IMG_3210.jpg", "IMG_3210"],
-  ["assets/art/still-life-2-2.jpg", "still-life-2"],
-  ["assets/art/NA7y1.jpg", "NA7y1"]
+  ["assets/art/IMG_3207.jpg", "IMG_3207"]
 ];
 
-const STUDY_ART = [
-  ["assets/art/female-portrait-oil-4.jpg", "Portrait, oil"],
-  ["assets/art/still-life-pencil.jpg", "Still life, pencil"],
-  ["assets/art/still-life-charcoal-3.jpg", "Still life, charcoal"],
-  ["assets/art/still-life-charcoal-4.jpg", "Still life, charcoal"],
-  ["assets/art/still-life-1.jpg", "Still life"],
-  ["assets/art/unfinished.jpg", "Unfinished"]
+const SHOP_PRODUCTS = [
+  { file: "assets/shop/copper-horizon.jpg", title: "Copper Horizon Softstyle Tee", href: "https://sassmeharder.com/product/30931683", kind: "tee", price: "$22.99" },
+  { file: "assets/shop/glow-bell.jpg", title: "Glow Bell Softstyle Tee", href: "https://sassmeharder.com/product/30931686", kind: "tee", price: "$22.99" },
+  { file: "assets/shop/cliff-sun.jpg", title: "Cliff Sun Softstyle Tee — Gold Rings, Red Rock, Cold Water", href: "https://sassmeharder.com/product/30932080", kind: "tee", price: "$22.99" },
+  { file: "assets/shop/prism-wash.jpg", title: "Prism Wash Softstyle Tee — Violet, Ember, Teal", href: "https://sassmeharder.com/product/30932082", kind: "tee", price: "$22.99" },
+  { file: "assets/shop/rainbow-skirt.jpg", title: "Rainbow 'Rainbows are beautiful' Women's Skater Skirt", href: "https://sassmeharder.com/product/29281220", kind: "skirt" },
+  { file: "assets/shop/cloud-dream-skirt.jpg", title: "Cloud Dream Skater Skirt — \"Above It All\"", href: "https://sassmeharder.com/product/29281029", kind: "skirt" },
+  { file: "assets/shop/la-nightlife-hoodie.jpg", title: "LA Night Life — Black & Gold Pullover Hoodie", href: "https://sassmeharder.com/product/29281146", kind: "hoodie" },
+  { file: "assets/shop/longsleeve-vneck.jpg", title: "Women's Long Sleeve V-neck Shirt (AOP)", href: "https://sassmeharder.com/product/29280927", kind: "longsleeve" },
+  { file: "assets/shop/tshirt-dress.jpg", title: "T-Shirt Dress (AOP)", href: "https://sassmeharder.com/product/29281285", kind: "dress" },
+  { file: "assets/shop/unisex-softstyle.jpg", title: "Unisex Softstyle T-Shirt", href: "https://sassmeharder.com/product/29470923", kind: "tee" }
 ];
 
 const MAPS = [
@@ -1083,7 +1231,7 @@ function addWorldGuides() {
   const marks = [
     ["SKY", 0, 108, 0, 22, 4],
     ["GROUND", 0, -36, 0, 18, 3.2],
-    ["ART  ·  WEST  −X", -250, 36, 0, 28, 3.4],
+    ["MUSEUM  ·  WEST  −X", -250, 22, 0, 28, 3.4],
     ["RESEARCH  ·  EAST  +X", 360, 16, 0, 32, 3.4],
     ["WRITING  ·  NORTH  +Z", 0, 22, 380, 28, 3.4],
     ["WEBSITES  ·  SOUTH  −Z", 0, -8, -260, 28, 3.4],
@@ -1101,7 +1249,7 @@ function addWorldGuides() {
 
   const hubs = [
     [0, 8, 0],
-    [-128, 30, 8],
+    [-128, 10, 0],
     [140, 4, 0],
     [6, 14, 160],
     [0, 58, -8],
@@ -1119,6 +1267,7 @@ function addWorldGuides() {
 }
 
 function addBeacon(region) {
+  if (region.noBeacon) return;
   const geo = new THREE.SphereGeometry(0.42, 24, 24);
   const mat = new THREE.MeshBasicMaterial({ color: region.kind === "exploded" ? gold : teal });
   const orb = new THREE.Mesh(geo, mat);
@@ -1632,6 +1781,458 @@ async function explodeResearch(id, figs) {
   });
 }
 
+
+const MUSEUM_WALL = new THREE.MeshLambertMaterial({ color: 0x101820 });
+const MUSEUM_FLOOR = new THREE.MeshLambertMaterial({ color: 0x0a1014 });
+const MUSEUM_CEIL = new THREE.MeshLambertMaterial({ color: 0x070b0e });
+const MUSEUM_TEAL = new THREE.MeshBasicMaterial({ color: teal });
+const MUSEUM_GOLD = new THREE.MeshBasicMaterial({ color: gold });
+const MUSEUM_DARK = new THREE.MeshLambertMaterial({ color: 0x161e24 });
+
+function musBox(w, h, d, mat) {
+  return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+}
+
+function musSlab(x, y, z, w, h, d, mat) {
+  const m = musBox(w, h, d, mat || MUSEUM_WALL);
+  m.position.set(x, y, z);
+  scene.add(m);
+  return m;
+}
+
+function framedArt(tex, maxW, rotDeg) {
+  let map = tex;
+  if (rotDeg) {
+    map = tex.clone();
+    map.center.set(0.5, 0.5);
+    map.rotation = (rotDeg * Math.PI) / 180;
+    map.needsUpdate = true;
+  }
+  const img = tex.image;
+  let aspect = img.width / img.height;
+  if (rotDeg === 90 || rotDeg === -90) aspect = 1 / aspect;
+  const w = aspect >= 1 ? maxW : maxW * aspect;
+  const h = aspect >= 1 ? maxW / aspect : maxW;
+  const g = new THREE.Group();
+  const back = musBox(w + 0.22, h + 0.22, 0.08, MUSEUM_GOLD);
+  back.position.z = -0.06;
+  const plate = musBox(w + 0.04, h + 0.04, 0.03, MUSEUM_DARK);
+  plate.position.z = -0.02;
+  const pic = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ map })
+  );
+  pic.position.z = 0.01;
+  g.add(back, plate, pic);
+  g.userData.pic = pic;
+  return g;
+}
+
+function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
+  const piece = framedArt(tex, 3.35, rotDeg || 0);
+  piece.position.set(...pos);
+  piece.rotation.y = rotY;
+  piece.userData.regionId = regionId;
+  piece.userData.title = title;
+  piece.userData.stay = true;
+  scene.add(piece);
+  clickables.push(piece);
+  const cap = makeLabel(title, {
+    w: 900, h: 140, pw: 3.4, ph: 0.55,
+    font: "500 40px Georgia, serif",
+    color: "#e8d29a",
+    stroke: "rgba(212,176,90,0.85)",
+    bg: "rgba(10,16,20,0.82)"
+  });
+  cap.position.set(pos[0], pos[1] - 2.15, pos[2]);
+  cap.rotation.y = rotY;
+  scene.add(cap);
+}
+
+function hangHall(works, hall, regionId) {
+  const { x0, x1, z0, z1, y, face } = hall;
+  const far = [];
+  const left = [];
+  const right = [];
+  works.forEach((w, i) => {
+    const slot = i % 5;
+    if (slot < 3) far.push(w);
+    else if (slot === 3) left.push(w);
+    else right.push(w);
+  });
+  if (face === "+z") {
+    placeRow(far, x0 + 4.2, x1 - 4.2, (x) => [x, y, z1 - 0.42], Math.PI, regionId);
+    placeRow(left, z0 + 5.5, z1 - 5.5, (z) => [x0 + 0.42, y, z], Math.PI / 2, regionId);
+    placeRow(right, z0 + 5.5, z1 - 5.5, (z) => [x1 - 0.42, y, z], -Math.PI / 2, regionId);
+  } else if (face === "-z") {
+    placeRow(far, x0 + 4.2, x1 - 4.2, (x) => [x, y, z0 + 0.42], 0, regionId);
+    placeRow(left, z0 + 5.5, z1 - 5.5, (z) => [x1 - 0.42, y, z], -Math.PI / 2, regionId);
+    placeRow(right, z0 + 5.5, z1 - 5.5, (z) => [x0 + 0.42, y, z], Math.PI / 2, regionId);
+  } else if (face === "-x") {
+    placeRow(far, z0 + 4.2, z1 - 4.2, (z) => [x0 + 0.42, y, z], Math.PI / 2, regionId);
+    placeRow(left, x0 + 5.5, x1 - 5.5, (x) => [x, y, z1 - 0.42], Math.PI, regionId);
+    placeRow(right, x0 + 5.5, x1 - 5.5, (x) => [x, y, z0 + 0.42], 0, regionId);
+  }
+}
+
+function placeRow(items, a0, a1, at, rotY, regionId) {
+  if (!items.length) return;
+  const n = items.length;
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? (a0 + a1) / 2 : a0 + ((i + 0.5) / n) * (a1 - a0);
+    const [tex, title, rot] = items[i];
+    hangOnWall(tex, title, regionId, at(t), rotY, rot || 0);
+  }
+}
+
+function hallTitle(text, pos, rotY) {
+  const lab = makeLabel(text, {
+    w: 1400, h: 220, pw: 8.6, ph: 1.3,
+    font: "600 64px Georgia, serif",
+    color: "#e8d29a",
+    stroke: "rgba(42,168,160,0.7)",
+    bg: "rgba(10,16,20,0.55)"
+  });
+  lab.position.set(...pos);
+  lab.rotation.y = rotY || 0;
+  scene.add(lab);
+}
+
+function addDoorway(regionId, pos, rotY, label) {
+  const g = new THREE.Group();
+  const frame = musBox(5.2, 7.4, 0.28, MUSEUM_GOLD);
+  const hole = musBox(4.3, 6.6, 0.32, new THREE.MeshBasicMaterial({
+    color: 0x071014, transparent: true, opacity: 0.35
+  }));
+  hole.position.z = 0.04;
+  const lintel = makeLabel(label, {
+    w: 900, h: 160, pw: 4.4, ph: 0.7,
+    font: "600 48px Georgia, serif"
+  });
+  lintel.position.set(0, 4.15, 0.2);
+  g.add(frame, hole, lintel);
+  g.position.set(...pos);
+  g.rotation.y = rotY || 0;
+  g.userData.regionId = regionId;
+  scene.add(g);
+  clickables.push(g);
+  return g;
+}
+
+function rimHall(x0, x1, z0, z1, y0, y1) {
+  const t = 0.07;
+  musSlab((x0 + x1) / 2, y0 + 0.06, z0 + t, x1 - x0, t, t, MUSEUM_TEAL);
+  musSlab((x0 + x1) / 2, y0 + 0.06, z1 - t, x1 - x0, t, t, MUSEUM_TEAL);
+  musSlab(x0 + t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, MUSEUM_TEAL);
+  musSlab(x1 - t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, MUSEUM_TEAL);
+  musSlab((x0 + x1) / 2, y1 - 0.08, z0 + t, x1 - x0, t, t, MUSEUM_TEAL);
+  musSlab((x0 + x1) / 2, y1 - 0.08, z1 - t, x1 - x0, t, t, MUSEUM_TEAL);
+}
+
+function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
+  const t = 0.45;
+  const cx = (x0 + x1) / 2;
+  const cz = (z0 + z1) / 2;
+  musSlab(cx, y0, cz, x1 - x0, 0.16, z1 - z0, MUSEUM_FLOOR);
+  musSlab(cx, y1, cz, x1 - x0, 0.16, z1 - z0, MUSEUM_CEIL);
+  const doors = openings || [];
+  function wallWithDoors(axis, fixed, a0, a1, yMid, h, doorsOn) {
+    const gaps = doorsOn
+      .filter((d) => d.axis === axis)
+      .map((d) => ({ a: d.a, w: d.w || 5.2 }))
+      .sort((p, q) => p.a - q.a);
+    let cursor = a0;
+    const segs = [];
+    gaps.forEach((g) => {
+      const g0 = g.a - g.w / 2;
+      const g1 = g.a + g.w / 2;
+      if (g0 > cursor + 0.4) segs.push([cursor, g0]);
+      cursor = Math.max(cursor, g1);
+    });
+    if (cursor < a1 - 0.4) segs.push([cursor, a1]);
+    segs.forEach(([s0, s1]) => {
+      const mid = (s0 + s1) / 2;
+      const len = s1 - s0;
+      if (axis === "z") musSlab(fixed, yMid, mid, t, h, len);
+      else musSlab(mid, yMid, fixed, len, h, t);
+    });
+  }
+  const yMid = (y0 + y1) / 2;
+  const h = y1 - y0;
+  wallWithDoors("z", x0, z0, z1, yMid, h, doors.filter((d) => d.side === "x0"));
+  wallWithDoors("z", x1, z0, z1, yMid, h, doors.filter((d) => d.side === "x1"));
+  wallWithDoors("x", z0, x0, x1, yMid, h, doors.filter((d) => d.side === "z0"));
+  wallWithDoors("x", z1, x0, x1, yMid, h, doors.filter((d) => d.side === "z1"));
+  rimHall(x0, x1, z0, z1, y0, y1);
+}
+
+function addMuseumLight(x, y, z, color, intensity, dist) {
+  const l = new THREE.PointLight(color, intensity, dist);
+  l.position.set(x, y, z);
+  scene.add(l);
+}
+
+function makeGarmentStand(tex, kind) {
+  const g = new THREE.Group();
+  const ped = musBox(1.55, 0.26, 1.15, MUSEUM_GOLD);
+  ped.position.y = 0.13;
+  g.add(ped);
+  const post = musBox(0.14, 0.95, 0.14, MUSEUM_DARK);
+  post.position.y = 0.72;
+  g.add(post);
+  const form = new THREE.Group();
+  form.position.y = 2.15;
+  const print = new THREE.MeshBasicMaterial({ map: tex });
+  if (kind === "skirt") {
+    const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.46, 0.24, 12), MUSEUM_DARK);
+    waist.position.y = 0.55;
+    const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.42, 1.28, 12), MUSEUM_DARK);
+    inner.position.y = -0.18;
+    const flare = new THREE.Mesh(new THREE.CylinderGeometry(0.92, 0.46, 1.3, 12, 1, true), print);
+    flare.position.y = -0.18;
+    form.add(waist, inner, flare);
+  } else {
+    const tw = kind === "hoodie" ? 1.42 : kind === "dress" ? 1.2 : 1.22;
+    const th = kind === "hoodie" ? 1.8 : kind === "dress" ? 2.35 : 1.62;
+    const body = musBox(tw, th, 0.32, MUSEUM_DARK);
+    const front = new THREE.Mesh(new THREE.PlaneGeometry(tw * 0.9, th * 0.9), print);
+    front.position.z = 0.17;
+    const sleeveW = (kind === "hoodie" || kind === "longsleeve") ? 0.78 : 0.42;
+    const sl = musBox(sleeveW, 0.36, 0.26, MUSEUM_DARK);
+    sl.position.set(-(tw / 2 + sleeveW / 2 - 0.06), th * 0.28, 0);
+    const sr = musBox(sleeveW, 0.36, 0.26, MUSEUM_DARK);
+    sr.position.set(tw / 2 + sleeveW / 2 - 0.06, th * 0.28, 0);
+    form.add(body, front, sl, sr);
+    if (kind === "hoodie") {
+      const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), MUSEUM_DARK);
+      hood.position.set(0, th / 2 + 0.02, -0.04);
+      form.add(hood);
+    }
+  }
+  g.add(form);
+  return g;
+}
+
+function buildMuseumShell() {
+  const x0 = -258, x1 = -156, y0 = 0, y1 = 15.2, z0 = -70, z1 = 66;
+  musSlab((x0 + x1) / 2, y0 - 0.2, (z0 + z1) / 2, x1 - x0 + 2.4, 0.4, z1 - z0 + 2.4, MUSEUM_FLOOR);
+  musSlab((x0 + x1) / 2, y1 + 0.35, (z0 + z1) / 2, x1 - x0 + 1.2, 0.7, z1 - z0 + 1.2, MUSEUM_DARK);
+  musSlab(x0 - 0.3, (y0 + y1) / 2, (z0 + z1) / 2, 0.6, y1 - y0 + 1.2, z1 - z0 + 1.2);
+  musSlab((x0 + x1) / 2, (y0 + y1) / 2, z0 - 0.3, x1 - x0 + 1.2, y1 - y0 + 1.2, 0.6);
+  musSlab((x0 + x1) / 2, (y0 + y1) / 2, z1 + 0.3, x1 - x0 + 1.2, y1 - y0 + 1.2, 0.6);
+
+  // east facade with portal gap
+  const facadeY = (y0 + y1) / 2;
+  const facadeH = y1 - y0 + 1.2;
+  musSlab(x1 + 0.3, facadeY, -38, 0.7, facadeH, 58);
+  musSlab(x1 + 0.3, facadeY, 36, 0.7, facadeH, 54);
+  musSlab(x1 + 0.3, 12.4, 0, 0.7, 6.4, 12.4);
+  musSlab(x1 + 0.3, 2.0, -7.6, 0.7, 4.0, 3.2);
+  musSlab(x1 + 0.3, 2.0, 7.6, 0.7, 4.0, 3.2);
+
+  // cornice and pilasters
+  musSlab(x1 + 0.85, y1 + 0.15, 0, 1.4, 0.35, z1 - z0 + 2, MUSEUM_GOLD);
+  musSlab(x1 + 1.1, 7.4, -8.6, 1.5, 14.8, 1.4, MUSEUM_DARK);
+  musSlab(x1 + 1.1, 7.4, 8.6, 1.5, 14.8, 1.4, MUSEUM_DARK);
+  musSlab(x1 + 1.1, 15.1, 0, 1.6, 0.45, 20, MUSEUM_GOLD);
+
+  // steps / plaza
+  musSlab(-152.2, 0.25, 0, 8.2, 0.5, 16, MUSEUM_DARK);
+  musSlab(-148.4, 0.08, 0, 6.4, 0.16, 20, MUSEUM_FLOOR);
+  musSlab(-140, 0.02, 0, 18, 0.08, 28, MUSEUM_FLOOR);
+  musSlab(-140, 0.07, -14, 18, 0.08, 0.18, MUSEUM_TEAL);
+  musSlab(-140, 0.07, 14, 18, 0.08, 0.18, MUSEUM_TEAL);
+
+  const name = makeLabel("MUSEUM", {
+    w: 1400, h: 280, pw: 16, ph: 2.6,
+    font: "600 120px Georgia, serif",
+    color: "#e8d29a",
+    stroke: "rgba(42,168,160,0.75)",
+    bg: "rgba(10,16,20,0.35)"
+  });
+  name.position.set(-154.6, 13.6, 0);
+  name.rotation.y = Math.PI / 2;
+  scene.add(name);
+
+  // small outdoor sculpture garden
+  [[-136, 0, 18], [-136, 0, -18], [-144, 0, 22]].forEach((p, i) => {
+    musSlab(p[0], 0.45, p[2], 1.4, 0.9, 1.4, MUSEUM_GOLD);
+    const stone = musBox(0.7 + i * 0.08, 1.6 + (i % 2) * 0.5, 0.55, MUSEUM_DARK);
+    stone.position.set(p[0], 1.7, p[2]);
+    stone.rotation.y = 0.2 * i;
+    scene.add(stone);
+  });
+}
+
+async function populateMuseum() {
+  buildMuseumShell();
+
+  const y0 = 0.08, y1 = 10.4;
+  enclosedHall(-188, -156.4, -18, 18, y0, y1, [
+    { side: "x1", axis: "z", a: 0, w: 5.6 },
+    { side: "x0", axis: "z", a: 0, w: 5.4 },
+    { side: "z1", axis: "x", a: -176, w: 5.2 },
+    { side: "z0", axis: "x", a: -170, w: 5.2 }
+  ]);
+  enclosedHall(-210, -162, 18, 64, y0, y1, [
+    { side: "z0", axis: "x", a: -176, w: 5.2 }
+  ]);
+  enclosedHall(-186, -158, -40, -18.2, y0, y1, [
+    { side: "z1", axis: "x", a: -170, w: 5.2 },
+    { side: "x0", axis: "z", a: -30, w: 4.8 }
+  ]);
+  enclosedHall(-230, -190, -56, -22, y0, y1, [
+    { side: "x1", axis: "z", a: -30, w: 4.8 }
+  ]);
+  enclosedHall(-190.2, -186, -40, -22, y0, 9.2, [
+    { side: "x0", axis: "z", a: -30, w: 4.8 },
+    { side: "x1", axis: "z", a: -30, w: 4.8 }
+  ]);
+  enclosedHall(-224, -188, -6.2, 6.2, y0, 9.2, [
+    { side: "x1", axis: "z", a: 0, w: 5.2 },
+    { side: "x0", axis: "z", a: 0, w: 5.2 },
+    { side: "z1", axis: "x", a: -220, w: 4.6 },
+    { side: "z0", axis: "x", a: -220, w: 4.6 }
+  ]);
+  enclosedHall(-240, -220, 6.2, 18.2, y0, 9.2, [
+    { side: "z0", axis: "x", a: -220, w: 4.6 },
+    { side: "z1", axis: "x", a: -234, w: 4.8 }
+  ]);
+  enclosedHall(-256, -224, -16, 16, y0, y1, [
+    { side: "x1", axis: "z", a: 0, w: 5.2 }
+  ]);
+  enclosedHall(-248, -220, 18, 42, y0, y1, [
+    { side: "z0", axis: "x", a: -234, w: 4.8 }
+  ]);
+  enclosedHall(-244, -220, -22.2, -6.2, y0, 9.2, [
+    { side: "z1", axis: "x", a: -220, w: 4.6 },
+    { side: "z0", axis: "x", a: -236, w: 5.2 }
+  ]);
+  enclosedHall(-256, -220, -68, -22, y0, y1, [
+    { side: "z1", axis: "x", a: -236, w: 5.2 }
+  ]);
+
+  addDoorway("lobby", [-155.6, 3.7, 0], Math.PI / 2, "Enter");
+  addDoorway("portraits", [-176, 3.7, 18.2], 0, "Portraits");
+  addDoorway("shop", [-170, 3.7, -17.8], Math.PI, "Gift shop");
+  addDoorway("still-life", [-186.2, 3.7, -30], -Math.PI / 2, "Still life");
+  addDoorway("coast", [-223.6, 3.7, 0], -Math.PI / 2, "Coast");
+  addDoorway("prints", [-234, 3.7, 18.2], 0, "Prints");
+  addDoorway("studio", [-236, 3.7, -21.8], Math.PI, "Studio");
+
+  hallTitle("Portraits & figures", [-186, 8.2, 63.2], Math.PI);
+  hallTitle("Still life", [-208, 8.2, -55.2], 0);
+  hallTitle("Coast", [-255.2, 8.2, 0], Math.PI / 2);
+  hallTitle("Prints", [-234, 8.2, 41.2], Math.PI);
+  hallTitle("Studio", [-236, 8.2, -67.2], 0);
+  hallTitle("Lobby", [-187.2, 8.4, 0], Math.PI / 2);
+
+  addMuseumLight(-176, 8.2, 0, 0x2aa8a0, 18, 42);
+  addMuseumLight(-186, 8.0, 40, 0xd4b05a, 12, 40);
+  addMuseumLight(-208, 8.0, -38, 0x2aa8a0, 12, 36);
+  addMuseumLight(-240, 8.0, 0, 0x2aa8a0, 14, 36);
+  addMuseumLight(-234, 7.6, 30, 0xd4b05a, 10, 28);
+  addMuseumLight(-236, 8.0, -44, 0x2aa8a0, 14, 42);
+  addMuseumLight(-170, 7.6, -28, 0xd4b05a, 12, 28);
+  addMuseumLight(-150, 14, 0, 0xd4b05a, 16, 50);
+
+  const loadWing = async (list) => Promise.all(list.map(async (item) => {
+    const tex = await loadTexture(item[0]);
+    return [tex, item[1], item[2]];
+  }));
+
+  hangHall(await loadWing(PORTRAITS), { x0: -210, x1: -162, z0: 18, z1: 64, y: 4.15, face: "+z" }, "portraits");
+  hangHall(await loadWing(STILL_LIFE), { x0: -230, x1: -190, z0: -56, z1: -22, y: 4.15, face: "-z" }, "still-life");
+  hangHall(await loadWing(COAST), { x0: -256, x1: -224, z0: -16, z1: 16, y: 4.15, face: "-x" }, "coast");
+  hangHall(await loadWing(PRINTS), { x0: -248, x1: -220, z0: 18, z1: 42, y: 4.15, face: "+z" }, "prints");
+  hangHall(await loadWing(STUDIO), { x0: -256, x1: -220, z0: -68, z1: -22, y: 4.15, face: "-z" }, "studio");
+
+  const shopTex = await Promise.all(SHOP_PRODUCTS.map((p) => loadTexture(p.file)));
+  shopTex.forEach((tex, i) => {
+    const p = SHOP_PRODUCTS[i];
+    const stand = makeGarmentStand(tex, p.kind);
+    if (i < 4) {
+      stand.position.set(-181 + i * 5.4, 0.08, -27.2);
+      stand.rotation.y = 0;
+    } else {
+      stand.position.set(-182.5 + (i - 4) * 4.4, 0.08, -36.6);
+      stand.rotation.y = 0;
+    }
+    stand.userData.regionId = "shop";
+    stand.userData.title = p.title;
+    stand.userData.body = (p.price ? p.price + ". " : "") + "sassmeharder / Shirts with Sass. Click opens the live product.";
+    stand.userData.href = p.href;
+    stand.userData.linkLabel = "Open this product";
+    stand.userData.openUrl = p.href;
+    stand.userData.stay = true;
+    scene.add(stand);
+    clickables.push(stand);
+    const tag = makeLabel(p.title, {
+      w: 1000, h: 160, pw: 3.6, ph: 0.55,
+      font: "500 36px Georgia, serif"
+    });
+    tag.position.set(stand.position.x, 0.85, stand.position.z + 0.95);
+    tag.rotation.y = 0;
+    scene.add(tag);
+  });
+
+  const counter = musBox(1.6, 1.15, 5.2, MUSEUM_DARK);
+  counter.position.set(-159.1, 0.7, -24.5);
+  scene.add(counter);
+  const top = musBox(1.7, 0.1, 5.3, MUSEUM_GOLD);
+  top.position.set(-159.1, 1.3, -24.5);
+  scene.add(top);
+  const sign = makeLabel("sassmeharder.com", {
+    w: 1400, h: 220, pw: 5.6, ph: 0.9,
+    font: "600 56px Georgia, serif"
+  });
+  sign.position.set(-158.2, 2.15, -24.5);
+  sign.rotation.y = -Math.PI / 2;
+  sign.userData.regionId = "shop";
+  sign.userData.title = "sassmeharder.com";
+  sign.userData.body = "Shirts with Sass. Live shop — click a garment to open the product.";
+  sign.userData.href = "https://sassmeharder.com/";
+  sign.userData.linkLabel = "Open sassmeharder.com";
+  sign.userData.openUrl = "https://sassmeharder.com/";
+  scene.add(sign);
+  clickables.push(sign);
+
+  const brand = makeLabel("Shirts with Sass", {
+    w: 1100, h: 180, pw: 5.2, ph: 0.75,
+    font: "500 44px Georgia, serif",
+    stroke: "rgba(42,168,160,0.8)"
+  });
+  brand.position.set(-170, 8.3, -39.3);
+  brand.rotation.y = Math.PI;
+  scene.add(brand);
+}
+
+function hopList(region) {
+  const dest = { pos: region.pos, look: region.look };
+  const hops = (region.hops && region.hops.length) ? region.hops.slice() : [dest];
+  const end = hops[hops.length - 1];
+  const endPos = new THREE.Vector3(...end.pos);
+  if (cam.pos.distanceTo(endPos) < 18) return [end];
+  if (cam.pos.x < -150 && hops.length > 1) return hops.slice(1);
+  return hops;
+}
+
+function beginHop(toPos, toLook) {
+  const aim = yawPitchFromPoints(toPos, toLook);
+  const dist = cam.pos.distanceTo(toPos);
+  return {
+    fromPos: cam.pos.clone(),
+    toPos,
+    fromYaw: lookYaw,
+    fromPitch: lookPitch,
+    toYaw: aim.yaw,
+    toPitch: aim.pitch,
+    t: 0,
+    dur: THREE.MathUtils.clamp(0.85 + dist / 78, 1.15, 3.8)
+  };
+}
+
+
 async function populate() {
   REGIONS.forEach(addBeacon);
   addWorldGuides();
@@ -1665,28 +2266,7 @@ async function populate() {
     scene.add(cap);
   });
 
-  const artLook = REGIONS.find((r) => r.id === "art").look;
-  const artTex = await Promise.all(ARTWORKS.map(([u]) => loadTexture(u)));
-  artTex.forEach((tex, i) => {
-    const cols = 8;
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    hangArt(tex, ARTWORKS[i][1], "art", [
-      artLook[0] - 37 + col * 10.6,
-      artLook[1] + 16 - row * 8.2,
-      artLook[2] - 4 - (row % 2) * 7 - (col % 2) * 3
-    ]);
-  });
-
-  const studyOrigin = REGIONS.find((r) => r.id === "studies").pos;
-  const studyTex = await Promise.all(STUDY_ART.map(([u]) => loadTexture(u)));
-  studyTex.forEach((tex, i) => {
-    hangArt(tex, STUDY_ART[i][1], "studies", [
-      studyOrigin[0] - 16 + (i % 3) * 12,
-      studyOrigin[1] + 4 - Math.floor(i / 3) * 8.2,
-      studyOrigin[2] - 12
-    ]);
-  });
+  await populateMuseum();
 
   const webOrigin = REGIONS.find((r) => r.id === "websites").pos;
   const webTex = await Promise.all(WEBSHOTS.map((u) => loadTexture(u)));
@@ -1711,7 +2291,7 @@ async function populate() {
   });
   const moonWidget = makeCard(
     "Moon-phase widget",
-    "A client website object — a moon-phase display built for a commissioned site. Those photographs are not studio art and are not hung in the loft."
+    "A client website object — a moon-phase display built for a commissioned site. Those photographs are not studio art and are not hung in the museum."
   );
   moonWidget.position.set(webOrigin[0] + 18, webOrigin[1] + 2, webOrigin[2] - 8);
   placeClickCard(moonWidget, "websites", {
@@ -1735,7 +2315,7 @@ async function populate() {
     await explodeResearch(id, RESEARCH_FIGS[id]);
   }
 
-  const arrival = makeLabel("Art west  ·  Research east  ·  Writing north  ·  Credentials above", {
+  const arrival = makeLabel("Museum west  ·  Research east  ·  Writing north  ·  Credentials above", {
     w: 1800, h: 220, pw: 22, ph: 2.4, font: "500 48px Georgia, serif"
   });
   arrival.position.set(0, 2.4, 4);
@@ -1786,20 +2366,13 @@ function showRegion(region, extra) {
 }
 
 function flyTo(region, extra) {
-  const toPos = new THREE.Vector3(...region.pos);
-  const toLook = new THREE.Vector3(...region.look);
-  const aim = yawPitchFromPoints(toPos, toLook);
-  const dist = cam.pos.distanceTo(toPos);
-  flight = {
-    fromPos: cam.pos.clone(),
-    toPos,
-    fromYaw: lookYaw,
-    fromPitch: lookPitch,
-    toYaw: aim.yaw,
-    toPitch: aim.pitch,
-    t: 0,
-    dur: THREE.MathUtils.clamp(1.15 + dist / 68, 1.7, 5.2)
-  };
+  const hops = hopList(region).map((h) => ({
+    pos: new THREE.Vector3(...h.pos),
+    look: new THREE.Vector3(...h.look)
+  }));
+  const first = hops[0];
+  flight = beginHop(first.pos, first.look);
+  flight.queue = hops.slice(1);
   cam.vel.set(0, 0, 0);
   scrollBoost = 0;
   showRegion(region, extra);
@@ -1844,15 +2417,23 @@ function onPointer(e) {
     shootBubble();
     return;
   }
+  if (obj.userData.openUrl) {
+    window.open(obj.userData.openUrl, "_blank", "noopener");
+  }
   const region = REGIONS.find((r) => r.id === obj.userData.regionId);
   if (!region) return;
-  flyTo(region, {
+  const extra = {
     title: obj.userData.title,
     body: obj.userData.body,
     href: obj.userData.href,
     linkLabel: obj.userData.linkLabel,
     links: obj.userData.links
-  });
+  };
+  if (obj.userData.stay && cam.pos.distanceTo(new THREE.Vector3(...region.pos)) < 36) {
+    showRegion(region, extra);
+    return;
+  }
+  flyTo(region, extra);
 }
 
 function bindInput() {
@@ -1914,7 +2495,14 @@ function tick() {
     cam.pos.lerpVectors(flight.fromPos, flight.toPos, s);
     lookYaw = lerpAngle(flight.fromYaw, flight.toYaw, s);
     lookPitch = flight.fromPitch + (flight.toPitch - flight.fromPitch) * s;
-    if (flight.t >= flight.dur) flight = null;
+    if (flight.t >= flight.dur) {
+      if (flight.queue && flight.queue.length) {
+        const next = flight.queue.shift();
+        const rest = flight.queue;
+        flight = beginHop(next.pos, next.look);
+        flight.queue = rest;
+      } else flight = null;
+    }
   } else {
     const dir = lookDir();
     const speed = keys.shift ? 62 : 34;
@@ -1982,7 +2570,7 @@ async function main() {
   setupNav();
   await populate();
   bindInput();
-  const start = yawPitchFromPoints(cam.pos, new THREE.Vector3(0, 8, 0));
+  const start = yawPitchFromPoints(cam.pos, new THREE.Vector3(...REGIONS[0].look));
   lookYaw = start.yaw;
   lookPitch = start.pitch;
   showRegion(REGIONS[0]);
