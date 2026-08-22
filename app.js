@@ -193,10 +193,10 @@ const REGIONS = [
     kind: "write",
     axis: "North · +Z",
     pos: [6, 14, 148],
-    look: [6, 11, 172],
+    look: [6, 11, 210],
     meta: "Writing · 2012–present",
     title: "Journalism and editing",
-    body: "Assistant editor at the Tillamook County Pioneer, with earlier bylines at the Seaside Signal, Cannon Beach Gazette, HipFish Monthly, and the Portland Mercury. Freelance newspaper work since November 2012 — arts, environment, and emergency preparedness on the north Oregon coast.",
+    body: "Assistant editor at the Tillamook County Pioneer, with live Cara Mico bylines in this hall. Earlier work: Seaside Signal (fifteen 2019 stories), Cannon Beach Gazette (puffin reprint), HipFish Monthly issue PDFs, and two Portland Mercury pieces. Freelance newspaper work since November 2012. Click a card to open the published story.",
     href: "https://www.tillamookcountypioneer.net/author/assistant-editor/",
     linkLabel: "Pioneer author archive"
   },
@@ -372,67 +372,46 @@ const AWARDS = [
 ];
 
 const PIONEER_PIECES = [
-  ["Author archive", "Cara Mico, assistant editor. Science, civic life, and the north Oregon coast.", "https://www.tillamookcountypioneer.net/author/assistant-editor/"],
+  ["Author archive", "Cara Mico, assistant editor. The Pioneer author page mixes other writers — sample Cara bylines hang beside this card.", "https://www.tillamookcountypioneer.net/author/assistant-editor/"],
   ["A New View: Space", "By Cara Mico. Hubble, JWST, and whether colonization is realistic.", "https://www.tillamookcountypioneer.net/a-new-view-space/"],
-  ["Manzanita Film Festival", "Second annual festival at the Pine Grove Community House, October 2–3, 2026.", "https://www.tillamookcountypioneer.net/tickets-now-available-for-the-second-annual-manzanita-film-festival/"],
-  ["Rooted & Rising", "View the Future’s first annual evening with Indigenous leaders, Yachats, September 12, 2026.", "https://www.tillamookcountypioneer.net/view-the-future-announces-first-annual-fundraising-event-rooted-rising/"],
-  ["Forest Trust Lands", "Notice of the virtual FTLAC meeting, August 21, 2026 — state forestlands and county trust revenues.", "https://www.tillamookcountypioneer.net/forest-trust-land-advisory-committee-to-meet-virtually-aug-21/"]
+  ["Space Just Got a Little Closer", "By Cara Mico. A Pioneer science piece on nearer space.", "https://www.tillamookcountypioneer.net/space-just-got-a-little-closer/"],
+  ["The Return of Sea Otters to Haystack Rock", "By Cara Mico. Sea otters returning to Haystack Rock.", "https://www.tillamookcountypioneer.net/the-return-of-sea-otters-to-haystack-rock/"],
+  ["Understanding AI Language Models", "By Cara Mico. An introductory guide to AI language models.", "https://www.tillamookcountypioneer.net/understanding-ai-language-models-an-introductory-guide/"],
+  ["Climate Change on the Oregon Coast", "By Cara Mico. A three-part series on climate change on the Oregon coast.", "https://www.tillamookcountypioneer.net/climate-change-on-the-oregon-coast-3-part-series/"]
 ];
 
-const SEASIDE_TITLES = [
-  "Hum and Swish (Sep 21, 2019)",
-  "Cleaning up on the diamond (Sep 18, 2019)",
-  "Preparedness forum invites community involvement (Sep 10, 2019)",
-  "Pickleball headed to Gearhart (Aug 27, 2019)",
-  "Jeepers Creepers Birding Event at Circle Creek (Aug 13, 2019)",
-  "Social Justice Motivates Artist May Wallace (Aug 2, 2019)",
-  "NCLC volunteers go deep into the weeds (Aug 1, 2019)",
-  "Fresh picked farmers market in Seaside (Jul 25, 2019)",
-  "Ode to the Tides (Jul 19, 2019)",
-  "Making scents at Beach Books (Jul 9, 2019)",
-  "Hypertufa workshop promotes local species (Jul 1, 2019)",
-  "Preserving pollinators on the north coast (May 29, 2019)",
-  "The food all around us (May 29, 2019)",
-  "Firehouse committee zeroes in on high point site (May 22, 2019)",
-  "Sparking change, one piece of plastic at a time (May 21, 2019)"
+const SEASIDE_PIECES = [
+  ["Hum and Swish", "Seaside Signal, September 21, 2019", "https://seasidesignal.com/2019/09/21/hum-and-swish/"],
+  ["Cleaning up on the diamond", "Seaside Signal, September 18, 2019", "https://seasidesignal.com/2019/09/18/cleaning-up-on-the-diamond/"],
+  ["Preparedness forum invites community involvement", "Seaside Signal, September 10, 2019", "https://seasidesignal.com/2019/09/10/preparedness-forum-invites-community-involvement/"],
+  ["Pickleball headed to Gearhart", "Seaside Signal, August 27, 2019", "https://seasidesignal.com/2019/08/27/pickleball-headed-to-gearhart/"],
+  ["Jeepers creepers, birding event at Circle Creek", "Seaside Signal, August 13, 2019", "https://seasidesignal.com/2019/08/13/jeepers-creepers-birding-event-at-circle-creek/"],
+  ["Social justice motivates artist May Wallace", "Seaside Signal, August 2, 2019", "https://seasidesignal.com/2019/08/02/social-justice-motivates-artist-may-wallace/"],
+  ["NCLC volunteers go deep into the weeds", "Seaside Signal, August 1, 2019", "https://seasidesignal.com/2019/08/01/nclc-volunteers-go-deep-into-the-weeds/"],
+  ["Fresh picked! Farmers Market in Seaside", "Seaside Signal, July 25, 2019", "https://seasidesignal.com/2019/07/25/fresh-picked-farmers-market-in-seaside/"],
+  ["Making ‘scents’ at Beach Books", "Seaside Signal, July 9, 2019", "https://seasidesignal.com/2019/07/09/making-scents-at-beach-books/"],
+  ["Hypertufa workshop promotes local species", "Seaside Signal, July 1, 2019", "https://seasidesignal.com/2019/07/01/hypertufa-workshop-promotes-local-species/"],
+  ["Ode to the Tides", "Seaside Signal, June 19, 2019", "https://seasidesignal.com/2019/06/19/ode-to-the-tides/"],
+  ["The food all around us", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/the-food-all-around-us/"],
+  ["‘Preserving pollinators’ on the North Coast", "Seaside Signal, May 29, 2019", "https://seasidesignal.com/2019/05/29/preserving-pollinators-on-the-north-coast/"],
+  ["Firehouse committee zeroes in on High Point site", "Seaside Signal, May 22, 2019", "https://seasidesignal.com/2019/05/22/firehouse-committee-zeroes-in-on-high-point-site/"],
+  ["Sparking change, one piece of plastic at a time", "Seaside Signal, May 21, 2019", "https://seasidesignal.com/2019/05/21/sparking-change-one-piece-of-plastic-at-a-time/"]
 ];
 
-const GAZETTE_TITLES = [
-  "Preparation is the Watchword (May 3, 2019)",
-  "Beauty and the Beast at Coaster Theater Spring Camp (May 2, 2019)",
-  "Site Plan for Larger Tree Work Required (Apr 17, 2019)",
-  "City Council Appeal Sent Back to Planning Commission (Apr 15, 2019)",
-  "Big Changes Ahead for Rental Permits (Apr 2, 2019)",
-  "Food for the Soul (Apr 2, 2019)",
-  "Bed and Breakfast or Short Term Rental? (Apr 1, 2019)",
-  "Design Review Board approves two new marijuana shop plans (Mar 26, 2019)",
-  "No tents in the park (Mar 21, 2019)",
-  "City seeks clarity on tourism funds (Mar 21, 2019)",
-  "Warren Way reconfiguration ahead (Mar 19, 2019)",
-  "Program seeks to protect puffin population (Mar 16, 2019)",
-  "Operations levy rejected for new fire truck (Mar 15, 2019)",
-  "What’s in store for the new RV park? (Mar 12, 2019)",
-  "Funding sought to analyze potential city hall sites (Mar 11, 2019)",
-  "Love it like a local (Mar 11, 2019)",
-  "Keeping a forest healthy (Mar 4, 2019)",
-  "Savor Cannon Beach (Feb 28, 2019)",
-  "Is comp plan revision ahead? (Feb 26, 2019)",
-  "City hall location only one of many concerns (Feb 20, 2019)",
-  "City hall location dizzying for council (Feb 8, 2019)",
-  "Burglaries spike, but overall crime report is 'average' (Feb 7, 2019)",
-  "Neal Maine's art of the migratory bird (Feb 7, 2019)"
+const GAZETTE_PIECES = [
+  ["Program seeks to protect puffin population", "Cannon Beach Gazette, March 16, 2019. The Gazette URL is 404; this is the sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.", "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/"]
 ];
 
 const HIPFISH = [
-  ["Riverbend Players stage a first musical: Cole Porter’s You Never Know", "May 2017, vol 18, issue 220, p. 16"],
-  ["North Coast Recreation District’s Brilliant New Theater Facility", "January 2017, vol 18, issue 216, pp. 12–13"],
-  ["Of Dust and the River: Tim Hurd", "October 2016, vol 17, issue 213, p. 13"],
-  ["When Albums Were Art — Fred Lackaff on The New Tweedy Bros!", "July 2016, vol 17, issue 210, pp. 11–12"]
+  ["When Albums Were Art", "HipFish Monthly, July 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/07/716.pdf"],
+  ["Of Dust and the River: Tim Hurd", "HipFish Monthly, October 2016 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2016/10/1016.pdf"],
+  ["The New NCRD Theater", "HipFish Monthly, January 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/01/117.pdf"],
+  ["Riverbend Players / Cole Porter", "HipFish Monthly, May 2017 issue PDF.", "https://www.hipfishmonthly.com/wp-content/uploads/2017/05/517.pdf"]
 ];
 
 const MERCURY = [
-  ["And Your Ammo, Too!", "Portland Mercury, February 20, 2013"],
-  ["A Temporary Armistice: Mayor's Plan to Solve Northwest Portland's Parking Wars Still Has Some Critics", "Portland Mercury, December 5, 2012"]
+  ["And Your Ammo, Too!", "Portland Mercury, February 20, 2013.", "https://www.portlandmercury.com/news/2013/02/20/8531590/and-your-ammo-too"],
+  ["A Temporary Armistice", "Portland Mercury, December 5, 2012. Mayor's plan to solve Northwest Portland parking wars.", "https://www.portlandmercury.com/news/2012/12/05/7826150/a-temporary-armistice"]
 ];
 
 const clickables = [];
@@ -450,7 +429,7 @@ const cam = {
   pos: new THREE.Vector3(0, 12, 32),
   vel: new THREE.Vector3()
 };
-const bounds = { x: [-220, 250], y: [-40, 88], z: [-210, 230] };
+const bounds = { x: [-220, 250], y: [-40, 88], z: [-210, 280] };
 
 function smoothstep(k) {
   k = THREE.MathUtils.clamp(k, 0, 1);
@@ -643,7 +622,7 @@ function addWorldGuides() {
     ["GROUND", 0, -30, 0, 18, 3.2],
     ["ART  ·  WEST  −X", -200, 34, 0, 28, 3.4],
     ["RESEARCH  ·  EAST  +X", 248, 16, 0, 32, 3.4],
-    ["WRITING  ·  NORTH  +Z", 0, 22, 228, 28, 3.4],
+    ["WRITING  ·  NORTH  +Z", 0, 22, 268, 28, 3.4],
     ["WEBSITES  ·  SOUTH  −Z", 0, -4, -208, 28, 3.4],
     ["CREDENTIALS  ·  ABOVE  +Y", 0, 78, -36, 26, 3.2]
   ];
@@ -754,81 +733,89 @@ function placeClickCard(mesh, regionId, extra) {
   clickables.push(mesh);
 }
 
+function hallCard(piece, hrefLabel) {
+  const m = makeCard(piece[0], piece[1]);
+  return { mesh: m, extra: {
+    title: piece[0],
+    body: piece[1],
+    href: piece[2],
+    linkLabel: hrefLabel
+  } };
+}
+
 function populateJournalism() {
   const origin = REGIONS.find((r) => r.id === "journalism").pos;
   const ox = origin[0], oy = origin[1], oz = origin[2];
 
   const intro = makeCard(
     "Tillamook County Pioneer",
-    "Assistant editor and website administrator, 2022–present. Four to eight monthly pieces on science, civic life, and the coast. Archive of bylines on the Pioneer."
+    "Assistant editor, 2022–present. The author archive mixes other writers. Sample Cara Mico bylines are the cards in this hall — click any card for the live piece."
   );
-  intro.position.set(ox - 10, oy + 1, oz + 16);
+  intro.position.set(ox - 12, oy + 2, oz + 14);
   placeClickCard(intro, "journalism", {
     title: "Tillamook County Pioneer",
-    body: "Assistant editor since June 2022. Author archive and recent bylines hang in this hall.",
+    body: "Assistant editor since June 2022. Live Cara bylines only — the Pioneer author page also lists other writers.",
     href: "https://www.tillamookcountypioneer.net/author/assistant-editor/",
     linkLabel: "Pioneer author archive",
     links: PIONEER_PIECES.map(([t, , u]) => [t, u])
   });
 
   PIONEER_PIECES.forEach((piece, i) => {
-    const m = makeCard(piece[0], piece[1]);
+    const { mesh, extra } = hallCard(piece, "Open this Pioneer piece");
     const col = i % 3;
     const row = Math.floor(i / 3);
-    m.position.set(ox - 12 + col * 9, oy + 2 - row * 6, oz + 28);
-    placeClickCard(m, "journalism", {
-      title: piece[0],
-      body: piece[1],
-      href: piece[2],
-      linkLabel: "Open this Pioneer piece"
-    });
+    mesh.position.set(ox - 14 + col * 11, oy + 3 - row * 6.4, oz + 28);
+    placeClickCard(mesh, "journalism", extra);
   });
 
-  const seaside = makeCard(
+  const seasideIntro = makeCard(
     "Seaside Signal — 2019",
-    SEASIDE_TITLES.slice(0, 8).join(" · ") + ". Titles from the published CV; live URLs are not attached here."
+    "Fifteen live bylines from the 2019 Signal list. Each card opens the published story."
   );
-  seaside.position.set(ox + 14, oy + 1, oz + 40);
-  placeClickCard(seaside, "journalism", {
+  seasideIntro.position.set(ox, oy + 8, oz + 52);
+  placeClickCard(seasideIntro, "journalism", {
     title: "Seaside Signal, 2019",
-    body: SEASIDE_TITLES.join(" · ")
+    body: "Fifteen verified live stories. Click a card or use the links in this panel.",
+    links: SEASIDE_PIECES.map(([t, , u]) => [t, u])
+  });
+
+  SEASIDE_PIECES.forEach((piece, i) => {
+    const { mesh, extra } = hallCard(piece, "Open this Signal story");
+    const col = i % 5;
+    const row = Math.floor(i / 5);
+    mesh.position.set(ox - 22 + col * 11, oy + 3 - row * 6.6, oz + 66);
+    placeClickCard(mesh, "journalism", extra);
   });
 
   const gazette = makeCard(
-    "Cannon Beach Gazette — 2019",
-    "Civic and arts reporting. One live URL: Program seeks to protect puffin population, March 16, 2019."
+    "Cannon Beach Gazette — puffins",
+    "Program seeks to protect puffin population, March 16, 2019. Labeled Cannon Beach Gazette. The Gazette page is 404; this opens the Seaside Signal sister reprint, bylined Cara Mico / For Cannon Beach Gazette."
   );
-  gazette.position.set(ox + 14, oy + 1, oz + 50);
+  gazette.position.set(ox, oy + 2, oz + 92);
   placeClickCard(gazette, "journalism", {
-    title: "Cannon Beach Gazette, 2019",
-    body: GAZETTE_TITLES.join(" · "),
-    href: "https://www.cannonbeachgazette.com/news/local-news/program-seeks-to-protect-puffin-population/article_39794b1e-486f-11e9-8df5-9fd8164430ec.html",
-    linkLabel: "Puffin population, Cannon Beach Gazette"
+    title: "Cannon Beach Gazette: puffin population",
+    body: "March 16, 2019. Gazette URL is 404. Sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.",
+    href: "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/",
+    linkLabel: "Open the Gazette puffin reprint"
   });
 
   HIPFISH.forEach((piece, i) => {
-    const m = makeCard(piece[0], "HipFish Monthly — " + piece[1]);
-    m.position.set(ox - 10 + (i % 2) * 10, oy + 1 - Math.floor(i / 2) * 6, oz + 64);
-    placeClickCard(m, "journalism", {
-      title: piece[0],
-      body: "HipFish Monthly, 2016–2017. " + piece[1]
-    });
+    const { mesh, extra } = hallCard(piece, "Open this HipFish issue PDF");
+    mesh.position.set(ox - 16 + (i % 2) * 16, oy + 2 - Math.floor(i / 2) * 6.4, oz + 110);
+    placeClickCard(mesh, "journalism", extra);
   });
 
   MERCURY.forEach((piece, i) => {
-    const m = makeCard(piece[0], piece[1]);
-    m.position.set(ox - 6 + i * 12, oy + 1, oz + 80);
-    placeClickCard(m, "journalism", {
-      title: piece[0],
-      body: piece[1]
-    });
+    const { mesh, extra } = hallCard(piece, "Open this Mercury story");
+    mesh.position.set(ox - 10 + i * 16, oy + 2, oz + 128);
+    placeClickCard(mesh, "journalism", extra);
   });
 
   const freelance = makeCard(
     "Freelance newspapers, since 2012",
-    "From the Experience page: covering arts, environment, and emergency preparedness since November 2012. Papers named in this room are the ones on the published CV — Pioneer, Seaside Signal, Cannon Beach Gazette, HipFish Monthly, and the Portland Mercury."
+    "From the Experience page: arts, environment, and emergency preparedness since November 2012. Papers in this room are the CV set — Pioneer, Seaside Signal, Cannon Beach Gazette, HipFish Monthly, and the Portland Mercury."
   );
-  freelance.position.set(ox, oy - 4, oz + 92);
+  freelance.position.set(ox, oy - 4, oz + 142);
   placeClickCard(freelance, "journalism", {
     title: "Freelance journalist, Nov 2012–present",
     body: "Arts, environment, and emergency preparedness. Assistant editor at the Tillamook County Pioneer. Other papers named here are from the published CV only."
