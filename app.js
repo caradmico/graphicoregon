@@ -1027,7 +1027,10 @@ const MERCURY = [
 ];
 
 const clickables = [];
-let scene, camera, renderer, avatar, shipMesh, suitMesh;
+const SHOP_CLICK_RANGE = 8;
+const OUTDOOR_AMBIENT = 0.58;
+const INDOOR_AMBIENT = 1.08;
+let scene, camera, renderer, avatar, shipMesh, suitMesh, sceneAmbient;
 let lookYaw = 0;
 let lookPitch = -0.12;
 let dragging = false;
@@ -1128,6 +1131,9 @@ function travelFacing() {
 function applyIndoorCamera(dt) {
   const t = studioIndoorT(cam.pos);
   indoorBlend = THREE.MathUtils.lerp(indoorBlend, t, 1 - Math.exp(-dt * 6));
+  if (sceneAmbient) {
+    sceneAmbient.intensity = THREE.MathUtils.lerp(OUTDOOR_AMBIENT, INDOOR_AMBIENT, indoorBlend);
+  }
   if (indoorBlend < 0.01) return;
   const targetY = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
   cam.pos.y += (targetY - cam.pos.y) * indoorBlend * (1 - Math.exp(-dt * 7.5));
@@ -2170,9 +2176,9 @@ async function explodeResearch(id, figs) {
 }
 
 
-const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x101820 });
-const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x0a1014 });
-const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x070b0e });
+const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x1c2a32 });
+const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x162028 });
+const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x121a20 });
 const STUDIO_TEAL = new THREE.MeshBasicMaterial({ color: teal });
 const STUDIO_GOLD = new THREE.MeshBasicMaterial({ color: gold });
 const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x161e24 });
@@ -2222,7 +2228,7 @@ function framedArt(tex, maxW, rotDeg) {
       map,
       emissive: 0xffffff,
       emissiveMap: map,
-      emissiveIntensity: 0.42,
+      emissiveIntensity: 0.78,
       roughness: 0.92,
       metalness: 0
     }))
@@ -2242,6 +2248,7 @@ function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
   piece.userData.title = title;
   piece.userData.stay = true;
   piece.userData.isArt = true;
+  piece.userData.hangOnWall = true;
   piece.userData.focusDist = 2.35;
   studioParent().add(piece);
   clickables.push(piece);
@@ -2374,18 +2381,17 @@ function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
   rimHall(x0, x1, z0, z1, y0, y1);
 }
 
-function addStudioLight(x, y, z, color, intensity, dist) {
-  const l = new THREE.PointLight(color, intensity, dist);
-  l.position.set(x, y, z);
-  studioParent().add(l);
-}
-
 function addStudioGalleryLight() {
-  const hemi = new THREE.HemisphereLight(0xd8ebe8, 0x0a1218, 1.15);
+  const hemi = new THREE.HemisphereLight(0xeaf6f4, 0x1a2830, 2.1);
   studioParent().add(hemi);
-  const skylight = new THREE.DirectionalLight(0xfff4e0, 0.55);
-  skylight.position.set(ax(-200), 18, 0);
+  const skylight = new THREE.DirectionalLight(0xfff6e8, 1.2);
+  skylight.position.set(ax(-200), 22, 6);
   studioParent().add(skylight);
+  const fill = new THREE.DirectionalLight(0xc8e8e4, 0.48);
+  fill.position.set(ax(-168), 11, -20);
+  studioParent().add(fill);
+  const studioAmbient = new THREE.AmbientLight(0xa8c4c0, 0.62);
+  studioParent().add(studioAmbient);
 }
 
 function makeGarmentStand(tex, kind) {
@@ -2544,14 +2550,6 @@ function populateStudioGeometry() {
   hallTitle("Lobby", [-187.2, 8.4, 0], Math.PI / 2);
 
   addStudioGalleryLight();
-  addStudioLight(-176, 8.2, 0, 0x2aa8a0, 18, 42);
-  addStudioLight(-186, 8.0, 40, 0xd4b05a, 12, 40);
-  addStudioLight(-208, 8.0, -38, 0x2aa8a0, 12, 36);
-  addStudioLight(-240, 8.0, 0, 0x2aa8a0, 14, 36);
-  addStudioLight(-234, 7.6, 30, 0xd4b05a, 10, 28);
-  addStudioLight(-236, 8.0, -44, 0x2aa8a0, 14, 42);
-  addStudioLight(-170, 7.6, -28, 0xd4b05a, 12, 28);
-  addStudioLight(-150, 14, 0, 0xd4b05a, 16, 50);
 
   const counter = musBox(1.6, 1.15, 5.2, STUDIO_DARK);
   counter.position.set(-159.1, 0.7, -24.5);
@@ -2571,6 +2569,7 @@ function populateStudioGeometry() {
   sign.userData.href = "https://sassmeharder.com/";
   sign.userData.linkLabel = "Open sassmeharder.com";
   sign.userData.openUrl = "https://sassmeharder.com/";
+  sign.userData.isShop = true;
   studioParent().add(sign);
   clickables.push(sign);
 
@@ -2617,6 +2616,7 @@ async function populateStudioArt() {
     stand.userData.href = p.href;
     stand.userData.linkLabel = "Open this product";
     stand.userData.openUrl = p.href;
+    stand.userData.isShop = true;
     stand.userData.stay = true;
     studioParent().add(stand);
     clickables.push(stand);
@@ -2915,6 +2915,12 @@ function setupNav() {
   });
 }
 
+function clickableRoot(hit) {
+  let obj = hit.object;
+  while (obj && !obj.userData.regionId && obj.parent) obj = obj.parent;
+  return obj && obj.userData.regionId ? obj : null;
+}
+
 function pickAt(e) {
   const rect = renderer.domElement.getBoundingClientRect();
   const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -2923,9 +2929,31 @@ function pickAt(e) {
   ray.setFromCamera({ x, y }, camera);
   const hits = ray.intersectObjects(clickables, true);
   if (!hits.length) return null;
-  let obj = hits[0].object;
-  while (obj && !obj.userData.regionId && obj.parent) obj = obj.parent;
-  return obj && obj.userData.regionId ? obj : null;
+
+  const picks = [];
+  for (const hit of hits) {
+    const obj = clickableRoot(hit);
+    if (!obj) continue;
+    const shopHit = obj.userData.isShop || obj.userData.openUrl;
+    if (shopHit && hit.distance > SHOP_CLICK_RANGE) continue;
+    picks.push({ obj, dist: hit.distance });
+  }
+  if (!picks.length) return null;
+
+  const arts = picks.filter((p) => p.obj.userData.isArt || p.obj.userData.hangOnWall);
+  const preferArt = isIndoors() || studioIndoorT(cam.pos) > 0.2;
+  if (preferArt && arts.length) {
+    arts.sort((a, b) => a.dist - b.dist);
+    return arts[0].obj;
+  }
+
+  picks.sort((a, b) => a.dist - b.dist);
+  if (arts.length) {
+    arts.sort((a, b) => a.dist - b.dist);
+    const front = picks[0];
+    if (front.obj.userData.openUrl && arts[0].dist < front.dist + 5) return arts[0].obj;
+  }
+  return picks[0].obj;
 }
 
 function onPointer(e) {
@@ -2937,9 +2965,6 @@ function onPointer(e) {
     }
     shootBubble();
     return;
-  }
-  if (obj.userData.openUrl) {
-    window.open(obj.userData.openUrl, "_blank", "noopener");
   }
   const region = REGIONS.find((r) => r.id === obj.userData.regionId);
   if (!region) return;
@@ -2953,6 +2978,9 @@ function onPointer(e) {
   if (obj.userData.isArt && (isIndoors() || studioIndoorT(cam.pos) > 0.2)) {
     beginArtFocus(obj, region, extra);
     return;
+  }
+  if (obj.userData.openUrl) {
+    window.open(obj.userData.openUrl, "_blank", "noopener");
   }
   if (obj.userData.stay && cam.pos.distanceTo(new THREE.Vector3(...region.pos)) < 36) {
     showRegion(region, extra);
@@ -3123,7 +3151,8 @@ async function main() {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  scene.add(new THREE.AmbientLight(0x6f8a88, 0.58));
+  sceneAmbient = new THREE.AmbientLight(0x6f8a88, OUTDOOR_AMBIENT);
+  scene.add(sceneAmbient);
   const key = new THREE.PointLight(0x2aa8a0, 22, 140);
   key.position.set(8, 22, 16);
   scene.add(key);
