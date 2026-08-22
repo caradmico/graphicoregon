@@ -1027,14 +1027,16 @@ const MERCURY = [
 ];
 
 const clickables = [];
-let scene, camera, renderer, ship;
+let scene, camera, renderer, avatar, shipMesh, suitMesh;
 let lookYaw = 0;
 let lookPitch = -0.12;
 let dragging = false;
 let lastX = 0;
 let lastY = 0;
 let keys = {};
-let scrollBoost = 0; // wheel dolly along look, units/sec — signed, symmetric
+let scrollBoost = 0; // wheel glide along flat facing, units/sec
+let strafeBoost = 0;
+let indoorBlend = 0;
 let flight = null;
 let bubbleCool = 0;
 const bubbles = [];
@@ -1045,6 +1047,11 @@ const _camRight = new THREE.Vector3();
 const _camTrueUp = new THREE.Vector3();
 const _camBack = new THREE.Vector3();
 const _camMat = new THREE.Matrix4();
+const _flatDir = new THREE.Vector3();
+const _avatarTarget = new THREE.Vector3();
+const STUDIO_SHELL = { x0: -258, x1: -156, z0: -70, z1: 66, entryX: -154 };
+const STUDIO_FLOOR_Y = 0.08;
+const STUDIO_EYE_Y = 1.72;
 const cam = {
   pos: new THREE.Vector3(...REGIONS[0].pos),
   vel: new THREE.Vector3()
@@ -1070,6 +1077,42 @@ function lerpAngle(a, b, t) {
 function lookDir() {
   const cp = Math.cos(lookPitch);
   return new THREE.Vector3(Math.sin(lookYaw) * cp, Math.sin(lookPitch), -Math.cos(lookYaw) * cp);
+}
+
+function flatLookDir() {
+  const dir = lookDir();
+  _flatDir.set(dir.x, 0, dir.z);
+  if (_flatDir.lengthSq() < 1e-6) _flatDir.set(0, 0, -1);
+  else _flatDir.normalize();
+  return _flatDir;
+}
+
+function studioIndoorT(p) {
+  const x0 = ax(STUDIO_SHELL.x0);
+  const x1 = ax(STUDIO_SHELL.x1);
+  const entryOuter = ax(STUDIO_SHELL.entryX) + 4;
+  if (p.y > STUDIO_FLOOR_Y + STUDIO_EYE_Y + 6) return 0;
+  if (p.z < STUDIO_SHELL.z0 + 1 || p.z > STUDIO_SHELL.z1 - 1) return 0;
+  if (p.x < x0 + 1 || p.x > entryOuter) return 0;
+  if (p.x <= x1) return 1;
+  return smoothstep((entryOuter - p.x) / (entryOuter - x1));
+}
+
+function travelFacing() {
+  if (cam.vel.lengthSq() > 0.55) {
+    _flatDir.set(cam.vel.x, 0, cam.vel.z);
+    if (_flatDir.lengthSq() > 1e-6) return _flatDir.normalize();
+  }
+  return flatLookDir();
+}
+
+function applyIndoorCamera(dt) {
+  const t = studioIndoorT(cam.pos);
+  indoorBlend = THREE.MathUtils.lerp(indoorBlend, t, 1 - Math.exp(-dt * 6));
+  if (indoorBlend < 0.01) return;
+  const targetY = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
+  cam.pos.y += (targetY - cam.pos.y) * indoorBlend * (1 - Math.exp(-dt * 7.5));
+  cam.vel.y *= 1 - indoorBlend * (1 - Math.exp(-dt * 5.5));
 }
 
 function yawPitchFromPoints(from, to) {
@@ -1446,6 +1489,85 @@ function makeShip() {
   return g;
 }
 
+function makeSuit() {
+  const g = new THREE.Group();
+  const goldMat = new THREE.MeshBasicMaterial({ color: gold });
+  const tealMat = new THREE.MeshBasicMaterial({ color: teal });
+  const inkMat = new THREE.MeshBasicMaterial({ color: ink });
+  const darkMat = new THREE.MeshBasicMaterial({ color: 0x161e24 });
+
+  const hip = 0.92;
+  const legH = 0.88;
+  const legGeo = new THREE.BoxGeometry(0.22, legH, 0.24);
+  const legL = new THREE.Mesh(legGeo, inkMat);
+  legL.position.set(-0.14, hip - legH * 0.5, 0);
+  const legR = legL.clone();
+  legR.position.x = 0.14;
+  g.add(legL, legR);
+
+  const boot = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.14, 0.34), goldMat);
+  boot.position.set(-0.14, hip - legH + 0.05, 0.04);
+  const bootR = boot.clone();
+  bootR.position.x = 0.14;
+  g.add(boot, bootR);
+
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.62, 0.3), tealMat);
+  torso.position.set(0, hip + 0.34, 0);
+  g.add(torso);
+
+  const chest = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.36, 0.08), goldMat);
+  chest.position.set(0, hip + 0.42, 0.18);
+  g.add(chest);
+
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.32), goldMat);
+  belt.position.set(0, hip + 0.06, 0);
+  g.add(belt);
+
+  const padGeo = new THREE.BoxGeometry(0.2, 0.12, 0.26);
+  const padL = new THREE.Mesh(padGeo, goldMat);
+  padL.position.set(-0.34, hip + 0.52, 0);
+  const padR = padL.clone();
+  padR.position.x = 0.34;
+  g.add(padL, padR);
+
+  const armGeo = new THREE.BoxGeometry(0.16, 0.52, 0.16);
+  const armL = new THREE.Mesh(armGeo, tealMat);
+  armL.position.set(-0.34, hip + 0.18, 0);
+  const armR = armL.clone();
+  armR.position.x = 0.34;
+  g.add(armL, armR);
+
+  const gloveL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.18), inkMat);
+  gloveL.position.set(-0.34, hip - 0.12, 0);
+  const gloveR = gloveL.clone();
+  gloveR.position.x = 0.34;
+  g.add(gloveL, gloveR);
+
+  const helm = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), goldMat);
+  helm.position.set(0, hip + 0.86, 0);
+  helm.scale.set(1, 1.05, 0.95);
+  g.add(helm);
+
+  const visor = new THREE.Mesh(
+    new THREE.SphereGeometry(0.17, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+    tealMat
+  );
+  visor.position.set(0, hip + 0.84, 0.12);
+  visor.rotation.x = -Math.PI / 2;
+  g.add(visor);
+
+  const cape = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.72, 0.06), darkMat);
+  cape.position.set(0, hip + 0.28, -0.2);
+  g.add(cape);
+
+  const trim = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.1), goldMat);
+  trim.position.set(0, hip + 0.28, -0.24);
+  g.add(trim);
+
+  g.userData.glow = null;
+  return g;
+}
+
 function makeMedal() {
   const g = new THREE.Group();
   const disc = new THREE.Mesh(
@@ -1480,8 +1602,9 @@ function shootBubble() {
   if (bubbleCool > 0 || bubbles.length > 22) return;
   bubbleCool = 0.16;
   const dir = lookDir();
-  const origin = ship
-    ? ship.position.clone().addScaledVector(dir, 0.85)
+  const body = (suitMesh && suitMesh.visible) ? suitMesh : shipMesh;
+  const origin = body
+    ? body.position.clone().addScaledVector(dir, 0.85)
     : cam.pos.clone().addScaledVector(dir, 2.2);
   const color = Math.random() < 0.55 ? teal : gold;
   const mesh = new THREE.Mesh(
@@ -1533,15 +1656,31 @@ function updateBubbles(dt) {
   }
 }
 
-function updateShip(dt) {
-  if (!ship) return;
+function updateAvatar(dt) {
+  if (!avatar) return;
+  const indoor = studioIndoorT(cam.pos) > 0.32;
+  shipMesh.visible = !indoor;
+  suitMesh.visible = indoor;
+  const facing = travelFacing();
+
+  if (indoor) {
+    _avatarTarget.set(cam.pos.x, STUDIO_FLOOR_Y, cam.pos.z);
+    suitMesh.position.lerp(_avatarTarget, 1 - Math.exp(-dt * 16));
+    suitMesh.lookAt(
+      suitMesh.position.x + facing.x,
+      suitMesh.position.y,
+      suitMesh.position.z + facing.z
+    );
+    return;
+  }
+
   const dir = lookDir();
-  const target = cam.pos.clone().addScaledVector(dir, 3.55);
-  target.y -= 0.88;
-  ship.position.lerp(target, 1 - Math.exp(-dt * 14));
-  const aim = ship.position.clone().add(dir);
-  ship.lookAt(aim);
-  const glow = ship.userData.glow;
+  _avatarTarget.copy(cam.pos).addScaledVector(dir, 3.55);
+  _avatarTarget.y -= 0.88;
+  shipMesh.position.lerp(_avatarTarget, 1 - Math.exp(-dt * 14));
+  const aim = shipMesh.position.clone().add(dir);
+  shipMesh.lookAt(aim);
+  const glow = shipMesh.userData.glow;
   if (glow) {
     const pulse = 0.45 + 0.28 * (0.5 + 0.5 * Math.sin(clock.elapsedTime * 6.2));
     glow.material.opacity = pulse;
@@ -2539,8 +2678,12 @@ function populateImmediate() {
   arrival.userData.billboard = true;
   scene.add(arrival);
 
-  ship = makeShip();
-  scene.add(ship);
+  avatar = new THREE.Group();
+  shipMesh = makeShip();
+  suitMesh = makeSuit();
+  suitMesh.visible = false;
+  avatar.add(shipMesh, suitMesh);
+  scene.add(avatar);
 }
 
 async function populateDeferred() {
@@ -2604,6 +2747,7 @@ function flyTo(region, extra) {
   flight.queue = hops.slice(1);
   cam.vel.set(0, 0, 0);
   scrollBoost = 0;
+  strafeBoost = 0;
   showRegion(region, extra);
 }
 
@@ -2673,11 +2817,17 @@ function bindInput() {
     e.preventDefault();
     if (flight) flight = null;
     let dy = e.deltaY;
-    if (e.deltaMode === 1) dy *= 16;
-    if (e.deltaMode === 2) dy *= 800;
-    const unit = THREE.MathUtils.clamp(dy / 100, -1, 1);
-    scrollBoost -= unit * 78;
+    let dx = e.deltaX;
+    if (e.deltaMode === 1) { dy *= 16; dx *= 16; }
+    if (e.deltaMode === 2) { dy *= 800; dx *= 800; }
+    const unitY = THREE.MathUtils.clamp(dy / 100, -1, 1);
+    const unitX = THREE.MathUtils.clamp(dx / 100, -1, 1);
+    scrollBoost -= unitY * 78;
     scrollBoost = THREE.MathUtils.clamp(scrollBoost, -130, 130);
+    if (Math.abs(dx) > 0.5) {
+      strafeBoost += unitX * 62;
+      strafeBoost = THREE.MathUtils.clamp(strafeBoost, -110, 110);
+    }
   }, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
@@ -2743,13 +2893,23 @@ function tick() {
     if (keys.d || keys.arrowright) lookYaw -= dt * 0.95;
     if (keys.q) cam.vel.y -= speed * 0.75 * dt;
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
+    const flat = flatLookDir();
     if (scrollBoost) {
-      cam.pos.addScaledVector(dir, scrollBoost * dt);
-      scrollBoost *= Math.exp(-dt * 2.05);
-      if (Math.abs(scrollBoost) < 0.35) scrollBoost = 0;
+      cam.vel.addScaledVector(flat, scrollBoost * 0.58);
+      scrollBoost *= Math.exp(-dt * 2.35);
+      if (Math.abs(scrollBoost) < 0.4) scrollBoost = 0;
+    }
+    if (strafeBoost) {
+      _camRight.crossVectors(_worldUp, flat);
+      if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
+      else _camRight.normalize();
+      cam.vel.addScaledVector(_camRight, strafeBoost * 0.52);
+      strafeBoost *= Math.exp(-dt * 2.35);
+      if (Math.abs(strafeBoost) < 0.4) strafeBoost = 0;
     }
     cam.vel.multiplyScalar(Math.exp(-dt * 2.15));
     cam.pos.addScaledVector(cam.vel, 1);
+    applyIndoorCamera(dt);
     cam.pos.x = THREE.MathUtils.clamp(cam.pos.x, bounds.x[0], bounds.x[1]);
     cam.pos.y = THREE.MathUtils.clamp(cam.pos.y, bounds.y[0], bounds.y[1]);
     cam.pos.z = THREE.MathUtils.clamp(cam.pos.z, bounds.z[0], bounds.z[1]);
@@ -2765,7 +2925,7 @@ function tick() {
   _camMat.makeBasis(_camRight, _camTrueUp, _camBack);
   camera.quaternion.setFromRotationMatrix(_camMat);
 
-  updateShip(dt);
+  updateAvatar(dt);
   updateBubbles(dt);
 
   scene.traverse((obj) => {
