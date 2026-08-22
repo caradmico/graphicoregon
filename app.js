@@ -2895,7 +2895,7 @@ function tick() {
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
     const flat = flatLookDir();
     if (scrollBoost) {
-      cam.vel.addScaledVector(flat, scrollBoost * 0.58);
+      cam.vel.addScaledVector(flat, scrollBoost * 0.58 * dt);
       scrollBoost *= Math.exp(-dt * 2.35);
       if (Math.abs(scrollBoost) < 0.4) scrollBoost = 0;
     }
@@ -2903,7 +2903,7 @@ function tick() {
       _camRight.crossVectors(_worldUp, flat);
       if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
       else _camRight.normalize();
-      cam.vel.addScaledVector(_camRight, strafeBoost * 0.52);
+      cam.vel.addScaledVector(_camRight, strafeBoost * 0.52 * dt);
       strafeBoost *= Math.exp(-dt * 2.35);
       if (Math.abs(strafeBoost) < 0.4) strafeBoost = 0;
     }
