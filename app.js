@@ -2938,7 +2938,38 @@ function showRegion(region, extra) {
   });
 }
 
+const WALK_WINGS = new Set(["portraits", "still-life", "coast", "prints", "studio"]);
+
+function nearestArtIn(regionId) {
+  let best = null;
+  let bestD = Infinity;
+  const here = new THREE.Vector3();
+  for (const obj of clickables) {
+    if (!obj.userData || !obj.userData.isArt || obj.userData.regionId !== regionId) continue;
+    obj.getWorldPosition(here);
+    const d = cam.pos.distanceTo(here);
+    if (d < bestD) {
+      bestD = d;
+      best = obj;
+    }
+  }
+  return best;
+}
+
+function walkToPiece(region, extra) {
+  const piece = nearestArtIn(region.id);
+  if (!piece) return false;
+  beginArtFocus(piece, region, {
+    title: piece.userData.title,
+    body: (extra && extra.body) || piece.userData.body,
+    href: piece.userData.href || (extra && extra.href),
+    linkLabel: piece.userData.linkLabel || (extra && extra.linkLabel)
+  });
+  return true;
+}
+
 function flyTo(region, extra) {
+  if (WALK_WINGS.has(region.id) && isIndoors() && walkToPiece(region, extra)) return;
   artFocus = null;
   const hops = hopList(region).map((h) => ({
     pos: new THREE.Vector3(...h.pos),
@@ -3084,7 +3115,7 @@ function bindInput() {
   el.addEventListener("pointermove", (e) => {
     if (!dragging) return;
     if (flight) flight = null;
-    lookYaw += (e.clientX - lastX) * 0.0028;
+    lookYaw -= (e.clientX - lastX) * 0.0028;
     lookPitch -= (e.clientY - lastY) * 0.0022;
     lookPitch = THREE.MathUtils.clamp(lookPitch, -1.15, 1.15);
     lastX = e.clientX;
