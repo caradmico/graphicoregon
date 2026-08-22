@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Graphic Oregon</title>
-  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art. A wanderable portfolio of mapping, habitat studies, and commissioned work.">
+  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art. A wanderable portfolio of mapping, habitat studies, journalism, and commissioned work.">
   <meta name="theme-color" content="#0a1014">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
   <link rel="stylesheet" href="styles.css">
@@ -13,7 +13,7 @@
   <div id="loader">
     <div class="inner">
       <h1>Graphic Oregon</h1>
-      <p>Research · Mapping · Design · Fine Art</p>
+      <p>Research · Mapping · Design · Writing · Fine Art</p>
     </div>
   </div>
   <canvas id="stage"></canvas>
@@ -25,15 +25,24 @@
     <div id="region-chip">
       <div class="label">Now entering</div>
       <div class="name" id="region-name">Arrival</div>
+      <div class="axis" id="region-axis">Origin</div>
+    </div>
+    <div id="compass" aria-hidden="true">
+      <div class="c-n">Writing +Z</div>
+      <div class="c-e">Research +X</div>
+      <div class="c-s">Websites −Z</div>
+      <div class="c-w">Art −X</div>
+      <div class="c-up">Credentials +Y</div>
+      <div class="c-dn">Ground −Y</div>
     </div>
     <nav id="destinations" aria-label="Portfolio regions"></nav>
     <aside id="panel" hidden>
       <div class="meta" id="panel-meta"></div>
       <h2 id="panel-title"></h2>
       <p id="panel-body"></p>
-      <p><a id="panel-link" href="#" target="_blank" rel="noopener">Open source page</a></p>
+      <div id="panel-links"></div>
     </aside>
-    <div id="help">Scroll or drag to travel · click a region · WASD / arrows to wander</div>
+    <div id="help">Scroll to fly · drag to look · WASD to travel · Q/E to climb · click a neighborhood</div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
   <script src="app.js"></script>

@@ -77,6 +77,42 @@ header.top p.tag {
   color: var(--gold-soft);
 }
 
+#region-chip .axis {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+#compass {
+  position: absolute;
+  top: 118px;
+  right: 28px;
+  width: 148px;
+  height: 148px;
+  border: 1px solid rgba(42, 168, 160, 0.28);
+  border-radius: 50%;
+  background: rgba(10, 16, 20, 0.42);
+  pointer-events: none;
+}
+
+#compass div {
+  position: absolute;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  white-space: nowrap;
+}
+
+#compass .c-n { top: 10px; left: 50%; transform: translateX(-50%); }
+#compass .c-s { bottom: 10px; left: 50%; transform: translateX(-50%); }
+#compass .c-e { right: 8px; top: 50%; transform: translateY(-50%); }
+#compass .c-w { left: 8px; top: 50%; transform: translateY(-50%); }
+#compass .c-up { top: 40px; left: 50%; transform: translateX(-50%); color: var(--teal); }
+#compass .c-dn { bottom: 40px; left: 50%; transform: translateX(-50%); color: var(--muted); }
+
 nav#destinations {
   position: absolute;
   left: 22px;
@@ -84,11 +120,21 @@ nav#destinations {
   pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-height: min(46vh, 420px);
+  gap: 4px;
+  max-height: min(52vh, 480px);
   overflow: auto;
   padding-right: 6px;
 }
+
+nav#destinations .group {
+  margin-top: 8px;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+nav#destinations .group:first-child { margin-top: 0; }
 
 nav#destinations button {
   appearance: none;
@@ -114,8 +160,8 @@ nav#destinations button.active {
   position: absolute;
   right: 22px;
   bottom: 22px;
-  width: min(380px, calc(100vw - 44px));
-  max-height: min(52vh, 460px);
+  width: min(400px, calc(100vw - 44px));
+  max-height: min(52vh, 480px);
   overflow: auto;
   pointer-events: auto;
   background: rgba(10, 16, 20, 0.78);
@@ -137,9 +183,13 @@ nav#destinations button.active {
   margin-bottom: 10px;
 }
 
-#panel a {
+#panel a,
+#panel-links a {
   color: var(--teal);
   text-underline-offset: 3px;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
 }
 
 #panel .meta {
@@ -179,7 +229,7 @@ nav#destinations button.active {
 #loader p { color: var(--teal); margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
 
 @media (max-width: 760px) {
-  nav#destinations { max-height: 28vh; }
-  #panel { max-height: 34vh; }
-  #help { display: none; }
+  nav#destinations { max-height: 26vh; }
+  #panel { max-height: 32vh; }
+  #help, #compass { display: none; }
 }
