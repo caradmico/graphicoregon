@@ -2195,13 +2195,13 @@ async function explodeResearch(id, figs) {
 }
 
 
-const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x3d4641 });
-const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x1a211e });
-const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x2a322e });
-const STUDIO_TEAL = new THREE.MeshLambertMaterial({ color: 0x1f4a48 });
-const STUDIO_GOLD = new THREE.MeshLambertMaterial({ color: 0x6e5a32 });
-const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x161814 });
-const STUDIO_FRAME = new THREE.MeshLambertMaterial({ color: 0x2c2a24 });
+const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x6e7c74 });
+const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x3a443e });
+const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x526058 });
+const STUDIO_TEAL = new THREE.MeshLambertMaterial({ color: 0x2a5854 });
+const STUDIO_GOLD = new THREE.MeshLambertMaterial({ color: 0x7a6640 });
+const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x1c1e1a });
+const STUDIO_FRAME = new THREE.MeshLambertMaterial({ color: 0x3a3832 });
 
 function musBox(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -2248,7 +2248,7 @@ function framedArt(tex, maxW, rotDeg) {
       map,
       emissive: 0xffffff,
       emissiveMap: map,
-      emissiveIntensity: 0.3
+      emissiveIntensity: 0.45
     }))
   );
   pic.position.z = 0.01;
@@ -2409,11 +2409,12 @@ function aimStudioDir(color, intensity, from, to) {
 }
 
 function addStudioGalleryLight() {
-  const hemi = new THREE.HemisphereLight(0xe8eee6, 0x2a322c, 0.95);
+  const hemi = new THREE.HemisphereLight(0xf0eee4, 0x3a443c, 1.35);
   studioParent().add(hemi);
-  aimStudioDir(0xf3efe4, 0.65, [-207, 24, -2], [-207, 0, -2]);
-  aimStudioDir(0xd8e4e0, 0.28, [-150, 10, 0], [-220, 4, 0]);
-  const studioAmbient = new THREE.AmbientLight(0xb8c4bc, 0.38);
+  aimStudioDir(0xf3efe4, 0.82, [-188, 20, 22], [-220, 1, -18]);
+  aimStudioDir(0xdce6e0, 0.42, [-150, 10, 0], [-220, 4, 0]);
+  aimStudioDir(0xe8e4d8, 0.34, [-207, 12, 48], [-207, 4, -28]);
+  const studioAmbient = new THREE.AmbientLight(0xc4d0c8, 0.55);
   studioParent().add(studioAmbient);
 }
 
