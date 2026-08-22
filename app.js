@@ -9,12 +9,12 @@ const REGIONS = [
     id: "arrival",
     name: "Arrival",
     kind: "intro",
-    axis: "Origin · 0, 0, 0",
-    pos: [0, 16, 36],
-    look: [20, 10, 8],
+    axis: "South of origin · looking north",
+    pos: [0, 15, -72],
+    look: [0, 8, 22],
     meta: "Graphic Oregon",
     title: "Technical design solutions",
-    body: "A small craft marks your place. Art is west — a building you can see from here, then fly into. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
+    body: "Art west. Research east. Writing north. Credentials above. Websites south.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   },
@@ -27,7 +27,7 @@ const REGIONS = [
     look: [-168, 9, 0],
     meta: "Oil · acrylic · charcoal · prints",
     title: "Plaza",
-    body: "A hall you fly into. The plaza faces the entrance. A second hop through the doorway takes you into the lobby, then corridors lead to portraits, still life, coast, prints, studio work, and the gift shop.",
+    body: "The west studio. Portraits, still life, coast, prints, and the gift shop.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
   },
@@ -240,8 +240,10 @@ const REGIONS = [
     name: "Netarts Bay Watershed",
     kind: "exploded",
     axis: "East · +X, ground −Y",
-    pos: [108, -8, 22],
-    look: [108, -10, 2],
+    pos: [108, -2, 48],
+    look: [108, -4, 16],
+    mark: [108, 10, 16],
+    quietMark: true,
     meta: "Research · Demeter Design, 2008",
     title: "Netarts Bay Watershed Habitat Assessment",
     body: "Prepared for the Tillamook Estuaries Partnership. A ~17,000-acre North Coast watershed and ~2,000-acre saline estuary. Poorly sorted spawning gravels are the primary limiter for Chum; summer rearing is an equal limiter for Coho. Maps and findings hang in this region — not an embedded report.",
@@ -997,7 +999,7 @@ const bubbles = [];
 const clock = new THREE.Clock();
 const _billboardAt = new THREE.Vector3();
 const cam = {
-  pos: new THREE.Vector3(0, 16, 36),
+  pos: new THREE.Vector3(0, 15, -72),
   vel: new THREE.Vector3()
 };
 const bounds = { x: [-320, 380], y: [-52, 120], z: [-280, 420] };
@@ -1199,13 +1201,28 @@ function makeJobCard(role, org, dates, body) {
 }
 
 function loadTexture(url) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (tex) => {
+      if (done) return;
+      done = true;
+      resolve(tex);
+    };
     const loader = new THREE.TextureLoader();
     loader.load(url, (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.minFilter = THREE.LinearFilter;
-      resolve(tex);
-    }, undefined, reject);
+      finish(tex);
+    }, undefined, () => {
+      console.warn("texture failed", url);
+      finish(null);
+    });
+    setTimeout(() => {
+      if (!done) {
+        console.warn("texture timeout", url);
+        finish(null);
+      }
+    }, 20000);
   });
 }
 
@@ -1287,21 +1304,22 @@ function addWorldGuides() {
 
 function addBeacon(region) {
   if (region.noBeacon) return;
-  const field = region.kind !== "art" && region.id !== "arrival";
-  const orbR = field ? 1.25 : 0.55;
+  const mark = region.mark || region.pos;
+  const field = region.kind !== "art" && region.id !== "arrival" && !region.quietMark;
+  const orbR = field ? 1.25 : 0.42;
   const geo = new THREE.SphereGeometry(orbR, 24, 24);
   const mat = new THREE.MeshBasicMaterial({ color: region.kind === "exploded" ? gold : teal });
   const orb = new THREE.Mesh(geo, mat);
-  orb.position.set(...region.pos);
+  orb.position.set(...mark);
   orb.userData.regionId = region.id;
   scene.add(orb);
   clickables.push(orb);
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(field ? 2.7 : 1.35, field ? 3.15 : 1.55, 48),
+    new THREE.RingGeometry(field ? 2.7 : 1.05, field ? 3.15 : 1.22, 48),
     new THREE.MeshBasicMaterial({ color: gold, side: THREE.DoubleSide, transparent: true, opacity: field ? 0.78 : 0.5 })
   );
   ring.rotation.x = Math.PI / 2;
-  ring.position.set(region.pos[0], region.pos[1] - (field ? 3.4 : 2.0), region.pos[2]);
+  ring.position.set(mark[0], mark[1] - (field ? 3.4 : 1.6), mark[2]);
   scene.add(ring);
   if (field) {
     const halo = new THREE.Mesh(
@@ -1309,13 +1327,13 @@ function addBeacon(region) {
       new THREE.MeshBasicMaterial({ color: teal, side: THREE.DoubleSide, transparent: true, opacity: 0.32 })
     );
     halo.rotation.x = Math.PI / 2;
-    halo.position.set(region.pos[0], region.pos[1] - 3.4, region.pos[2]);
+    halo.position.set(mark[0], mark[1] - 3.4, mark[2]);
     scene.add(halo);
     const shaft = new THREE.Mesh(
       new THREE.CylinderGeometry(0.07, 0.07, 26, 8),
       new THREE.MeshBasicMaterial({ color: gold, transparent: true, opacity: 0.3, side: THREE.DoubleSide })
     );
-    shaft.position.set(region.pos[0], region.pos[1] + 10, region.pos[2]);
+    shaft.position.set(mark[0], mark[1] + 10, mark[2]);
     scene.add(shaft);
   }
   const title = makeLabel(region.name, {
@@ -1323,7 +1341,7 @@ function addBeacon(region) {
     ph: field ? 2.5 : 1.7,
     font: field ? "600 68px Georgia, serif" : "600 56px Georgia, serif"
   });
-  title.position.set(region.pos[0], region.pos[1] + (field ? 3.8 : 2.4), region.pos[2]);
+  title.position.set(mark[0], mark[1] + (field ? 3.8 : 2.2), mark[2]);
   title.userData.regionId = region.id;
   title.userData.billboard = true;
   scene.add(title);
@@ -1527,9 +1545,10 @@ function constellation(origin) {
 }
 
 function placeClickCard(mesh, regionId, extra) {
+  extra = extra || {};
   mesh.userData.regionId = regionId;
-  mesh.userData.billboard = true;
-  Object.assign(mesh.userData, extra || {});
+  if (extra.billboard !== false) mesh.userData.billboard = true;
+  Object.assign(mesh.userData, extra);
   scene.add(mesh);
   clickables.push(mesh);
 }
@@ -1806,6 +1825,7 @@ async function explodeResearch(id, figs) {
   const [lx, ly, lz] = r.look;
   const texs = await Promise.all(figs.map(([u]) => loadTexture(u)));
   texs.forEach((tex, i) => {
+    if (!tex) return;
     const plane = imagePlane(tex, 6.2);
     const a = (i / figs.length) * Math.PI * 1.7 - 0.85;
     const rad = 13;
@@ -1830,19 +1850,19 @@ async function explodeResearch(id, figs) {
 }
 
 
-const MUSEUM_WALL = new THREE.MeshLambertMaterial({ color: 0x101820 });
-const MUSEUM_FLOOR = new THREE.MeshLambertMaterial({ color: 0x0a1014 });
-const MUSEUM_CEIL = new THREE.MeshLambertMaterial({ color: 0x070b0e });
-const MUSEUM_TEAL = new THREE.MeshBasicMaterial({ color: teal });
-const MUSEUM_GOLD = new THREE.MeshBasicMaterial({ color: gold });
-const MUSEUM_DARK = new THREE.MeshLambertMaterial({ color: 0x161e24 });
+const STUDIO_WALL = new THREE.MeshLambertMaterial({ color: 0x101820 });
+const STUDIO_FLOOR = new THREE.MeshLambertMaterial({ color: 0x0a1014 });
+const STUDIO_CEIL = new THREE.MeshLambertMaterial({ color: 0x070b0e });
+const STUDIO_TEAL = new THREE.MeshBasicMaterial({ color: teal });
+const STUDIO_GOLD = new THREE.MeshBasicMaterial({ color: gold });
+const STUDIO_DARK = new THREE.MeshLambertMaterial({ color: 0x161e24 });
 
 function musBox(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 }
 
 function musSlab(x, y, z, w, h, d, mat) {
-  const m = musBox(w, h, d, mat || MUSEUM_WALL);
+  const m = musBox(w, h, d, mat || STUDIO_WALL);
   m.position.set(x, y, z);
   scene.add(m);
   return m;
@@ -1862,9 +1882,9 @@ function framedArt(tex, maxW, rotDeg) {
   const w = aspect >= 1 ? maxW : maxW * aspect;
   const h = aspect >= 1 ? maxW / aspect : maxW;
   const g = new THREE.Group();
-  const back = musBox(w + 0.22, h + 0.22, 0.08, MUSEUM_GOLD);
+  const back = musBox(w + 0.22, h + 0.22, 0.08, STUDIO_GOLD);
   back.position.z = -0.06;
-  const plate = musBox(w + 0.04, h + 0.04, 0.03, MUSEUM_DARK);
+  const plate = musBox(w + 0.04, h + 0.04, 0.03, STUDIO_DARK);
   plate.position.z = -0.02;
   const pic = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
@@ -1877,6 +1897,7 @@ function framedArt(tex, maxW, rotDeg) {
 }
 
 function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
+  if (!tex) return;
   const piece = framedArt(tex, 3.35, rotDeg || 0);
   piece.position.set(...pos);
   piece.rotation.y = rotY;
@@ -1948,7 +1969,7 @@ function hallTitle(text, pos, rotY) {
 
 function addDoorway(regionId, pos, rotY, label) {
   const g = new THREE.Group();
-  const frame = musBox(5.2, 7.4, 0.28, MUSEUM_GOLD);
+  const frame = musBox(5.2, 7.4, 0.28, STUDIO_GOLD);
   const hole = musBox(4.3, 6.6, 0.32, new THREE.MeshBasicMaterial({
     color: 0x071014, transparent: true, opacity: 0.35
   }));
@@ -1969,20 +1990,20 @@ function addDoorway(regionId, pos, rotY, label) {
 
 function rimHall(x0, x1, z0, z1, y0, y1) {
   const t = 0.07;
-  musSlab((x0 + x1) / 2, y0 + 0.06, z0 + t, x1 - x0, t, t, MUSEUM_TEAL);
-  musSlab((x0 + x1) / 2, y0 + 0.06, z1 - t, x1 - x0, t, t, MUSEUM_TEAL);
-  musSlab(x0 + t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, MUSEUM_TEAL);
-  musSlab(x1 - t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, MUSEUM_TEAL);
-  musSlab((x0 + x1) / 2, y1 - 0.08, z0 + t, x1 - x0, t, t, MUSEUM_TEAL);
-  musSlab((x0 + x1) / 2, y1 - 0.08, z1 - t, x1 - x0, t, t, MUSEUM_TEAL);
+  musSlab((x0 + x1) / 2, y0 + 0.06, z0 + t, x1 - x0, t, t, STUDIO_TEAL);
+  musSlab((x0 + x1) / 2, y0 + 0.06, z1 - t, x1 - x0, t, t, STUDIO_TEAL);
+  musSlab(x0 + t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, STUDIO_TEAL);
+  musSlab(x1 - t, y0 + 0.06, (z0 + z1) / 2, t, t, z1 - z0, STUDIO_TEAL);
+  musSlab((x0 + x1) / 2, y1 - 0.08, z0 + t, x1 - x0, t, t, STUDIO_TEAL);
+  musSlab((x0 + x1) / 2, y1 - 0.08, z1 - t, x1 - x0, t, t, STUDIO_TEAL);
 }
 
 function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
   const t = 0.45;
   const cx = (x0 + x1) / 2;
   const cz = (z0 + z1) / 2;
-  musSlab(cx, y0, cz, x1 - x0, 0.16, z1 - z0, MUSEUM_FLOOR);
-  musSlab(cx, y1, cz, x1 - x0, 0.16, z1 - z0, MUSEUM_CEIL);
+  musSlab(cx, y0, cz, x1 - x0, 0.16, z1 - z0, STUDIO_FLOOR);
+  musSlab(cx, y1, cz, x1 - x0, 0.16, z1 - z0, STUDIO_CEIL);
   const doors = openings || [];
   function wallWithDoors(axis, fixed, a0, a1, yMid, h, doorsOn) {
     const gaps = doorsOn
@@ -2014,7 +2035,7 @@ function enclosedHall(x0, x1, z0, z1, y0, y1, openings) {
   rimHall(x0, x1, z0, z1, y0, y1);
 }
 
-function addMuseumLight(x, y, z, color, intensity, dist) {
+function addStudioLight(x, y, z, color, intensity, dist) {
   const l = new THREE.PointLight(color, intensity, dist);
   l.position.set(x, y, z);
   scene.add(l);
@@ -2022,19 +2043,19 @@ function addMuseumLight(x, y, z, color, intensity, dist) {
 
 function makeGarmentStand(tex, kind) {
   const g = new THREE.Group();
-  const ped = musBox(1.55, 0.26, 1.15, MUSEUM_GOLD);
+  const ped = musBox(1.55, 0.26, 1.15, STUDIO_GOLD);
   ped.position.y = 0.13;
   g.add(ped);
-  const post = musBox(0.14, 0.95, 0.14, MUSEUM_DARK);
+  const post = musBox(0.14, 0.95, 0.14, STUDIO_DARK);
   post.position.y = 0.72;
   g.add(post);
   const form = new THREE.Group();
   form.position.y = 2.15;
   const print = bothSides(new THREE.MeshBasicMaterial({ map: tex }));
   if (kind === "skirt") {
-    const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.46, 0.24, 12), MUSEUM_DARK);
+    const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.46, 0.24, 12), STUDIO_DARK);
     waist.position.y = 0.55;
-    const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.42, 1.28, 12), MUSEUM_DARK);
+    const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.42, 1.28, 12), STUDIO_DARK);
     inner.position.y = -0.18;
     const flare = new THREE.Mesh(new THREE.CylinderGeometry(0.92, 0.46, 1.3, 12, 1, true), print);
     flare.position.y = -0.18;
@@ -2042,17 +2063,17 @@ function makeGarmentStand(tex, kind) {
   } else {
     const tw = kind === "hoodie" ? 1.42 : kind === "dress" ? 1.2 : 1.22;
     const th = kind === "hoodie" ? 1.8 : kind === "dress" ? 2.35 : 1.62;
-    const body = musBox(tw, th, 0.32, MUSEUM_DARK);
+    const body = musBox(tw, th, 0.32, STUDIO_DARK);
     const front = new THREE.Mesh(new THREE.PlaneGeometry(tw * 0.9, th * 0.9), print);
     front.position.z = 0.17;
     const sleeveW = (kind === "hoodie" || kind === "longsleeve") ? 0.78 : 0.42;
-    const sl = musBox(sleeveW, 0.36, 0.26, MUSEUM_DARK);
+    const sl = musBox(sleeveW, 0.36, 0.26, STUDIO_DARK);
     sl.position.set(-(tw / 2 + sleeveW / 2 - 0.06), th * 0.28, 0);
-    const sr = musBox(sleeveW, 0.36, 0.26, MUSEUM_DARK);
+    const sr = musBox(sleeveW, 0.36, 0.26, STUDIO_DARK);
     sr.position.set(tw / 2 + sleeveW / 2 - 0.06, th * 0.28, 0);
     form.add(body, front, sl, sr);
     if (kind === "hoodie") {
-      const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), MUSEUM_DARK);
+      const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), STUDIO_DARK);
       hood.position.set(0, th / 2 + 0.02, -0.04);
       form.add(hood);
     }
@@ -2061,10 +2082,10 @@ function makeGarmentStand(tex, kind) {
   return g;
 }
 
-function buildMuseumShell() {
+function buildStudioShell() {
   const x0 = -258, x1 = -156, y0 = 0, y1 = 15.2, z0 = -70, z1 = 66;
-  musSlab((x0 + x1) / 2, y0 - 0.2, (z0 + z1) / 2, x1 - x0 + 2.4, 0.4, z1 - z0 + 2.4, MUSEUM_FLOOR);
-  musSlab((x0 + x1) / 2, y1 + 0.35, (z0 + z1) / 2, x1 - x0 + 1.2, 0.7, z1 - z0 + 1.2, MUSEUM_DARK);
+  musSlab((x0 + x1) / 2, y0 - 0.2, (z0 + z1) / 2, x1 - x0 + 2.4, 0.4, z1 - z0 + 2.4, STUDIO_FLOOR);
+  musSlab((x0 + x1) / 2, y1 + 0.35, (z0 + z1) / 2, x1 - x0 + 1.2, 0.7, z1 - z0 + 1.2, STUDIO_DARK);
   musSlab(x0 - 0.3, (y0 + y1) / 2, (z0 + z1) / 2, 0.6, y1 - y0 + 1.2, z1 - z0 + 1.2);
   musSlab((x0 + x1) / 2, (y0 + y1) / 2, z0 - 0.3, x1 - x0 + 1.2, y1 - y0 + 1.2, 0.6);
   musSlab((x0 + x1) / 2, (y0 + y1) / 2, z1 + 0.3, x1 - x0 + 1.2, y1 - y0 + 1.2, 0.6);
@@ -2079,41 +2100,41 @@ function buildMuseumShell() {
   musSlab(x1 + 0.3, 2.0, 7.6, 0.7, 4.0, 3.2);
 
   // cornice and pilasters
-  musSlab(x1 + 0.85, y1 + 0.15, 0, 1.4, 0.35, z1 - z0 + 2, MUSEUM_GOLD);
-  musSlab(x1 + 1.1, 7.4, -8.6, 1.5, 14.8, 1.4, MUSEUM_DARK);
-  musSlab(x1 + 1.1, 7.4, 8.6, 1.5, 14.8, 1.4, MUSEUM_DARK);
-  musSlab(x1 + 1.1, 15.1, 0, 1.6, 0.45, 20, MUSEUM_GOLD);
+  musSlab(x1 + 0.85, y1 + 0.15, 0, 1.4, 0.35, z1 - z0 + 2, STUDIO_GOLD);
+  musSlab(x1 + 1.1, 7.4, -8.6, 1.5, 14.8, 1.4, STUDIO_DARK);
+  musSlab(x1 + 1.1, 7.4, 8.6, 1.5, 14.8, 1.4, STUDIO_DARK);
+  musSlab(x1 + 1.1, 15.1, 0, 1.6, 0.45, 20, STUDIO_GOLD);
 
   // steps / plaza
-  musSlab(-152.2, 0.25, 0, 8.2, 0.5, 16, MUSEUM_DARK);
-  musSlab(-148.4, 0.08, 0, 6.4, 0.16, 20, MUSEUM_FLOOR);
-  musSlab(-140, 0.02, 0, 18, 0.08, 28, MUSEUM_FLOOR);
-  musSlab(-140, 0.07, -14, 18, 0.08, 0.18, MUSEUM_TEAL);
-  musSlab(-140, 0.07, 14, 18, 0.08, 0.18, MUSEUM_TEAL);
+  musSlab(-152.2, 0.25, 0, 8.2, 0.5, 16, STUDIO_DARK);
+  musSlab(-148.4, 0.08, 0, 6.4, 0.16, 20, STUDIO_FLOOR);
+  musSlab(-140, 0.02, 0, 18, 0.08, 28, STUDIO_FLOOR);
+  musSlab(-140, 0.07, -14, 18, 0.08, 0.18, STUDIO_TEAL);
+  musSlab(-140, 0.07, 14, 18, 0.08, 0.18, STUDIO_TEAL);
 
   const name = makeLabel("STUDIO", {
-    w: 1400, h: 280, pw: 16, ph: 2.6,
-    font: "600 120px Georgia, serif",
+    w: 1600, h: 320, pw: 24, ph: 4.2,
+    font: "600 140px Georgia, serif",
     color: "#e8d29a",
-    stroke: "rgba(42,168,160,0.75)",
-    bg: "rgba(10,16,20,0.35)"
+    stroke: "rgba(42,168,160,0.85)",
+    bg: "rgba(10,16,20,0.45)"
   });
-  name.position.set(-154.6, 13.6, 0);
+  name.position.set(-154.4, 14.4, 0);
   name.rotation.y = Math.PI / 2;
   scene.add(name);
 
   // small outdoor sculpture garden
   [[-136, 0, 18], [-136, 0, -18], [-144, 0, 22]].forEach((p, i) => {
-    musSlab(p[0], 0.45, p[2], 1.4, 0.9, 1.4, MUSEUM_GOLD);
-    const stone = musBox(0.7 + i * 0.08, 1.6 + (i % 2) * 0.5, 0.55, MUSEUM_DARK);
+    musSlab(p[0], 0.45, p[2], 1.4, 0.9, 1.4, STUDIO_GOLD);
+    const stone = musBox(0.7 + i * 0.08, 1.6 + (i % 2) * 0.5, 0.55, STUDIO_DARK);
     stone.position.set(p[0], 1.7, p[2]);
     stone.rotation.y = 0.2 * i;
     scene.add(stone);
   });
 }
 
-async function populateMuseum() {
-  buildMuseumShell();
+function populateStudioGeometry() {
+  buildStudioShell();
 
   const y0 = 0.08, y1 = 10.4;
   enclosedHall(-188, -156.4, -18, 18, y0, y1, [
@@ -2175,19 +2196,54 @@ async function populateMuseum() {
   hallTitle("Studio", [-236, 8.2, -67.2], 0);
   hallTitle("Lobby", [-187.2, 8.4, 0], Math.PI / 2);
 
-  addMuseumLight(-176, 8.2, 0, 0x2aa8a0, 18, 42);
-  addMuseumLight(-186, 8.0, 40, 0xd4b05a, 12, 40);
-  addMuseumLight(-208, 8.0, -38, 0x2aa8a0, 12, 36);
-  addMuseumLight(-240, 8.0, 0, 0x2aa8a0, 14, 36);
-  addMuseumLight(-234, 7.6, 30, 0xd4b05a, 10, 28);
-  addMuseumLight(-236, 8.0, -44, 0x2aa8a0, 14, 42);
-  addMuseumLight(-170, 7.6, -28, 0xd4b05a, 12, 28);
-  addMuseumLight(-150, 14, 0, 0xd4b05a, 16, 50);
+  addStudioLight(-176, 8.2, 0, 0x2aa8a0, 18, 42);
+  addStudioLight(-186, 8.0, 40, 0xd4b05a, 12, 40);
+  addStudioLight(-208, 8.0, -38, 0x2aa8a0, 12, 36);
+  addStudioLight(-240, 8.0, 0, 0x2aa8a0, 14, 36);
+  addStudioLight(-234, 7.6, 30, 0xd4b05a, 10, 28);
+  addStudioLight(-236, 8.0, -44, 0x2aa8a0, 14, 42);
+  addStudioLight(-170, 7.6, -28, 0xd4b05a, 12, 28);
+  addStudioLight(-150, 14, 0, 0xd4b05a, 16, 50);
 
-  const loadWing = async (list) => Promise.all(list.map(async (item) => {
-    const tex = await loadTexture(item[0]);
-    return [tex, item[1], item[2]];
-  }));
+  const counter = musBox(1.6, 1.15, 5.2, STUDIO_DARK);
+  counter.position.set(-159.1, 0.7, -24.5);
+  scene.add(counter);
+  const top = musBox(1.7, 0.1, 5.3, STUDIO_GOLD);
+  top.position.set(-159.1, 1.3, -24.5);
+  scene.add(top);
+  const sign = makeLabel("sassmeharder.com", {
+    w: 1400, h: 220, pw: 5.6, ph: 0.9,
+    font: "600 56px Georgia, serif"
+  });
+  sign.position.set(-158.2, 2.15, -24.5);
+  sign.rotation.y = -Math.PI / 2;
+  sign.userData.regionId = "shop";
+  sign.userData.title = "sassmeharder.com";
+  sign.userData.body = "Shirts with Sass. Live shop — click a garment to open the product.";
+  sign.userData.href = "https://sassmeharder.com/";
+  sign.userData.linkLabel = "Open sassmeharder.com";
+  sign.userData.openUrl = "https://sassmeharder.com/";
+  scene.add(sign);
+  clickables.push(sign);
+
+  const brand = makeLabel("Shirts with Sass", {
+    w: 1100, h: 180, pw: 5.2, ph: 0.75,
+    font: "500 44px Georgia, serif",
+    stroke: "rgba(42,168,160,0.8)"
+  });
+  brand.position.set(-170, 8.3, -39.3);
+  brand.rotation.y = Math.PI;
+  scene.add(brand);
+}
+
+async function populateStudioArt() {
+  const loadWing = async (list) => {
+    const pairs = await Promise.all(list.map(async (item) => {
+      const tex = await loadTexture(item[0]);
+      return tex ? [tex, item[1], item[2]] : null;
+    }));
+    return pairs.filter(Boolean);
+  };
 
   hangHall(await loadWing(PORTRAITS), { x0: -210, x1: -162, z0: 18, z1: 64, y: 4.15, face: "+z" }, "portraits");
   hangHall(await loadWing(STILL_LIFE), { x0: -230, x1: -190, z0: -56, z1: -22, y: 4.15, face: "-z" }, "still-life");
@@ -2197,6 +2253,7 @@ async function populateMuseum() {
 
   const shopTex = await Promise.all(SHOP_PRODUCTS.map((p) => loadTexture(p.file)));
   shopTex.forEach((tex, i) => {
+    if (!tex) return;
     const p = SHOP_PRODUCTS[i];
     const stand = makeGarmentStand(tex, p.kind);
     if (i < 4) {
@@ -2223,36 +2280,6 @@ async function populateMuseum() {
     tag.rotation.y = 0;
     scene.add(tag);
   });
-
-  const counter = musBox(1.6, 1.15, 5.2, MUSEUM_DARK);
-  counter.position.set(-159.1, 0.7, -24.5);
-  scene.add(counter);
-  const top = musBox(1.7, 0.1, 5.3, MUSEUM_GOLD);
-  top.position.set(-159.1, 1.3, -24.5);
-  scene.add(top);
-  const sign = makeLabel("sassmeharder.com", {
-    w: 1400, h: 220, pw: 5.6, ph: 0.9,
-    font: "600 56px Georgia, serif"
-  });
-  sign.position.set(-158.2, 2.15, -24.5);
-  sign.rotation.y = -Math.PI / 2;
-  sign.userData.regionId = "shop";
-  sign.userData.title = "sassmeharder.com";
-  sign.userData.body = "Shirts with Sass. Live shop — click a garment to open the product.";
-  sign.userData.href = "https://sassmeharder.com/";
-  sign.userData.linkLabel = "Open sassmeharder.com";
-  sign.userData.openUrl = "https://sassmeharder.com/";
-  scene.add(sign);
-  clickables.push(sign);
-
-  const brand = makeLabel("Shirts with Sass", {
-    w: 1100, h: 180, pw: 5.2, ph: 0.75,
-    font: "500 44px Georgia, serif",
-    stroke: "rgba(42,168,160,0.8)"
-  });
-  brand.position.set(-170, 8.3, -39.3);
-  brand.rotation.y = Math.PI;
-  scene.add(brand);
 }
 
 function hopList(region) {
@@ -2281,56 +2308,103 @@ function beginHop(toPos, toLook) {
 }
 
 
-async function populate() {
-  REGIONS.forEach(addBeacon);
-  addWorldGuides();
-  constellation([98, 20, -50]);
+function addPortico(x, y, z, rotY, lintel) {
+  const g = new THREE.Group();
+  const left = musBox(2.0, 16, 2.0, STUDIO_DARK);
+  left.position.set(0, 8, -10);
+  const right = musBox(2.0, 16, 2.0, STUDIO_DARK);
+  right.position.set(0, 8, 10);
+  const beam = musBox(2.2, 1.6, 24, STUDIO_GOLD);
+  beam.position.set(0.1, 16.2, 0);
+  g.add(left, right, beam);
+  const lab = makeLabel(lintel, {
+    w: 1400, h: 280, pw: 20, ph: 3.4,
+    font: "600 120px Georgia, serif",
+    color: "#e8d29a",
+    stroke: "rgba(42,168,160,0.85)",
+    bg: "rgba(10,16,20,0.4)"
+  });
+  lab.position.set(1.6, 16.5, 0);
+  lab.rotation.y = Math.PI / 2;
+  g.add(lab);
+  g.position.set(x, y, z);
+  g.rotation.y = rotY || 0;
+  scene.add(g);
+  return g;
+}
 
-  const netarts = REGIONS.find((r) => r.id === "netarts");
-  const [nx, ny, nz] = netarts.pos;
+function addRackWall(x, y, z, rotY, lintel) {
+  const g = new THREE.Group();
+  const wall = musBox(1.1, 15.6, 22.4, STUDIO_DARK);
+  wall.position.set(0, 7.8, 0);
+  const beam = musBox(1.6, 1.15, 23.2, STUDIO_GOLD);
+  beam.position.set(0.2, 15.9, 0);
+  g.add(wall, beam);
+  const lab = makeLabel(lintel, {
+    w: 1400, h: 240, pw: 16.5, ph: 2.6,
+    font: "600 110px Georgia, serif",
+    color: "#e8d29a",
+    stroke: "rgba(42,168,160,0.8)",
+    bg: "rgba(10,16,20,0.4)"
+  });
+  lab.position.set(1.15, 16.0, 0);
+  lab.rotation.y = Math.PI / 2;
+  g.add(lab);
+  g.position.set(x, y, z);
+  g.rotation.y = rotY || 0;
+  scene.add(g);
+  return g;
+}
+
+function addArrivalAnchors() {
+  addPortico(-42, 0, -6, 0, "STUDIO");
+  addRackWall(46, 0, 18, Math.PI, "RESEARCH");
+  addPortico(0, 0, 54, Math.PI / 2, "WRITING");
+}
+
+function populateNetartsWall() {
+  const wx = 108, wy = -2, wz = 16;
+  const board = musBox(28.6, 22.4, 0.35, STUDIO_DARK);
+  board.position.set(wx, wy + 1.2, wz - 0.28);
+  scene.add(board);
+  const rail = musBox(28.8, 0.28, 0.4, STUDIO_GOLD);
+  rail.position.set(wx, wy + 12.4, wz - 0.05);
+  scene.add(rail);
+  const foot = musBox(28.8, 0.22, 0.4, STUDIO_TEAL);
+  foot.position.set(wx, wy - 10.2, wz - 0.05);
+  scene.add(foot);
   NETARTS_CARDS.forEach((card, i) => {
     const m = makeCard(card[0], card[1]);
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-    m.position.set(nx - 12 + col * 9.5, ny + 2 - row * 6, nz - 10);
-    placeClickCard(m, "netarts");
+    m.position.set(wx - 14.6, wy + 9.2 - i * 3.55, wz + 0.12);
+    m.scale.set(0.72, 0.72, 1);
+    m.rotation.y = 0;
+    placeClickCard(m, "netarts", { billboard: false, title: card[0], body: card[1] });
   });
+}
 
+async function populateNetartsMaps() {
+  const wx = 108, wy = -2, wz = 16;
   const mapTex = await Promise.all(MAPS.map(([u]) => loadTexture(u)));
   mapTex.forEach((tex, i) => {
-    const plane = imagePlane(tex, 6.8);
-    const a = (i / MAPS.length) * Math.PI * 2;
-    const r = 20;
-    plane.position.set(nx + Math.cos(a) * r, ny - 4 + Math.sin(i) * 2.4, nz - 18 + Math.sin(a) * r * 0.6);
-    plane.lookAt(nx, ny, nz - 6);
-    plane.userData.regionId = "netarts";
-    plane.userData.title = MAPS[i][1];
-    plane.userData.billboard = true;
-    scene.add(plane);
-    clickables.push(plane);
-    const cap = makeLabel(MAPS[i][1], { w: 900, h: 160, pw: 5.2, ph: 0.9, font: "500 40px Georgia, serif" });
-    cap.position.copy(plane.position);
-    cap.position.y -= 3.8;
-    cap.lookAt(nx, ny, nz - 6);
-    cap.userData.billboard = true;
-    scene.add(cap);
-  });
-
-  await populateMuseum();
-
-  const webOrigin = REGIONS.find((r) => r.id === "websites").pos;
-  const webTex = await Promise.all(WEBSHOTS.map((u) => loadTexture(u)));
-  webTex.forEach((tex, i) => {
-    const plane = imagePlane(tex, 7.2);
+    if (!tex) return;
+    const plane = imagePlane(tex, 6.2);
     const col = i % 3;
     const row = Math.floor(i / 3);
-    plane.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] + 5 - row * 7.2, webOrigin[2] - 16);
-    plane.userData.regionId = "websites";
-    plane.userData.title = "Website gallery";
-    plane.userData.billboard = true;
+    plane.position.set(wx - 1.2 + col * 7.6, wy + 6.4 - row * 5.7, wz + 0.12);
+    plane.rotation.y = 0;
+    plane.userData.regionId = "netarts";
+    plane.userData.title = MAPS[i][1];
     scene.add(plane);
     clickables.push(plane);
+    const cap = makeLabel(MAPS[i][1], { w: 900, h: 130, pw: 6.0, ph: 0.62, font: "500 34px Georgia, serif" });
+    cap.position.set(plane.position.x, plane.position.y - 2.7, wz + 0.16);
+    cap.rotation.y = 0;
+    scene.add(cap);
   });
+}
+
+function populateWebPlaques() {
+  const webOrigin = REGIONS.find((r) => r.id === "websites").pos;
   WEB_NAMES.forEach((name, i) => {
     const plaque = makeLabel(name, { w: 900, h: 180, pw: 6.4, ph: 1.15, font: "500 44px Georgia, serif", stroke: "rgba(42,168,160,0.75)" });
     const col = i % 3;
@@ -2350,9 +2424,33 @@ async function populate() {
     title: "Moon-phase widget",
     body: "A moon-phase widget made as a website/client object. The phase photographs were for that widget, not Fine Art."
   });
+}
 
-  await populateJournalism();
-  await populateGazette();
+async function populateWebShots() {
+  const webOrigin = REGIONS.find((r) => r.id === "websites").pos;
+  const webTex = await Promise.all(WEBSHOTS.map((u) => loadTexture(u)));
+  webTex.forEach((tex, i) => {
+    if (!tex) return;
+    const plane = imagePlane(tex, 7.2);
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    plane.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] + 5 - row * 7.2, webOrigin[2] - 16);
+    plane.userData.regionId = "websites";
+    plane.userData.title = "Website gallery";
+    plane.userData.billboard = true;
+    scene.add(plane);
+    clickables.push(plane);
+  });
+}
+
+function populateImmediate() {
+  REGIONS.forEach(addBeacon);
+  addWorldGuides();
+  constellation([98, 20, -50]);
+  addArrivalAnchors();
+  populateNetartsWall();
+  populateStudioGeometry();
+  populateWebPlaques();
   populateCredentials();
   populateAwards();
   populateIloa();
@@ -2360,22 +2458,28 @@ async function populate() {
   populateTalks();
   populateAiTutor();
   populateContracts();
-
   ["willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"].forEach(populateResearchCard);
 
-  for (const id of Object.keys(RESEARCH_FIGS)) {
-    await explodeResearch(id, RESEARCH_FIGS[id]);
-  }
-
-  const arrival = makeLabel("Art west  ·  Research east  ·  Writing north  ·  Credentials above", {
-    w: 1800, h: 220, pw: 22, ph: 2.4, font: "500 48px Georgia, serif"
+  const arrival = makeLabel("Art west  ·  Research east  ·  Writing north", {
+    w: 1800, h: 200, pw: 28, ph: 2.2, font: "500 52px Georgia, serif"
   });
-  arrival.position.set(0, 2.4, 4);
+  arrival.position.set(0, 7.2, 6);
   arrival.userData.billboard = true;
   scene.add(arrival);
 
   ship = makeShip();
   scene.add(ship);
+}
+
+async function populateDeferred() {
+  await populateNetartsMaps();
+  await populateStudioArt();
+  await populateWebShots();
+  await populateJournalism();
+  await populateGazette();
+  for (const id of Object.keys(RESEARCH_FIGS)) {
+    await explodeResearch(id, RESEARCH_FIGS[id]);
+  }
 }
 
 function nearestRegion(p) {
@@ -2602,10 +2706,10 @@ async function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(ink);
   scene.fog = new THREE.FogExp2(0x0a1216, 0.00105);
-  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
+  camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 2000);
   camera.position.copy(cam.pos);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   scene.add(new THREE.AmbientLight(0x6f8a88, 0.95));
@@ -2618,13 +2722,13 @@ async function main() {
   const east = new THREE.PointLight(0x2aa8a0, 20, 340);
   east.position.set(220, 8, 10);
   scene.add(east);
-  const far = new THREE.PointLight(0xd4b05a, 10, 220);
-  far.position.set(-180, 24, -40);
+  const far = new THREE.PointLight(0xd4b05a, 14, 260);
+  far.position.set(-150, 22, 0);
   scene.add(far);
 
   addStars();
   setupNav();
-  await populate();
+  populateImmediate();
   bindInput();
   const start = yawPitchFromPoints(cam.pos, new THREE.Vector3(...REGIONS[0].look));
   lookYaw = start.yaw;
@@ -2637,6 +2741,7 @@ async function main() {
     renderer.setSize(innerWidth, innerHeight);
   });
   tick();
+  populateDeferred().catch((err) => console.warn(err));
 }
 
 main().catch((err) => {
