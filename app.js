@@ -55,13 +55,13 @@ const REGIONS = [
     name: "Portraits & figures",
     kind: "art",
     axis: "West · −X, north wing",
-    pos: [-176, 4.1, 30],
-    look: [-176, 3.5, 56],
+    pos: [-186, 4.1, 40],
+    look: [-204, 3.6, 40],
     hops: [
       { pos: [-128, 10, 0], look: [-168, 9, 0] },
       { pos: [-156, 4.6, 0], look: [-176, 4.1, 0] },
-      { pos: [-176, 4.3, 6], look: [-176, 4.0, 20] },
-      { pos: [-176, 4.1, 30], look: [-176, 3.5, 56] }
+      { pos: [-176, 4.3, 8], look: [-190, 3.8, 28] },
+      { pos: [-186, 4.1, 40], look: [-204, 3.6, 40] }
     ],
     noBeacon: true,
     meta: "Oil · acrylic · charcoal · graphite",
@@ -2939,6 +2939,19 @@ function showRegion(region, extra) {
 }
 
 const WALK_WINGS = new Set(["portraits", "still-life", "coast", "prints", "studio"]);
+// Local studio stands past each gold doorway, looking at a side wall — never the lintel.
+const WING_STAND = {
+  portraits: { pos: [-186, 40], look: [-204, 40] },
+  "still-life": { pos: [-210, -38], look: [-228, -38] },
+  coast: { pos: [-240, 0], look: [-254, 0] },
+  prints: { pos: [-234, 30], look: [-246, 30] },
+  studio: { pos: [-238, -44], look: [-250, -44] }
+};
+let pendingWing = null;
+
+function onWestCampus() {
+  return cam.pos.x < ax(-120);
+}
 
 function nearestArtIn(regionId) {
   let best = null;
@@ -2970,22 +2983,16 @@ function walkToPiece(region, extra) {
 
 function walkIntoWing(region, extra) {
   const eye = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
-  const toPos = new THREE.Vector3(...region.pos);
-  toPos.y = eye;
-  const toLook = toPos.clone();
-  if (region.id === "portraits" || region.id === "prints") toLook.x -= 14;
-  else if (region.id === "still-life" || region.id === "studio") toLook.x += 10;
-  else if (region.id === "coast") toLook.x -= 12;
-  else {
-    const aim = new THREE.Vector3(...region.look).sub(toPos);
-    aim.y = 0;
-    if (aim.lengthSq() > 1e-6) aim.normalize();
-    else aim.set(-1, 0, 0);
-    toLook.copy(toPos).addScaledVector(aim, 8);
-  }
+  const stand = WING_STAND[region.id];
+  const toPos = stand
+    ? new THREE.Vector3(ax(stand.pos[0]), eye, stand.pos[1])
+    : new THREE.Vector3(region.pos[0], eye, region.pos[2]);
+  const toLook = stand
+    ? new THREE.Vector3(ax(stand.look[0]), eye, stand.look[1])
+    : new THREE.Vector3(region.look[0], eye, region.look[2]);
   artFocus = null;
   flight = beginHop(toPos, toLook);
-  flight.dur = THREE.MathUtils.clamp(cam.pos.distanceTo(toPos) / 28, 0.55, 1.35);
+  flight.dur = THREE.MathUtils.clamp(cam.pos.distanceTo(toPos) / 22, 0.45, 1.15);
   flight.queue = [];
   cam.vel.set(0, 0, 0);
   scrollBoost = 0;
@@ -2993,10 +3000,33 @@ function walkIntoWing(region, extra) {
   showRegion(region, extra);
 }
 
+function requestWingWalk(region, extra) {
+  if (walkToPiece(region, extra)) {
+    pendingWing = null;
+    return;
+  }
+  pendingWing = { region, extra, tries: 0 };
+  walkIntoWing(region, extra);
+}
+
+function pumpPendingWing() {
+  if (!pendingWing) return;
+  if (flight) return;
+  if (artFocus && !artFocus.exiting) {
+    pendingWing = null;
+    return;
+  }
+  if (walkToPiece(pendingWing.region, pendingWing.extra)) {
+    pendingWing = null;
+    return;
+  }
+  pendingWing.tries += 1;
+  if (pendingWing.tries > 90) pendingWing = null;
+}
+
 function flyTo(region, extra) {
-  if (WALK_WINGS.has(region.id) && (isIndoors() || studioIndoorT(cam.pos) > 0.2)) {
-    if (walkToPiece(region, extra)) return;
-    walkIntoWing(region, extra);
+  if (WALK_WINGS.has(region.id) && (onWestCampus() || isIndoors() || studioIndoorT(cam.pos) > 0.05)) {
+    requestWingWalk(region, extra);
     return;
   }
   artFocus = null;
@@ -3252,6 +3282,7 @@ function tick() {
     }
   });
 
+  pumpPendingWing();
   const region = nearestRegion(cam.pos);
   document.getElementById("region-name").textContent = region.name;
   const axis = document.getElementById("region-axis");
