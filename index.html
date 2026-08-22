@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graphic Oregon</title>
+  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art. A wanderable portfolio of mapping, habitat studies, and commissioned work.">
+  <meta name="theme-color" content="#0a1014">
+  <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="loader">
+    <div class="inner">
+      <h1>Graphic Oregon</h1>
+      <p>Research · Mapping · Design · Fine Art</p>
+    </div>
+  </div>
+  <canvas id="stage"></canvas>
+  <div id="hud">
+    <header class="top">
+      <h1>Graphic Oregon</h1>
+      <p class="tag">Research, website design, media, and fine art</p>
+    </header>
+    <div id="region-chip">
+      <div class="label">Now entering</div>
+      <div class="name" id="region-name">Arrival</div>
+    </div>
+    <nav id="destinations" aria-label="Portfolio regions"></nav>
+    <aside id="panel" hidden>
+      <div class="meta" id="panel-meta"></div>
+      <h2 id="panel-title"></h2>
+      <p id="panel-body"></p>
+      <p><a id="panel-link" href="#" target="_blank" rel="noopener">Open source page</a></p>
+    </aside>
+    <div id="help">Scroll or drag to travel · click a region · WASD / arrows to wander</div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

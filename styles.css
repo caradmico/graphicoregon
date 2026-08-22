@@ -1,0 +1,185 @@
+:root {
+  --ink: #0a1014;
+  --ink-2: #121a20;
+  --teal: #2aa8a0;
+  --teal-dim: #1a6f6a;
+  --gold: #d4b05a;
+  --gold-soft: #e8d29a;
+  --paper: #e8efe8;
+  --muted: #9bb0b0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
+canvas#stage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+header.top {
+  position: absolute;
+  top: 22px;
+  left: 28px;
+  pointer-events: auto;
+  max-width: min(420px, calc(100vw - 56px));
+}
+
+header.top h1 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gold-soft);
+  line-height: 1.1;
+}
+
+header.top p.tag {
+  margin-top: 6px;
+  color: var(--teal);
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#region-chip {
+  position: absolute;
+  top: 22px;
+  right: 28px;
+  pointer-events: none;
+  text-align: right;
+}
+
+#region-chip .label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+#region-chip .name {
+  font-size: 1.15rem;
+  color: var(--gold-soft);
+}
+
+nav#destinations {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(46vh, 420px);
+  overflow: auto;
+  padding-right: 6px;
+}
+
+nav#destinations button {
+  appearance: none;
+  background: rgba(10, 16, 20, 0.62);
+  border: 1px solid rgba(42, 168, 160, 0.35);
+  color: var(--paper);
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  backdrop-filter: blur(8px);
+}
+
+nav#destinations button:hover,
+nav#destinations button.active {
+  border-color: var(--gold);
+  color: var(--gold-soft);
+}
+
+#panel {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  width: min(380px, calc(100vw - 44px));
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  pointer-events: auto;
+  background: rgba(10, 16, 20, 0.78);
+  border: 1px solid rgba(212, 176, 90, 0.35);
+  padding: 18px 18px 16px;
+  backdrop-filter: blur(10px);
+}
+
+#panel h2 {
+  font-size: 1.25rem;
+  color: var(--gold-soft);
+  margin-bottom: 8px;
+}
+
+#panel p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--paper);
+  margin-bottom: 10px;
+}
+
+#panel a {
+  color: var(--teal);
+  text-underline-offset: 3px;
+}
+
+#panel .meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+#help {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 18px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-align: center;
+  pointer-events: none;
+}
+
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.6s ease;
+}
+
+#loader.hide { opacity: 0; pointer-events: none; }
+
+#loader .inner { text-align: center; }
+#loader h1 { color: var(--gold-soft); letter-spacing: 0.08em; }
+#loader p { color: var(--teal); margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+
+@media (max-width: 760px) {
+  nav#destinations { max-height: 28vh; }
+  #panel { max-height: 34vh; }
+  #help { display: none; }
+}
