@@ -197,6 +197,19 @@ const REGIONS = [
     linkLabel: "Related: IAU mapping proposal"
   },
   {
+    id: "staris",
+    name: "StarIS",
+    kind: "exploded",
+    axis: "East · +X, high",
+    pos: [96, 56, -148],
+    look: [96, 52, -164],
+    meta: "Space · Star Visualizer",
+    title: "StarIS",
+    body: "A catalog star field in space — Gaia-style positions you can fly up to, not a caption. The StarIS visualizer lives here as an object on the field.",
+    href: "https://staris-b01f2.web.app/",
+    linkLabel: "Open StarIS"
+  },
+  {
     id: "nano",
     name: "Nanoactuator Design",
     kind: "exploded",
@@ -609,7 +622,7 @@ REGIONS.forEach((r) => {
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
   { label: "Art · west", ids: ["art", "lobby", "portraits", "still-life", "coast", "prints", "studio", "shop"] },
-  { label: "Research · east +X", ids: ["iau", "iloa", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
+  { label: "Research · east +X", ids: ["iau", "iloa", "staris", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
   { label: "Writing · north +Z", ids: ["journalism", "gazette"] },
   { label: "Credentials · above +Y", ids: ["credentials", "aitutor", "service", "talks", "awards"] },
   { label: "Websites · south −Z", ids: ["websites", "contracts"] }
@@ -2797,6 +2810,50 @@ async function populateWebShots() {
   });
 }
 
+
+async function populateStarIS() {
+  const r = REGIONS.find((x) => x.id === "staris");
+  if (!r) return;
+  let rows = [];
+  try {
+    const res = await fetch("assets/staris/stars.json");
+    rows = await res.json();
+  } catch (err) {
+    return;
+  }
+  if (!Array.isArray(rows) || !rows.length) return;
+  const pos = [];
+  const col = [];
+  const tealC = new THREE.Color(teal);
+  const goldC = new THREE.Color(gold);
+  const sc = 0.38;
+  rows.forEach((s) => {
+    if (!s || (s.x === 0 && s.y === 0 && s.z === 0)) return;
+    pos.push(s.x * sc + r.pos[0], s.y * sc + r.pos[1], s.z * sc + r.pos[2]);
+    const tcol = Math.min(1, Math.max(0, (2.2 - (s.mag || 5)) / 7));
+    const c = goldC.clone().lerp(tealC, 1 - tcol);
+    col.push(c.r, c.g, c.b);
+  });
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+  const pts = new THREE.Points(g, new THREE.PointsMaterial({
+    size: 0.58, sizeAttenuation: true, vertexColors: true, transparent: true, opacity: 0.94
+  }));
+  pts.userData.regionId = "staris";
+  pts.userData.title = "StarIS";
+  scene.add(pts);
+  clickables.push(pts);
+  const rim = new THREE.Mesh(
+    new THREE.RingGeometry(19.2, 19.55, 72),
+    new THREE.MeshBasicMaterial({ color: gold, side: THREE.DoubleSide, transparent: true, opacity: 0.32 })
+  );
+  rim.position.set(...r.pos);
+  rim.userData.billboard = true;
+  rim.userData.regionId = "staris";
+  scene.add(rim);
+}
+
 function populateImmediate() {
   REGIONS.forEach(addBeacon);
   addWorldGuides();
@@ -2830,6 +2887,7 @@ function populateImmediate() {
 }
 
 async function populateDeferred() {
+  await populateStarIS();
   await populateNetartsMaps();
   await populateStudioArt();
   await populateWebShots();
