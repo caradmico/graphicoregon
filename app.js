@@ -1034,10 +1034,14 @@ let dragging = false;
 let lastX = 0;
 let lastY = 0;
 let keys = {};
-let scrollBoost = 0; // wheel glide along flat facing, units/sec
+let scrollBoost = 0; // wheel glide along flat facing, units/sec (outdoors only)
 let strafeBoost = 0;
 let indoorBlend = 0;
 let flight = null;
+let artFocus = null;
+const WALK_SPEED = 3.4;
+const WALK_RUN = 5.2;
+const INDOOR_SCROLL_STEP = 0.65;
 let bubbleCool = 0;
 const bubbles = [];
 const clock = new THREE.Clock();
@@ -1052,6 +1056,21 @@ const _avatarTarget = new THREE.Vector3();
 const STUDIO_SHELL = { x0: -258, x1: -156, z0: -70, z1: 66, entryX: -154 };
 const STUDIO_FLOOR_Y = 0.08;
 const STUDIO_EYE_Y = 1.72;
+const STUDIO_WALK_PAD = 0.55;
+// Walkable hall footprints (local studio coords; x shifted by ax() at runtime).
+const STUDIO_HALLS = [
+  { x0: -188, x1: -156.4, z0: -18, z1: 18 },
+  { x0: -210, x1: -162, z0: 18, z1: 64 },
+  { x0: -186, x1: -158, z0: -40, z1: -18.2 },
+  { x0: -230, x1: -190, z0: -56, z1: -22 },
+  { x0: -190.2, x1: -186, z0: -40, z1: -22 },
+  { x0: -224, x1: -188, z0: -6.2, z1: 6.2 },
+  { x0: -240, x1: -220, z0: 6.2, z1: 18.2 },
+  { x0: -256, x1: -224, z0: -16, z1: 16 },
+  { x0: -248, x1: -220, z0: 18, z1: 42 },
+  { x0: -244, x1: -220, z0: -22.2, z1: -6.2 },
+  { x0: -256, x1: -220, z0: -68, z1: -22 }
+];
 const cam = {
   pos: new THREE.Vector3(...REGIONS[0].pos),
   vel: new THREE.Vector3()
@@ -1113,6 +1132,118 @@ function applyIndoorCamera(dt) {
   const targetY = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
   cam.pos.y += (targetY - cam.pos.y) * indoorBlend * (1 - Math.exp(-dt * 7.5));
   cam.vel.y *= 1 - indoorBlend * (1 - Math.exp(-dt * 5.5));
+}
+
+function isIndoors() {
+  return indoorBlend > 0.45 || studioIndoorT(cam.pos) > 0.45;
+}
+
+function studioWalkable(x, z) {
+  const p = STUDIO_WALK_PAD;
+  for (const h of STUDIO_HALLS) {
+    if (x >= ax(h.x0) + p && x <= ax(h.x1) - p && z >= h.z0 + p && z <= h.z1 - p) return true;
+  }
+  return false;
+}
+
+function moveIndoor(delta) {
+  const nx = cam.pos.x + delta.x;
+  const nz = cam.pos.z + delta.z;
+  if (studioWalkable(nx, nz)) {
+    cam.pos.x = nx;
+    cam.pos.z = nz;
+    return;
+  }
+  if (studioWalkable(nx, cam.pos.z)) cam.pos.x = nx;
+  else if (studioWalkable(cam.pos.x, nz)) cam.pos.z = nz;
+}
+
+function indoorWalk(dt) {
+  const flat = flatLookDir();
+  _camRight.crossVectors(_worldUp, flat);
+  if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
+  else _camRight.normalize();
+  const speed = (keys.shift ? WALK_RUN : WALK_SPEED) * dt;
+  const move = new THREE.Vector3();
+  if (keys.w || keys.arrowup) move.addScaledVector(flat, speed);
+  if (keys.s || keys.arrowdown) move.addScaledVector(flat, -speed);
+  if (keys.a || keys.arrowleft) move.addScaledVector(_camRight, -speed);
+  if (keys.d || keys.arrowright) move.addScaledVector(_camRight, speed);
+  if (move.lengthSq() > 0) moveIndoor(move);
+  cam.pos.y = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
+  cam.vel.set(0, 0, 0);
+  lookPitch = THREE.MathUtils.clamp(lookPitch, -0.42, 0.42);
+}
+
+function artWorldFocus(piece) {
+  const worldPos = new THREE.Vector3();
+  const worldQuat = new THREE.Quaternion();
+  piece.getWorldPosition(worldPos);
+  piece.getWorldQuaternion(worldQuat);
+  const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(worldQuat).normalize();
+  const dist = piece.userData.focusDist || 2.35;
+  const toPos = worldPos.clone().addScaledVector(normal, dist);
+  toPos.y = STUDIO_FLOOR_Y + STUDIO_EYE_Y;
+  const toLook = worldPos.clone();
+  toLook.y += 0.35;
+  return { toPos, toLook };
+}
+
+function beginArtFocus(piece, region, extra) {
+  const { toPos, toLook } = artWorldFocus(piece);
+  const aim = yawPitchFromPoints(toPos, toLook);
+  const keepReturn = artFocus && !artFocus.exiting;
+  artFocus = {
+    fromPos: cam.pos.clone(),
+    toPos,
+    fromYaw: lookYaw,
+    fromPitch: lookPitch,
+    toYaw: aim.yaw,
+    toPitch: aim.pitch,
+    returnPos: keepReturn ? artFocus.returnPos.clone() : cam.pos.clone(),
+    returnYaw: keepReturn ? artFocus.returnYaw : lookYaw,
+    returnPitch: keepReturn ? artFocus.returnPitch : lookPitch,
+    t: 0,
+    dur: 0.85,
+    piece,
+    region,
+    extra
+  };
+  flight = null;
+  cam.vel.set(0, 0, 0);
+  scrollBoost = 0;
+  strafeBoost = 0;
+  showRegion(region, extra);
+}
+
+function exitArtFocus() {
+  if (!artFocus) return;
+  const back = {
+    fromPos: cam.pos.clone(),
+    toPos: artFocus.returnPos.clone(),
+    fromYaw: lookYaw,
+    fromPitch: lookPitch,
+    toYaw: artFocus.returnYaw,
+    toPitch: artFocus.returnPitch,
+    t: 0,
+    dur: 0.7,
+    exiting: true
+  };
+  artFocus = back;
+}
+
+function updateArtFocus(dt) {
+  if (!artFocus) return false;
+  if (artFocus.t >= artFocus.dur) {
+    if (artFocus.exiting) artFocus = null;
+    return false;
+  }
+  artFocus.t += dt;
+  const s = smoothstep(artFocus.t / artFocus.dur);
+  cam.pos.lerpVectors(artFocus.fromPos, artFocus.toPos, s);
+  lookYaw = lerpAngle(artFocus.fromYaw, artFocus.toYaw, s);
+  lookPitch = artFocus.fromPitch + (artFocus.toPitch - artFocus.fromPitch) * s;
+  return true;
 }
 
 function yawPitchFromPoints(from, to) {
@@ -1658,21 +1789,15 @@ function updateBubbles(dt) {
 
 function updateAvatar(dt) {
   if (!avatar) return;
-  const indoor = studioIndoorT(cam.pos) > 0.32;
-  shipMesh.visible = !indoor;
-  suitMesh.visible = indoor;
-  const facing = travelFacing();
-
-  if (indoor) {
-    _avatarTarget.set(cam.pos.x, STUDIO_FLOOR_Y, cam.pos.z);
-    suitMesh.position.lerp(_avatarTarget, 1 - Math.exp(-dt * 16));
-    suitMesh.lookAt(
-      suitMesh.position.x + facing.x,
-      suitMesh.position.y,
-      suitMesh.position.z + facing.z
-    );
+  const indoor = isIndoors();
+  const focused = artFocus && !artFocus.exiting;
+  shipMesh.visible = !indoor && !focused;
+  suitMesh.visible = false;
+  if (indoor || focused) {
+    avatar.visible = false;
     return;
   }
+  avatar.visible = true;
 
   const dir = lookDir();
   _avatarTarget.copy(cam.pos).addScaledVector(dir, 3.55);
@@ -2093,7 +2218,14 @@ function framedArt(tex, maxW, rotDeg) {
   plate.position.z = -0.02;
   const pic = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    bothSides(new THREE.MeshBasicMaterial({ map }))
+    bothSides(new THREE.MeshStandardMaterial({
+      map,
+      emissive: 0xffffff,
+      emissiveMap: map,
+      emissiveIntensity: 0.42,
+      roughness: 0.92,
+      metalness: 0
+    }))
   );
   pic.position.z = 0.01;
   g.add(back, plate, pic);
@@ -2109,6 +2241,8 @@ function hangOnWall(tex, title, regionId, pos, rotY, rotDeg) {
   piece.userData.regionId = regionId;
   piece.userData.title = title;
   piece.userData.stay = true;
+  piece.userData.isArt = true;
+  piece.userData.focusDist = 2.35;
   studioParent().add(piece);
   clickables.push(piece);
   const cap = makeLabel(title, {
@@ -2244,6 +2378,14 @@ function addStudioLight(x, y, z, color, intensity, dist) {
   const l = new THREE.PointLight(color, intensity, dist);
   l.position.set(x, y, z);
   studioParent().add(l);
+}
+
+function addStudioGalleryLight() {
+  const hemi = new THREE.HemisphereLight(0xd8ebe8, 0x0a1218, 1.15);
+  studioParent().add(hemi);
+  const skylight = new THREE.DirectionalLight(0xfff4e0, 0.55);
+  skylight.position.set(ax(-200), 18, 0);
+  studioParent().add(skylight);
 }
 
 function makeGarmentStand(tex, kind) {
@@ -2401,6 +2543,7 @@ function populateStudioGeometry() {
   hallTitle("Studio", [-236, 8.2, -67.2], 0);
   hallTitle("Lobby", [-187.2, 8.4, 0], Math.PI / 2);
 
+  addStudioGalleryLight();
   addStudioLight(-176, 8.2, 0, 0x2aa8a0, 18, 42);
   addStudioLight(-186, 8.0, 40, 0xd4b05a, 12, 40);
   addStudioLight(-208, 8.0, -38, 0x2aa8a0, 12, 36);
@@ -2738,6 +2881,7 @@ function showRegion(region, extra) {
 }
 
 function flyTo(region, extra) {
+  artFocus = null;
   const hops = hopList(region).map((h) => ({
     pos: new THREE.Vector3(...h.pos),
     look: new THREE.Vector3(...h.look)
@@ -2787,6 +2931,10 @@ function pickAt(e) {
 function onPointer(e) {
   const obj = pickAt(e);
   if (!obj) {
+    if (artFocus && !artFocus.exiting) {
+      exitArtFocus();
+      return;
+    }
     shootBubble();
     return;
   }
@@ -2802,6 +2950,10 @@ function onPointer(e) {
     linkLabel: obj.userData.linkLabel,
     links: obj.userData.links
   };
+  if (obj.userData.isArt && (isIndoors() || studioIndoorT(cam.pos) > 0.2)) {
+    beginArtFocus(obj, region, extra);
+    return;
+  }
   if (obj.userData.stay && cam.pos.distanceTo(new THREE.Vector3(...region.pos)) < 36) {
     showRegion(region, extra);
     return;
@@ -2822,11 +2974,18 @@ function bindInput() {
     if (e.deltaMode === 2) { dy *= 800; dx *= 800; }
     const unitY = THREE.MathUtils.clamp(dy / 100, -1, 1);
     const unitX = THREE.MathUtils.clamp(dx / 100, -1, 1);
-    scrollBoost -= unitY * 3;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -12, 12);
+    if (artFocus && !artFocus.exiting) return;
+    if (isIndoors()) {
+      const flat = flatLookDir();
+      const step = -unitY * INDOOR_SCROLL_STEP;
+      if (Math.abs(step) > 0.02) moveIndoor(flat.clone().multiplyScalar(step));
+      return;
+    }
+    scrollBoost -= unitY * 1.6;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -6, 6);
     if (Math.abs(dx) > 0.5) {
-      strafeBoost += unitX * 62;
-      strafeBoost = THREE.MathUtils.clamp(strafeBoost, -110, 110);
+      strafeBoost += unitX * 28;
+      strafeBoost = THREE.MathUtils.clamp(strafeBoost, -50, 50);
     }
   }, { passive: false });
   let downX = 0, downY = 0;
@@ -2854,6 +3013,11 @@ function bindInput() {
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     keys[k] = true;
+    if (k === "escape" && artFocus && !artFocus.exiting) {
+      e.preventDefault();
+      exitArtFocus();
+      return;
+    }
     if (k === "f") {
       e.preventDefault();
       shootBubble();
@@ -2870,7 +3034,9 @@ function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
   if (bubbleCool > 0) bubbleCool = Math.max(0, bubbleCool - dt);
 
-  if (flight) {
+  if (updateArtFocus(dt)) {
+    // camera handled by art focus
+  } else if (flight) {
     flight.t += dt;
     const s = smoothstep(flight.t / flight.dur);
     cam.pos.lerpVectors(flight.fromPos, flight.toPos, s);
@@ -2884,30 +3050,35 @@ function tick() {
         flight.queue = rest;
       } else flight = null;
     }
+  } else if (isIndoors()) {
+    indoorWalk(dt);
+    applyIndoorCamera(dt);
+    cam.pos.x = THREE.MathUtils.clamp(cam.pos.x, bounds.x[0], bounds.x[1]);
+    cam.pos.z = THREE.MathUtils.clamp(cam.pos.z, bounds.z[0], bounds.z[1]);
   } else {
     const dir = lookDir();
-    const speed = keys.shift ? 62 : 34;
-    if (keys.w || keys.arrowup) cam.vel.addScaledVector(dir, speed * dt);
-    if (keys.s || keys.arrowdown) cam.vel.addScaledVector(dir, -speed * dt);
-    if (keys.a || keys.arrowleft) lookYaw += dt * 0.95;
-    if (keys.d || keys.arrowright) lookYaw -= dt * 0.95;
-    if (keys.q) cam.vel.y -= speed * 0.75 * dt;
-    if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
+    const speed = keys.shift ? 24 : 14;
     const flat = flatLookDir();
+    _camRight.crossVectors(_worldUp, flat);
+    if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
+    else _camRight.normalize();
+    if (keys.w || keys.arrowup) cam.vel.addScaledVector(flat, speed * dt);
+    if (keys.s || keys.arrowdown) cam.vel.addScaledVector(flat, -speed * dt);
+    if (keys.a || keys.arrowleft) cam.vel.addScaledVector(_camRight, -speed * dt);
+    if (keys.d || keys.arrowright) cam.vel.addScaledVector(_camRight, speed * dt);
+    if (keys.q) cam.vel.y -= speed * 0.55 * dt;
+    if (keys.e || keys[" "]) cam.vel.y += speed * 0.55 * dt;
     if (scrollBoost) {
-      cam.vel.addScaledVector(flat, scrollBoost * 0.58 * dt);
-      scrollBoost *= Math.exp(-dt * 2.35);
-      if (Math.abs(scrollBoost) < 0.4) scrollBoost = 0;
+      cam.vel.addScaledVector(flat, scrollBoost * 0.38 * dt);
+      scrollBoost *= Math.exp(-dt * 3.2);
+      if (Math.abs(scrollBoost) < 0.25) scrollBoost = 0;
     }
     if (strafeBoost) {
-      _camRight.crossVectors(_worldUp, flat);
-      if (_camRight.lengthSq() < 1e-8) _camRight.set(1, 0, 0);
-      else _camRight.normalize();
-      cam.vel.addScaledVector(_camRight, strafeBoost * 0.52 * dt);
-      strafeBoost *= Math.exp(-dt * 2.35);
-      if (Math.abs(strafeBoost) < 0.4) strafeBoost = 0;
+      cam.vel.addScaledVector(_camRight, strafeBoost * 0.34 * dt);
+      strafeBoost *= Math.exp(-dt * 3.2);
+      if (Math.abs(strafeBoost) < 0.25) strafeBoost = 0;
     }
-    cam.vel.multiplyScalar(Math.exp(-dt * 2.15));
+    cam.vel.multiplyScalar(Math.exp(-dt * 3.4));
     cam.pos.addScaledVector(cam.vel, 1);
     applyIndoorCamera(dt);
     cam.pos.x = THREE.MathUtils.clamp(cam.pos.x, bounds.x[0], bounds.x[1]);
@@ -2952,7 +3123,7 @@ async function main() {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  scene.add(new THREE.AmbientLight(0x6f8a88, 0.95));
+  scene.add(new THREE.AmbientLight(0x6f8a88, 0.58));
   const key = new THREE.PointLight(0x2aa8a0, 22, 140);
   key.position.set(8, 22, 16);
   scene.add(key);
