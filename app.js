@@ -3185,7 +3185,7 @@ function bindInput() {
   el.addEventListener("pointermove", (e) => {
     if (!dragging) return;
     if (flight) flight = null;
-    lookYaw -= (e.clientX - lastX) * 0.0028;
+    lookYaw += (e.clientX - lastX) * 0.0028;
     lookPitch -= (e.clientY - lastY) * 0.0022;
     lookPitch = THREE.MathUtils.clamp(lookPitch, -1.15, 1.15);
     lastX = e.clientX;
