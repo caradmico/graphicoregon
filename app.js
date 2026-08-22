@@ -2595,15 +2595,17 @@ function onPointer(e) {
 
 function bindInput() {
   const el = renderer.domElement;
-  el.addEventListener("wheel", (e) => {
+  const wheelIgnore = (t) => t && t.closest && t.closest("#destinations, #panel, a, button, input, textarea, select");
+  window.addEventListener("wheel", (e) => {
+    if (wheelIgnore(e.target)) return;
     e.preventDefault();
     if (flight) flight = null;
     let dy = e.deltaY;
     if (e.deltaMode === 1) dy *= 16;
     if (e.deltaMode === 2) dy *= 400;
-    dy = THREE.MathUtils.clamp(dy, -18, 18);
-    scrollBoost += -dy * 0.0035;
-    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -2.2, 2.2);
+    dy = THREE.MathUtils.clamp(dy, -140, 140);
+    scrollBoost += -dy * 0.09;
+    scrollBoost = THREE.MathUtils.clamp(scrollBoost, -56, 56);
   }, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
@@ -2670,9 +2672,9 @@ function tick() {
     if (keys.q) cam.vel.y -= speed * 0.75 * dt;
     if (keys.e || keys[" "]) cam.vel.y += speed * 0.75 * dt;
     if (scrollBoost) {
-      cam.vel.addScaledVector(dir, scrollBoost * dt * 5);
-      scrollBoost *= Math.exp(-dt * 6.4);
-      if (Math.abs(scrollBoost) < 0.012) scrollBoost = 0;
+      cam.vel.addScaledVector(dir, scrollBoost * dt * 24);
+      scrollBoost *= Math.exp(-dt * 3.2);
+      if (Math.abs(scrollBoost) < 0.06) scrollBoost = 0;
     }
     cam.vel.multiplyScalar(Math.exp(-dt * 2.15));
     cam.pos.addScaledVector(cam.vel, 1);
