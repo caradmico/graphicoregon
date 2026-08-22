@@ -14,7 +14,7 @@ const REGIONS = [
     look: [0, 8, 0],
     meta: "Graphic Oregon",
     title: "Technical design solutions",
-    body: "Graphic Oregon blends creative design, scientific research, geospatial mapping, and IT expertise. Art is west. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
+    body: "A small craft marks your place. Art is west. Research is east. Writing is ahead. Credentials rise above. Website work sits south and lower.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   },
@@ -23,11 +23,37 @@ const REGIONS = [
     name: "Fine Art",
     kind: "art",
     axis: "West · −X loft",
-    pos: [-118, 30, 6],
-    look: [-138, 28, -2],
+    pos: [-128, 30, 8],
+    look: [-150, 28, -4],
     meta: "Oil · acrylic · ink · digital · charcoal",
     title: "Fine art and illustration",
-    body: "A working studio practice — figures, portraits, still lifes, coast studies, and prints. Open to commissions.",
+    body: "A working studio practice — figures, portraits, still lifes, coast studies, and prints. Open to commissions. Moon-phase studies hang further west; extra still lifes sit in the south wing.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "moons",
+    name: "Moon Phases",
+    kind: "art",
+    axis: "West · −X, further loft",
+    pos: [-198, 38, -72],
+    look: [-214, 36, -88],
+    meta: "Fine art · 2025 studio set",
+    title: "Moon-phase set",
+    body: "Eight public moon-phase studies from the Graphic Oregon studio library (June and July 2025 uploads): new, waxing crescent, first quarter, waxing gibbous, full, waning gibbous, last quarter, waning crescent.",
+    href: "https://graphicoregon.com/sample-page/",
+    linkLabel: "Open the studio page"
+  },
+  {
+    id: "studies",
+    name: "Studio Studies",
+    kind: "art",
+    axis: "West · −X, south wing",
+    pos: [-168, 18, 78],
+    look: [-184, 16, 62],
+    meta: "Still life · portrait · unfinished",
+    title: "Further studio studies",
+    body: "Additional public works from the Fine Art page: extra still lifes, another oil portrait, and an unfinished study. Titles follow the studio filenames.",
     href: "https://graphicoregon.com/sample-page/",
     linkLabel: "Open the studio page"
   },
@@ -43,6 +69,19 @@ const REGIONS = [
     body: "IAU 1930 boundaries (Delporte’s 88 constellations) often diverge from historical asterisms. The Aquarius–Pisces line from Beta to Iota Aquarii crosses into Capricornus. A dual system is proposed: keep cultural asterisms as an archive, and adopt a universe-centric reference from ICRS and Gaia.",
     href: "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/",
     linkLabel: "Open the IAU proposal"
+  },
+  {
+    id: "iloa",
+    name: "ILOA / Lunar Observatory",
+    kind: "research",
+    axis: "East · +X, high",
+    pos: [72, 44, -118],
+    look: [86, 42, -134],
+    meta: "Research · Palo Alto, 2025–Present",
+    title: "3D Modeling and Astrometric Research",
+    body: "International Lunar Observatory Association, Palo Alto, 2025–Present. Working-group support for a revised constellation-boundary map; abstracts and posters for global conferences. Stanford on the Moon: planning a permanent endowment for a university observatory, with alumni engagement and a reunion conference.",
+    href: "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/",
+    linkLabel: "Related: IAU mapping proposal"
   },
   {
     id: "nano",
@@ -144,7 +183,7 @@ const REGIONS = [
     look: [216, -14, -20],
     meta: "Research · sediment and habitat",
     title: "North Fork Siuslaw Sediment and Habitat Assessment",
-    body: "Sediment and habitat assessment for the North Fork Siuslaw watershed.",
+    body: "Sediment and habitat assessment for the North Fork Siuslaw watershed. MidCoast Watershed Council, 2009. Distinct from the 2009 headwater and road-condition assessment further out.",
     href: "https://graphicoregon.com/north-fork-siuslaw-sediment-and-habitat-assessment/",
     linkLabel: "Open the Siuslaw assessment"
   },
@@ -188,28 +227,197 @@ const REGIONS = [
     linkLabel: "Open the hazard mitigation plan"
   },
   {
+    id: "willamette-culvert",
+    name: "Willamette Culvert Inventory",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [248, -8, 110],
+    look: [264, -8, 94],
+    meta: "Technical consulting · 2011",
+    title: "Willamette River Culvert Inventory",
+    body: "Middle Willamette Watershed Council, 2011. Title and client from the published CV technical consulting reports. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "willamette-plan",
+    name: "Willamette Restoration Plan",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [268, -10, 70],
+    look: [284, -10, 54],
+    meta: "Technical consulting · 2011",
+    title: "Willamette River Restoration Plan",
+    body: "Mid-Willamette Watershed Alliance, 2011. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "hells-canyon",
+    name: "Snake River Hells Canyon",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [288, -12, 20],
+    look: [304, -12, 4],
+    meta: "Technical consulting · 2010",
+    title: "Snake River Hells Canyon Watershed Assessment",
+    body: "Powder Basin Watershed Council, 2010. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "oweb",
+    name: "OWEB Riparian Restoration",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [258, -6, -40],
+    look: [274, -6, -56],
+    meta: "Technical consulting · 2010",
+    title: "OWEB Riparian Restoration Effectiveness",
+    body: "Oregon Watershed Enhancement Board, 2010. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "john-day",
+    name: "North Fork John Day",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [292, -14, -80],
+    look: [308, -14, -96],
+    meta: "Technical consulting · 2010",
+    title: "North Fork John Day Watershed Sediment and Physical Habitat Assessment",
+    body: "Bureau of Land Management, 2010. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "santiam",
+    name: "Santiam Calapooia",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [318, -10, -20],
+    look: [334, -10, -36],
+    meta: "Technical consulting · 2010",
+    title: "Santiam Calapooia Model Watershed Restoration Plan",
+    body: "Santiam and Calapooia Watershed Councils, 2010. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "siuslaw-headwater",
+    name: "Siuslaw Headwater & Roads",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [240, -18, -128],
+    look: [256, -18, -144],
+    meta: "Technical consulting · 2009",
+    title: "North Fork Siuslaw River Headwater and Road Condition Assessment",
+    body: "MidCoast Watershed Council, 2009. A separate report from the North Fork Siuslaw Sediment and Habitat Assessment. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "big-elk",
+    name: "Big Elk & Indian Creek",
+    kind: "research",
+    axis: "East · +X, further",
+    pos: [275, -16, 150],
+    look: [291, -16, 134],
+    meta: "Technical consulting · 2009",
+    title: "Big Elk and Indian Creek Watersheds Physical Habitat Assessment",
+    body: "MidCoast Watershed Council, 2009. Title and client from the published CV. No separate PDF page on graphicoregon.com.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
     id: "journalism",
     name: "Journalism & Writing",
     kind: "write",
     axis: "North · +Z",
-    pos: [6, 14, 148],
-    look: [6, 11, 210],
+    pos: [6, 14, 160],
+    look: [6, 11, 222],
     meta: "Writing · 2012–present",
     title: "Journalism and editing",
-    body: "Assistant editor at the Tillamook County Pioneer, with live Cara Mico bylines in this hall. Earlier work: Seaside Signal (fifteen 2019 stories), Cannon Beach Gazette (puffin reprint), HipFish Monthly issue PDFs, and two Portland Mercury pieces. Freelance newspaper work since November 2012. Click a card to open the published story.",
+    body: "Assistant editor at the Tillamook County Pioneer, with live Cara Mico bylines in this hall. Earlier work: Seaside Signal (fifteen 2019 stories), Cannon Beach Gazette titles from the CV, HipFish Monthly issue PDFs, and two Portland Mercury pieces. Freelance newspaper work since November 2012.",
     href: "https://www.tillamookcountypioneer.net/author/assistant-editor/",
     linkLabel: "Pioneer author archive"
+  },
+  {
+    id: "gazette",
+    name: "Cannon Beach Gazette",
+    kind: "write",
+    axis: "North · +Z, further",
+    pos: [10, 12, 308],
+    look: [10, 10, 328],
+    meta: "Writing · Gazette 2019",
+    title: "Cannon Beach Gazette, 2019",
+    body: "Titles from the published CV. The Gazette pages are not recovered live except the puffin reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.",
+    href: "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/",
+    linkLabel: "Open the Gazette puffin reprint"
   },
   {
     id: "credentials",
     name: "Qualifications",
     kind: "creds",
     axis: "Above · +Y",
-    pos: [0, 56, -8],
-    look: [0, 52, -28],
+    pos: [0, 58, -8],
+    look: [0, 54, -28],
     meta: "Experience · education · training",
     title: "Qualifications and credentials",
-    body: "Roles from Graphic Oregon’s Experience page, with education and the training list from the published CV. Certifications named here are the ones on that record — not a LinkedIn Learning inventory.",
+    body: "Roles from Graphic Oregon’s Experience page and the published CV. Certifications named here are the ones on that record — not a LinkedIn Learning inventory. Awards hang as medals above this ring.",
+    href: "https://graphicoregon.com/experience/",
+    linkLabel: "Open the Experience page"
+  },
+  {
+    id: "aitutor",
+    name: "AI Tutor",
+    kind: "creds",
+    axis: "Above · +Y, east",
+    pos: [36, 78, 28],
+    look: [36, 76, 8],
+    meta: "Global Logic · 2024–2025",
+    title: "AI Tutor, Global Logic",
+    body: "San Francisco, 2024–2025. Developed and edited content for Google’s ML models, focusing on data quality. Refined machine responses to meet Google’s standards. Used Looker to monitor and optimize content production metrics.",
+    href: "https://graphicoregon.com/experience/",
+    linkLabel: "Open the Experience page"
+  },
+  {
+    id: "service",
+    name: "Service & Civic Work",
+    kind: "creds",
+    axis: "Above · +Y, west",
+    pos: [-38, 74, -48],
+    look: [-38, 72, -68],
+    meta: "Service · elected office",
+    title: "Service and civic work",
+    body: "Named service from the published CV: North Coast Communities for Watershed Protection drinking-water work (2024), Kings Mountain Archery Range, SETI development consulting, Women in Science Portland, CART Manzanita, and elected boards at Tillamook County Transportation District (2014–2017) and Garibaldi Rural Fire Protection District (2014–2016).",
+    href: "https://graphicoregon.com/experience/",
+    linkLabel: "Open the Experience page"
+  },
+  {
+    id: "talks",
+    name: "Presentations",
+    kind: "creds",
+    axis: "Above · +Y, further",
+    pos: [42, 88, -58],
+    look: [42, 86, -78],
+    meta: "Presentations and conferences",
+    title: "Presentations and conferences",
+    body: "From the published CV: University of Oregon 2017 graduate research on evaluation methods and the Lane Arts asset map; American Planners Association 2015 charette on climate and salmon habitat; Network of Oregon Watershed Councils 2010 co-presentation on restoration planning prioritization methods.",
+    href: "https://graphicoregon.com/research/",
+    linkLabel: "Open the research index"
+  },
+  {
+    id: "awards",
+    name: "Awards",
+    kind: "creds",
+    axis: "Above · +Y",
+    pos: [0, 96, 18],
+    look: [0, 94, -2],
+    meta: "Fellowships and awards",
+    title: "Fellowships and awards",
+    body: "Recology Artist Residency, Astoria Visual Arts Alliance, 2018. Arts Research Travel Grant, University of Oregon, 2017. Studio Art Scholarship, Otis College of Art and Design, 2002. Studio Art Scholarship, Pratt, 2002 (declined).",
     href: "https://graphicoregon.com/experience/",
     linkLabel: "Open the Experience page"
   },
@@ -218,23 +426,36 @@ const REGIONS = [
     name: "Website Design",
     kind: "web",
     axis: "South · −Z, lower",
-    pos: [14, -10, -138],
-    look: [14, -10, -158],
+    pos: [14, -10, -148],
+    look: [14, -10, -168],
     meta: "Website design and management",
     title: "Website work",
-    body: "HTML/CSS, responsive applications, and long-term site management. Named work from the Graphic Oregon studio: Tillamook County Pioneer, Color Outside the Lines, Pete Anderson Realty, Oceanside Cougar Ridge, Gold and Silver Market Update, Big Wave Cafe, Offshore Grill, Smiley Salmon, Manzanita Beach Company, Coast Broadcasting, Brag Props, and House.Me App. Screenshots from the studio gallery hang here.",
+    body: "HTML/CSS, responsive applications, and long-term site management. Named work from the Graphic Oregon studio list. Screenshots from the studio gallery hang here. Named contract domains sit further south.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
+  },
+  {
+    id: "contracts",
+    name: "Named Web Contracts",
+    kind: "web",
+    axis: "South · −Z, further",
+    pos: [36, -16, -208],
+    look: [36, -16, -228],
+    meta: "CV contract domains",
+    title: "Named website contracts",
+    body: "From the published CV: goldsilvermarketupdate.com, coloroutsidelines.com, offshoregrill.com, bigwavecafe.com, and marketing strategy for oil painter PK Jones. Color Outside the Lines also appears on the studio home list; the defended live URL is coloroutsidethelines.org.",
+    href: "https://coloroutsidethelines.org/",
+    linkLabel: "Open Color Outside the Lines"
   }
 ];
 
 const NAV_GROUPS = [
   { label: "Arrival", ids: ["arrival"] },
-  { label: "Art · west −X", ids: ["art"] },
-  { label: "Research · east +X", ids: ["iau", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp"] },
-  { label: "Writing · north +Z", ids: ["journalism"] },
-  { label: "Credentials · above +Y", ids: ["credentials"] },
-  { label: "Websites · south −Z", ids: ["websites"] }
+  { label: "Art · west −X", ids: ["art", "moons", "studies"] },
+  { label: "Research · east +X", ids: ["iau", "iloa", "nano", "eval", "lane", "netarts", "nehalem", "tillamook-bay", "nestucca", "siuslaw", "tillamook-river", "necanicum", "nhmp", "willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"] },
+  { label: "Writing · north +Z", ids: ["journalism", "gazette"] },
+  { label: "Credentials · above +Y", ids: ["credentials", "aitutor", "service", "talks", "awards"] },
+  { label: "Websites · south −Z", ids: ["websites", "contracts"] }
 ];
 
 const IAU_CARDS = [
@@ -254,6 +475,13 @@ const NETARTS_CARDS = [
   ["Repair", "High priorities: conservation easements on North Fork Whiskey and Fall; culvert replacements; large-wood placement; hatchery diversion upgrade."]
 ];
 
+const ILOA_CARDS = [
+  ["3D modeling and astrometry", "International Lunar Observatory Association, Palo Alto, 2025–Present. Working-group support for a revised constellation-boundary mapping system."],
+  ["Stanford on the Moon", "Planning a permanent endowment for a university observatory, coordinating meetings with university leaders and stakeholders under the Stanford on the Moon initiative."],
+  ["Conference and alumni", "A multi-part initiative for lunar research and alumni engagement — invitations, venue, student groups, and an endowment meeting."],
+  ["Weekly calendar", "Managing the accuracy of a weekly calendar: updates, proofreading, and editing so the organizational tool stays reliable."]
+];
+
 const WEB_NAMES = [
   "Tillamook County Pioneer",
   "Color Outside the Lines",
@@ -267,6 +495,14 @@ const WEB_NAMES = [
   "Coast Broadcasting",
   "Brag Props",
   "House.Me App"
+];
+
+const WEB_CONTRACTS = [
+  ["goldsilvermarketupdate.com", "CV contract. Gold and Silver Market Update — web designer.", "https://goldsilvermarketupdate.com"],
+  ["coloroutsidelines.com", "CV contract domain. Studio home list names Color Outside the Lines; the defended live URL is coloroutsidethelines.org.", "https://coloroutsidethelines.org/"],
+  ["offshoregrill.com", "CV contract. Offshore Grill — website design and web admin.", "https://offshoregrill.com"],
+  ["bigwavecafe.com", "CV contract. Big Wave Cafe — web admin.", "https://bigwavecafe.com"],
+  ["PK Jones", "Currently developing marketing strategy for oil painter PK Jones. Named on the published CV. No public contract URL listed.", ""]
 ];
 
 const ARTWORKS = [
@@ -301,6 +537,26 @@ const ARTWORKS = [
   ["assets/art/composition-study.jpg", "Composition study"],
   ["assets/art/male-portrait.jpg", "Portrait, oil pastel and charcoal"],
   ["assets/art/mixed-media-gouache.jpg", "Mixed media, gouache on Canson"]
+];
+
+const MOON_ART = [
+  ["assets/art/new-moon.jpg", "New moon"],
+  ["assets/art/waxing-crescent.jpg", "Waxing crescent"],
+  ["assets/art/first-quarter-moon.jpg", "First quarter"],
+  ["assets/art/waxing-gibbous.jpg", "Waxing gibbous"],
+  ["assets/art/full-moon.jpg", "Full moon"],
+  ["assets/art/waning-gibbous.jpg", "Waning gibbous"],
+  ["assets/art/last-quarter.jpg", "Last quarter"],
+  ["assets/art/waning-crescent.jpg", "Waning crescent"]
+];
+
+const STUDY_ART = [
+  ["assets/art/female-portrait-oil-4.jpg", "Portrait, oil"],
+  ["assets/art/still-life-pencil.jpg", "Still life, pencil"],
+  ["assets/art/still-life-charcoal-3.jpg", "Still life, charcoal"],
+  ["assets/art/still-life-charcoal-4.jpg", "Still life, charcoal"],
+  ["assets/art/still-life-1.jpg", "Still life"],
+  ["assets/art/unfinished.jpg", "Unfinished"]
 ];
 
 const MAPS = [
@@ -343,7 +599,11 @@ const JOBS = [
   ["Radio Broadcasting", "KTIL 95.5 FM Tillamook, KMUN", "2013–2014", "Radio broadcasting and marketing. Live broadcasts and audience engagement."],
   ["Watershed Council Coordinator", "North Clackamas Urban Watersheds Council", "Apr 2012–Apr 2013", "Restoration planning, GIS analysis, and educational outreach."],
   ["Presidential Fellow", "Organizing for America", "Sep 2012–Nov 2012", "Outreach campaign, data collection, and volunteer recruitment during the 2012 election."],
-  ["Biological Research Consultant", "Demeter Design / Graphic Oregon", "Since 2006", "Data collection, analysis, and project management for environmental research."]
+  ["Biological Research Consultant", "Demeter Design / Graphic Oregon", "Since 2006", "Data collection, analysis, and project management for environmental research."],
+  ["Production Manager", "North Coast Music Festival", "2016–2019", "Festival programming for a local musical festival. Raised funds from local businesses to support artist travel and pay."],
+  ["Grants and Sponsorship Coordinator", "Willamette Valley Music Festival", "2016–2017", "Grant writing and sponsorship program coordinator for the University of Oregon student music festival."],
+  ["Communications Design Assistant", "University of Oregon School of Music & Dance", "2016–2017", "Communications design for the school of music and dance."],
+  ["Minutes Recorder", "Lane Council of Governments", "2015–2016", "Public records keeper for Eugene-area government meetings."]
 ];
 
 const EDUCATION = [
@@ -371,13 +631,36 @@ const AWARDS = [
   ["Studio Art Scholarship", "Pratt, 2002 (declined)"]
 ];
 
+const SERVICE = [
+  ["Drinking Water Source Project Manager", "North Coast Communities for Watershed Protection, 2024", "Drinking-water source project work for NCCWP, 2024."],
+  ["Kings Mountain Archery Range", "Board member, publicist, nonprofit consultant, 2024", "Board, publicity, and nonprofit consulting for Kings Mountain Archery Range."],
+  ["Development Consultant", "SETI, 2024", "Development consulting for SETI, 2024."],
+  ["Communications Volunteer", "Women in Science Portland, 2020", "Communications volunteer with Women in Science Portland."],
+  ["Board Member", "Conservation Action Resource Team, Manzanita, 2019–2020", "Board service with CART, Manzanita."],
+  ["Elected Board Member", "Tillamook County Transportation District, 2014–2017", "Elected board member, Tillamook County Transportation District."],
+  ["Elected Board Member", "Garibaldi Rural Fire Protection District, 2014–2016", "Elected board member, Garibaldi RFPD."]
+];
+
+const TALKS = [
+  ["Evaluation Methods for Inclusive Art Programs at OSLP", "Arts and Administration Graduate Research Presentation, University of Oregon, 2017.", "https://graphicoregon.com/program-evaluation-methods/"],
+  ["Lane Arts Council Arts Asset Mapping", "Arts and Administration Poster Session, University of Oregon, 2017.", "https://graphicoregon.com/lane-arts-council-arts-asset-map-user-guide/"],
+  ["Planning for Climate Change, Considering Salmon Habitat", "American Planners Association Annual Conference, 2015. Charette presenter.", ""],
+  ["Restoration Planning Prioritization Methods", "Network of Oregon Watershed Councils, 2010. Co-presenter.", ""]
+];
+
 const PIONEER_PIECES = [
   ["Author archive", "Cara Mico, assistant editor. The Pioneer author page mixes other writers — sample Cara bylines hang beside this card.", "https://www.tillamookcountypioneer.net/author/assistant-editor/"],
   ["A New View: Space", "By Cara Mico. Hubble, JWST, and whether colonization is realistic.", "https://www.tillamookcountypioneer.net/a-new-view-space/"],
-  ["Space Just Got a Little Closer", "By Cara Mico. A Pioneer science piece on nearer space.", "https://www.tillamookcountypioneer.net/space-just-got-a-little-closer/"],
+  ["Space Just Got a Little Closer", "By Cara Mico, Assistant Editor. A Pioneer science piece on nearer space.", "https://www.tillamookcountypioneer.net/space-just-got-a-little-closer/"],
   ["The Return of Sea Otters to Haystack Rock", "By Cara Mico. Sea otters returning to Haystack Rock.", "https://www.tillamookcountypioneer.net/the-return-of-sea-otters-to-haystack-rock/"],
   ["Understanding AI Language Models", "By Cara Mico. An introductory guide to AI language models.", "https://www.tillamookcountypioneer.net/understanding-ai-language-models-an-introductory-guide/"],
-  ["Climate Change on the Oregon Coast", "By Cara Mico. A three-part series on climate change on the Oregon coast.", "https://www.tillamookcountypioneer.net/climate-change-on-the-oregon-coast-3-part-series/"]
+  ["Climate Change on the Oregon Coast", "By Cara Mico. A three-part series on climate change on the Oregon coast.", "https://www.tillamookcountypioneer.net/climate-change-on-the-oregon-coast-3-part-series/"],
+  ["Near Space Corporation in Tillamook", "By Cara Mico, Assistant Editor. Near Space Corporation test flights out of Tillamook.", "https://www.tillamookcountypioneer.net/near-space-corporation-in-tillamook-bringing-humans-closer-to-the-void/"],
+  ["On the Future of Artificial Intelligence", "By Cara Mico, Assistant Editor. How AI can help humanity.", "https://www.tillamookcountypioneer.net/on-the-future-of-artificial-intelligence-and-how-it-can-help-humanity/"],
+  ["Spy vs. Spy — Balloon War", "By Cara Mico, Assistant Editor. Balloon incidents and sky news.", "https://www.tillamookcountypioneer.net/spy-vs-spy-balloon-war/"],
+  ["The Data of Immigration", "By Cara Mico, Assistant Editor. A data look at immigration.", "https://www.tillamookcountypioneer.net/the-data-of-immigration/"],
+  ["Homelessness in Tillamook County and on the West Coast", "By Cara Mico, Assistant Editor. How Tillamook County diverges from larger West Coast cities.", "https://www.tillamookcountypioneer.net/homelessness-in-tillamook-county-and-on-the-west-coast/"],
+  ["A Hidden Gem: The Minor Peak of Saddle Mountain", "Posted by Cara Mico, Assistant Editor. The minor peak of Saddle Mountain in Oregon’s coastal range.", "https://www.tillamookcountypioneer.net/a-hidden-gem-the-minor-peak-of-saddle-mountain/"]
 ];
 
 const SEASIDE_PIECES = [
@@ -399,7 +682,29 @@ const SEASIDE_PIECES = [
 ];
 
 const GAZETTE_PIECES = [
-  ["Program seeks to protect puffin population", "Cannon Beach Gazette, March 16, 2019. The Gazette URL is 404; this is the sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.", "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/"]
+  ["Program seeks to protect puffin population", "Cannon Beach Gazette, March 16, 2019. Gazette URL is 404. Sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.", "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/"],
+  ["Preparation is the Watchword", "Cannon Beach Gazette, May 3, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Beauty and the Beast at Coaster Theater Spring Camp", "Cannon Beach Gazette, May 2, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Site Plan for Larger Tree Work Required", "Cannon Beach Gazette, April 17, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["City Council Appeal Sent Back to Planning Commission", "Cannon Beach Gazette, April 15, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Big Changes Ahead for Rental Permits", "Cannon Beach Gazette, April 2, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Food for the Soul", "Cannon Beach Gazette, April 2, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Bed and Breakfast or Short Term Rental?", "Cannon Beach Gazette, April 1, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Design Review Board approves two new marijuana shop plans", "Cannon Beach Gazette, March 26, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["No tents in the park", "Cannon Beach Gazette, March 21, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["City seeks clarity on tourism funds", "Cannon Beach Gazette, March 21, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Warren Way reconfiguration ahead", "Cannon Beach Gazette, March 19, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Operations levy rejected for new fire truck", "Cannon Beach Gazette, March 15, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["What’s in store for the new RV park?", "Cannon Beach Gazette, March 12, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Funding sought to analyze potential city hall sites", "Cannon Beach Gazette, March 11, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Love it like a local", "Cannon Beach Gazette, March 11, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Keeping a forest healthy", "Cannon Beach Gazette, March 4, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Savor Cannon Beach", "Cannon Beach Gazette, February 28, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Is comp plan revision ahead?", "Cannon Beach Gazette, February 26, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["City hall location only one of many concerns", "Cannon Beach Gazette, February 20, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["City hall location dizzying for council", "Cannon Beach Gazette, February 8, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Burglaries spike, but overall crime report is 'average'", "Cannon Beach Gazette, February 7, 2019. Title from the published CV. Live Gazette URL not recovered.", ""],
+  ["Neal Maine's art of the migratory bird", "Cannon Beach Gazette, February 7, 2019. Title from the published CV. Live Gazette URL not recovered.", ""]
 ];
 
 const HIPFISH = [
@@ -415,7 +720,7 @@ const MERCURY = [
 ];
 
 const clickables = [];
-let scene, camera, renderer;
+let scene, camera, renderer, ship;
 let lookYaw = 0;
 let lookPitch = -0.12;
 let dragging = false;
@@ -424,12 +729,14 @@ let lastY = 0;
 let keys = {};
 let scrollBoost = 0;
 let flight = null;
+let bubbleCool = 0;
+const bubbles = [];
 const clock = new THREE.Clock();
 const cam = {
   pos: new THREE.Vector3(0, 12, 32),
   vel: new THREE.Vector3()
 };
-const bounds = { x: [-220, 250], y: [-40, 88], z: [-210, 280] };
+const bounds = { x: [-280, 380], y: [-52, 120], z: [-280, 400] };
 
 function smoothstep(k) {
   k = THREE.MathUtils.clamp(k, 0, 1);
@@ -601,9 +908,9 @@ function addStars() {
   const n = 4200;
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 1400;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 700;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 1400;
+    pos[i * 3] = (Math.random() - 0.5) * 1600;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 800;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 1600;
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -613,18 +920,18 @@ function addStars() {
 }
 
 function addWorldGuides() {
-  const grid = new THREE.GridHelper(420, 42, 0x1a6f6a, 0x143238);
-  grid.position.y = -24;
+  const grid = new THREE.GridHelper(560, 56, 0x1a6f6a, 0x143238);
+  grid.position.y = -28;
   scene.add(grid);
 
   const marks = [
-    ["SKY", 0, 78, 0, 22, 4],
-    ["GROUND", 0, -30, 0, 18, 3.2],
-    ["ART  ·  WEST  −X", -200, 34, 0, 28, 3.4],
-    ["RESEARCH  ·  EAST  +X", 248, 16, 0, 32, 3.4],
-    ["WRITING  ·  NORTH  +Z", 0, 22, 268, 28, 3.4],
-    ["WEBSITES  ·  SOUTH  −Z", 0, -4, -208, 28, 3.4],
-    ["CREDENTIALS  ·  ABOVE  +Y", 0, 78, -36, 26, 3.2]
+    ["SKY", 0, 108, 0, 22, 4],
+    ["GROUND", 0, -36, 0, 18, 3.2],
+    ["ART  ·  WEST  −X", -250, 36, 0, 28, 3.4],
+    ["RESEARCH  ·  EAST  +X", 360, 16, 0, 32, 3.4],
+    ["WRITING  ·  NORTH  +Z", 0, 22, 380, 28, 3.4],
+    ["WEBSITES  ·  SOUTH  −Z", 0, -8, -260, 28, 3.4],
+    ["CREDENTIALS  ·  ABOVE  +Y", 0, 108, -40, 26, 3.2]
   ];
   marks.forEach(([t, x, y, z, pw, ph]) => {
     const lab = makeLabel(t, {
@@ -638,11 +945,11 @@ function addWorldGuides() {
 
   const hubs = [
     [0, 8, 0],
-    [-118, 28, 6],
+    [-128, 30, 8],
     [140, 4, 0],
-    [6, 12, 148],
-    [0, 52, -8],
-    [14, -10, -138]
+    [6, 14, 160],
+    [0, 58, -8],
+    [14, -10, -148]
   ];
   hubs.slice(1).forEach((h) => {
     const g = new THREE.BufferGeometry().setFromPoints([
@@ -676,6 +983,150 @@ function addBeacon(region) {
   title.userData.billboard = true;
   scene.add(title);
   clickables.push(title);
+}
+
+function makeShip() {
+  const g = new THREE.Group();
+  const goldMat = new THREE.MeshBasicMaterial({ color: gold });
+  const tealMat = new THREE.MeshBasicMaterial({ color: teal });
+  const dark = new THREE.MeshBasicMaterial({ color: 0x1a6f6a });
+
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 1.15, 8), goldMat);
+  body.rotation.x = Math.PI / 2;
+  g.add(body);
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 8), goldMat);
+  nose.rotation.x = -Math.PI / 2;
+  nose.position.z = -0.78;
+  g.add(nose);
+
+  const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), tealMat);
+  canopy.position.set(0, 0.14, -0.12);
+  canopy.scale.set(0.85, 0.55, 1);
+  g.add(canopy);
+
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.035, 0.38), goldMat);
+  wing.position.set(0, -0.04, 0.08);
+  g.add(wing);
+
+  const tail = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.32, 0.22), goldMat);
+  tail.position.set(0, 0.2, 0.48);
+  g.add(tail);
+
+  const strut = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.04, 0.08), dark);
+  strut.position.set(0, -0.12, 0.02);
+  g.add(strut);
+
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 8, 8),
+    new THREE.MeshBasicMaterial({ color: teal, transparent: true, opacity: 0.7 })
+  );
+  glow.position.z = 0.68;
+  g.add(glow);
+  g.userData.glow = glow;
+  return g;
+}
+
+function makeMedal() {
+  const g = new THREE.Group();
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(0.95, 28),
+    new THREE.MeshBasicMaterial({ color: gold, side: THREE.DoubleSide })
+  );
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.98, 1.18, 28),
+    new THREE.MeshBasicMaterial({ color: teal, side: THREE.DoubleSide })
+  );
+  ring.position.z = 0.02;
+  g.add(disc, ring);
+  return g;
+}
+
+function hangArt(tex, title, regionId, pos) {
+  const plane = imagePlane(tex, 5.1);
+  plane.position.set(...pos);
+  plane.userData.regionId = regionId;
+  plane.userData.title = title;
+  scene.add(plane);
+  clickables.push(plane);
+  const cap = makeLabel(title, { w: 900, h: 160, pw: 4.6, ph: 0.8, font: "500 42px Georgia, serif" });
+  cap.position.copy(plane.position);
+  cap.position.y -= 3.0;
+  scene.add(cap);
+}
+
+function shootBubble() {
+  if (bubbleCool > 0 || bubbles.length > 22) return;
+  bubbleCool = 0.16;
+  const dir = lookDir();
+  const origin = ship
+    ? ship.position.clone().addScaledVector(dir, 0.85)
+    : cam.pos.clone().addScaledVector(dir, 2.2);
+  const color = Math.random() < 0.55 ? teal : gold;
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.22 + Math.random() * 0.12, 12, 12),
+    new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.38, depthWrite: false
+    })
+  );
+  mesh.position.copy(origin);
+  scene.add(mesh);
+  bubbles.push({
+    mesh,
+    vel: dir.clone().multiplyScalar(7.2 + Math.random() * 2.4).add(new THREE.Vector3(
+      (Math.random() - 0.5) * 1.3,
+      0.75 + Math.random() * 1.05,
+      (Math.random() - 0.5) * 1.3
+    )),
+    age: 0,
+    life: 2.8 + Math.random() * 1.4,
+    wob: Math.random() * Math.PI * 2,
+    pop: false
+  });
+}
+
+function updateBubbles(dt) {
+  for (let i = bubbles.length - 1; i >= 0; i--) {
+    const b = bubbles[i];
+    b.age += dt;
+    b.wob += dt * 3.2;
+    if (!b.pop) {
+      b.vel.y += dt * 0.55;
+      b.vel.multiplyScalar(Math.exp(-dt * 0.35));
+      b.mesh.position.addScaledVector(b.vel, dt);
+      b.mesh.position.x += Math.sin(b.wob) * dt * 0.55;
+      b.mesh.position.y += Math.cos(b.wob * 1.3) * dt * 0.35;
+      const t = b.age / b.life;
+      b.mesh.material.opacity = 0.4 * (1 - t * t);
+      if (b.age >= b.life) b.pop = true;
+    } else {
+      b.mesh.scale.multiplyScalar(1 + dt * 4.2);
+      b.mesh.material.opacity *= Math.exp(-dt * 8);
+      if (b.mesh.material.opacity < 0.02) {
+        scene.remove(b.mesh);
+        b.mesh.geometry.dispose();
+        b.mesh.material.dispose();
+        bubbles.splice(i, 1);
+      }
+    }
+  }
+}
+
+function updateShip(dt) {
+  if (!ship) return;
+  const dir = lookDir();
+  const target = cam.pos.clone().addScaledVector(dir, 3.55);
+  target.y -= 0.88;
+  ship.position.lerp(target, 1 - Math.exp(-dt * 14));
+  const aim = ship.position.clone().add(dir);
+  ship.lookAt(aim);
+  const glow = ship.userData.glow;
+  if (glow) {
+    const pulse = 0.45 + 0.28 * (0.5 + 0.5 * Math.sin(clock.elapsedTime * 6.2));
+    glow.material.opacity = pulse;
+    const boost = Math.min(cam.vel.length() * 0.04, 0.25);
+    glow.scale.setScalar(1 + boost);
+  }
 }
 
 function constellation(origin) {
@@ -751,7 +1202,7 @@ function populateJournalism() {
     "Tillamook County Pioneer",
     "Assistant editor, 2022–present. The author archive mixes other writers. Sample Cara Mico bylines are the cards in this hall — click any card for the live piece."
   );
-  intro.position.set(ox - 12, oy + 2, oz + 14);
+  intro.position.set(ox - 14, oy + 2, oz + 16);
   placeClickCard(intro, "journalism", {
     title: "Tillamook County Pioneer",
     body: "Assistant editor since June 2022. Live Cara bylines only — the Pioneer author page also lists other writers.",
@@ -762,9 +1213,9 @@ function populateJournalism() {
 
   PIONEER_PIECES.forEach((piece, i) => {
     const { mesh, extra } = hallCard(piece, "Open this Pioneer piece");
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-    mesh.position.set(ox - 14 + col * 11, oy + 3 - row * 6.4, oz + 28);
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    mesh.position.set(ox - 18 + col * 12, oy + 3 - row * 6.8, oz + 32);
     placeClickCard(mesh, "journalism", extra);
   });
 
@@ -772,7 +1223,7 @@ function populateJournalism() {
     "Seaside Signal — 2019",
     "Fifteen live bylines from the 2019 Signal list. Each card opens the published story."
   );
-  seasideIntro.position.set(ox, oy + 8, oz + 52);
+  seasideIntro.position.set(ox, oy + 8, oz + 62);
   placeClickCard(seasideIntro, "journalism", {
     title: "Seaside Signal, 2019",
     body: "Fifteen verified live stories. Click a card or use the links in this panel.",
@@ -783,25 +1234,13 @@ function populateJournalism() {
     const { mesh, extra } = hallCard(piece, "Open this Signal story");
     const col = i % 5;
     const row = Math.floor(i / 5);
-    mesh.position.set(ox - 22 + col * 11, oy + 3 - row * 6.6, oz + 66);
+    mesh.position.set(ox - 24 + col * 12, oy + 3 - row * 6.8, oz + 78);
     placeClickCard(mesh, "journalism", extra);
-  });
-
-  const gazette = makeCard(
-    "Cannon Beach Gazette — puffins",
-    "Program seeks to protect puffin population, March 16, 2019. Labeled Cannon Beach Gazette. The Gazette page is 404; this opens the Seaside Signal sister reprint, bylined Cara Mico / For Cannon Beach Gazette."
-  );
-  gazette.position.set(ox, oy + 2, oz + 92);
-  placeClickCard(gazette, "journalism", {
-    title: "Cannon Beach Gazette: puffin population",
-    body: "March 16, 2019. Gazette URL is 404. Sister reprint on the Seaside Signal, bylined Cara Mico / For Cannon Beach Gazette.",
-    href: "https://seasidesignal.com/2019/03/16/program-seeks-to-protect-puffin-population/",
-    linkLabel: "Open the Gazette puffin reprint"
   });
 
   HIPFISH.forEach((piece, i) => {
     const { mesh, extra } = hallCard(piece, "Open this HipFish issue PDF");
-    mesh.position.set(ox - 16 + (i % 2) * 16, oy + 2 - Math.floor(i / 2) * 6.4, oz + 110);
+    mesh.position.set(ox - 16 + (i % 2) * 16, oy + 2 - Math.floor(i / 2) * 6.4, oz + 108);
     placeClickCard(mesh, "journalism", extra);
   });
 
@@ -815,10 +1254,22 @@ function populateJournalism() {
     "Freelance newspapers, since 2012",
     "From the Experience page: arts, environment, and emergency preparedness since November 2012. Papers in this room are the CV set — Pioneer, Seaside Signal, Cannon Beach Gazette, HipFish Monthly, and the Portland Mercury."
   );
-  freelance.position.set(ox, oy - 4, oz + 142);
+  freelance.position.set(ox, oy - 4, oz + 144);
   placeClickCard(freelance, "journalism", {
     title: "Freelance journalist, Nov 2012–present",
     body: "Arts, environment, and emergency preparedness. Assistant editor at the Tillamook County Pioneer. Other papers named here are from the published CV only."
+  });
+}
+
+function populateGazette() {
+  const origin = REGIONS.find((r) => r.id === "gazette").pos;
+  const ox = origin[0], oy = origin[1], oz = origin[2];
+  GAZETTE_PIECES.forEach((piece, i) => {
+    const { mesh, extra } = hallCard(piece, piece[2] ? "Open the Gazette puffin reprint" : "");
+    const col = i % 5;
+    const row = Math.floor(i / 5);
+    mesh.position.set(ox - 24 + col * 12, oy + 4 - row * 6.8, oz + 14);
+    placeClickCard(mesh, "gazette", extra);
   });
 }
 
@@ -829,8 +1280,8 @@ function populateCredentials() {
   JOBS.forEach((job, i) => {
     const m = makeJobCard(job[0], job[1], job[2], job[3]);
     const ang = (i / JOBS.length) * Math.PI * 2;
-    const r = 22;
-    m.position.set(ox + Math.cos(ang) * r, oy + ((i % 3) - 1) * 5.4, oz - 16 + Math.sin(ang) * r * 0.55);
+    const r = 28;
+    m.position.set(ox + Math.cos(ang) * r, oy + ((i % 3) - 1) * 5.6, oz - 16 + Math.sin(ang) * r * 0.58);
     m.lookAt(ox, oy, oz - 8);
     placeClickCard(m, "credentials", {
       title: job[0],
@@ -842,7 +1293,7 @@ function populateCredentials() {
 
   EDUCATION.forEach((ed, i) => {
     const m = makeJobCard(ed[0], ed[1], "Education", ed[2]);
-    m.position.set(ox - 16 + i * 11, oy + 10, oz - 6);
+    m.position.set(ox - 18 + i * 12, oy + 12, oz - 6);
     placeClickCard(m, "credentials", {
       title: ed[0],
       body: ed[1] + ". " + ed[2],
@@ -858,22 +1309,119 @@ function populateCredentials() {
     });
     const col = i % 2;
     const row = Math.floor(i / 2);
-    plaque.position.set(ox - 10 + col * 12, oy - 12 - row * 2.1, oz - 4);
+    plaque.position.set(ox - 12 + col * 14, oy - 14 - row * 2.2, oz - 4);
     placeClickCard(plaque, "credentials", {
       title: c[0],
       body: c[1] + ". From the published CV training list — not a LinkedIn Learning catalog."
     });
   });
+}
 
+function populateAwards() {
+  const origin = REGIONS.find((r) => r.id === "awards").pos;
+  const ox = origin[0], oy = origin[1], oz = origin[2];
   AWARDS.forEach((a, i) => {
-    const plaque = makeLabel(a[0] + " — " + a[1], {
-      w: 1400, h: 200, pw: 9.4, ph: 1.35, font: "500 40px Georgia, serif"
+    const medal = makeMedal();
+    const ang = (i / AWARDS.length) * Math.PI * 2;
+    medal.position.set(ox + Math.cos(ang) * 8.5, oy + 1.2, oz + Math.sin(ang) * 8.5);
+    medal.userData.regionId = "awards";
+    medal.userData.title = a[0];
+    medal.userData.body = a[1];
+    scene.add(medal);
+    clickables.push(medal);
+    const lab = makeLabel(a[0] + " — " + a[1], {
+      w: 1400, h: 200, pw: 8.6, ph: 1.25, font: "500 40px Georgia, serif"
     });
-    plaque.position.set(ox - 16 + i * 11, oy + 14.5, oz - 2);
-    placeClickCard(plaque, "credentials", {
-      title: a[0],
-      body: a[1]
+    lab.position.set(medal.position.x, medal.position.y - 2.2, medal.position.z);
+    lab.userData.regionId = "awards";
+    lab.userData.billboard = true;
+    scene.add(lab);
+    clickables.push(lab);
+  });
+}
+
+function populateIloa() {
+  const origin = REGIONS.find((r) => r.id === "iloa").pos;
+  ILOA_CARDS.forEach((card, i) => {
+    const m = makeCard(card[0], card[1]);
+    const ang = (i / ILOA_CARDS.length) * Math.PI * 1.5 - 0.4;
+    m.position.set(origin[0] + Math.cos(ang) * 12, origin[1] + ((i % 2) - 0.5) * 3.2, origin[2] - 8 + Math.sin(ang) * 10);
+    m.lookAt(origin[0], origin[1], origin[2]);
+    placeClickCard(m, "iloa", {
+      title: card[0],
+      body: card[1],
+      href: "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/",
+      linkLabel: "Related: IAU mapping proposal"
     });
+  });
+}
+
+function populateService() {
+  const origin = REGIONS.find((r) => r.id === "service").pos;
+  SERVICE.forEach((s, i) => {
+    const m = makeJobCard(s[0], s[1], "Service", s[2]);
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    m.position.set(origin[0] - 12 + col * 12, origin[1] + 3 - row * 6.6, origin[2] - 10);
+    placeClickCard(m, "service", {
+      title: s[0],
+      body: s[1] + ". " + s[2],
+      href: "https://graphicoregon.com/experience/",
+      linkLabel: "Open the Experience page"
+    });
+  });
+}
+
+function populateTalks() {
+  const origin = REGIONS.find((r) => r.id === "talks").pos;
+  TALKS.forEach((t, i) => {
+    const { mesh, extra } = hallCard(t, t[2] ? "Open the related paper" : "");
+    mesh.position.set(origin[0] - 16 + (i % 2) * 16, origin[1] + 2 - Math.floor(i / 2) * 6.6, origin[2] - 8);
+    placeClickCard(mesh, "talks", extra);
+  });
+}
+
+function populateAiTutor() {
+  const origin = REGIONS.find((r) => r.id === "aitutor").pos;
+  const cards = [
+    ["Google ML models", "Developed and edited content for Google’s ML models, focusing on data quality."],
+    ["Machine responses", "Refined machine responses to meet Google’s standards."],
+    ["Looker", "Used Looker to monitor and optimize content production metrics."]
+  ];
+  cards.forEach((c, i) => {
+    const m = makeCard(c[0], c[1]);
+    m.position.set(origin[0] - 10 + i * 10, origin[1] + 1, origin[2] - 8);
+    placeClickCard(m, "aitutor", { title: c[0], body: c[1] });
+  });
+}
+
+function populateContracts() {
+  const origin = REGIONS.find((r) => r.id === "contracts").pos;
+  WEB_CONTRACTS.forEach((c, i) => {
+    const plaque = makeLabel(c[0], {
+      w: 1100, h: 200, pw: 7.4, ph: 1.25, font: "500 44px Georgia, serif",
+      stroke: "rgba(42,168,160,0.75)"
+    });
+    plaque.position.set(origin[0] - 16 + (i % 3) * 14, origin[1] + 3 - Math.floor(i / 3) * 3.2, origin[2] - 8);
+    placeClickCard(plaque, "contracts", {
+      title: c[0],
+      body: c[1],
+      href: c[2] || undefined,
+      linkLabel: c[2] ? "Open named site" : undefined
+    });
+  });
+}
+
+function populateResearchCard(id) {
+  const r = REGIONS.find((x) => x.id === id);
+  if (!r) return;
+  const m = makeCard(r.title, r.body);
+  m.position.set(r.pos[0], r.pos[1] + 3.4, r.pos[2] - 8);
+  placeClickCard(m, id, {
+    title: r.title,
+    body: r.body,
+    href: r.href,
+    linkLabel: r.linkLabel
   });
 }
 
@@ -913,19 +1461,35 @@ async function populate() {
   const artOrigin = REGIONS.find((r) => r.id === "art").pos;
   const artTex = await Promise.all(ARTWORKS.map(([u]) => loadTexture(u)));
   artTex.forEach((tex, i) => {
-    const plane = imagePlane(tex, 5.1);
-    const cols = 6;
+    const cols = 5;
     const col = i % cols;
     const row = Math.floor(i / cols);
-    plane.position.set(artOrigin[0] - 22 + col * 8.2, artOrigin[1] + 8 - row * 7.4, artOrigin[2] - 16 - (row % 2) * 4);
-    plane.userData.regionId = "art";
-    plane.userData.title = ARTWORKS[i][1];
-    scene.add(plane);
-    clickables.push(plane);
-    const cap = makeLabel(ARTWORKS[i][1], { w: 900, h: 160, pw: 4.6, ph: 0.8, font: "500 42px Georgia, serif" });
-    cap.position.copy(plane.position);
-    cap.position.y -= 3.0;
-    scene.add(cap);
+    hangArt(tex, ARTWORKS[i][1], "art", [
+      artOrigin[0] - 24 + col * 10.4,
+      artOrigin[1] + 10 - row * 8.6,
+      artOrigin[2] - 18 - (row % 2) * 5
+    ]);
+  });
+
+  const moonOrigin = REGIONS.find((r) => r.id === "moons").pos;
+  const moonTex = await Promise.all(MOON_ART.map(([u]) => loadTexture(u)));
+  moonTex.forEach((tex, i) => {
+    const ang = (i / MOON_ART.length) * Math.PI * 2;
+    hangArt(tex, MOON_ART[i][1], "moons", [
+      moonOrigin[0] + Math.cos(ang) * 16,
+      moonOrigin[1] + Math.sin(i) * 1.6,
+      moonOrigin[2] - 8 + Math.sin(ang) * 16
+    ]);
+  });
+
+  const studyOrigin = REGIONS.find((r) => r.id === "studies").pos;
+  const studyTex = await Promise.all(STUDY_ART.map(([u]) => loadTexture(u)));
+  studyTex.forEach((tex, i) => {
+    hangArt(tex, STUDY_ART[i][1], "studies", [
+      studyOrigin[0] - 16 + (i % 3) * 12,
+      studyOrigin[1] + 4 - Math.floor(i / 3) * 8.2,
+      studyOrigin[2] - 12
+    ]);
   });
 
   const webOrigin = REGIONS.find((r) => r.id === "websites").pos;
@@ -934,7 +1498,7 @@ async function populate() {
     const plane = imagePlane(tex, 7.2);
     const col = i % 3;
     const row = Math.floor(i / 3);
-    plane.position.set(webOrigin[0] - 14 + col * 11, webOrigin[1] + 4 - row * 6.4, webOrigin[2] - 14);
+    plane.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] + 5 - row * 7.2, webOrigin[2] - 16);
     plane.userData.regionId = "websites";
     plane.userData.title = "Website gallery";
     scene.add(plane);
@@ -944,20 +1508,32 @@ async function populate() {
     const plaque = makeLabel(name, { w: 900, h: 180, pw: 6.4, ph: 1.15, font: "500 44px Georgia, serif", stroke: "rgba(42,168,160,0.75)" });
     const col = i % 3;
     const row = Math.floor(i / 3);
-    plaque.position.set(webOrigin[0] - 14 + col * 11, webOrigin[1] - 8 - row * 1.7, webOrigin[2] - 4);
+    plaque.position.set(webOrigin[0] - 16 + col * 13, webOrigin[1] - 10 - row * 2.0, webOrigin[2] - 4);
     plaque.userData.regionId = "websites";
     scene.add(plaque);
     clickables.push(plaque);
   });
 
   populateJournalism();
+  populateGazette();
   populateCredentials();
+  populateAwards();
+  populateIloa();
+  populateService();
+  populateTalks();
+  populateAiTutor();
+  populateContracts();
+
+  ["willamette-culvert", "willamette-plan", "hells-canyon", "oweb", "john-day", "santiam", "siuslaw-headwater", "big-elk"].forEach(populateResearchCard);
 
   const arrival = makeLabel("Art west  ·  Research east  ·  Writing north  ·  Credentials above", {
     w: 1800, h: 220, pw: 22, ph: 2.4, font: "500 48px Georgia, serif"
   });
   arrival.position.set(0, 2.4, 4);
   scene.add(arrival);
+
+  ship = makeShip();
+  scene.add(ship);
 }
 
 function nearestRegion(p) {
@@ -1040,18 +1616,26 @@ function setupNav() {
   });
 }
 
-function onPointer(e) {
+function pickAt(e) {
   const rect = renderer.domElement.getBoundingClientRect();
   const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
   const ray = new THREE.Raycaster();
   ray.setFromCamera({ x, y }, camera);
   const hits = ray.intersectObjects(clickables, true);
-  if (!hits.length) return;
+  if (!hits.length) return null;
   let obj = hits[0].object;
   while (obj && !obj.userData.regionId && obj.parent) obj = obj.parent;
-  const id = obj && obj.userData.regionId;
-  const region = REGIONS.find((r) => r.id === id);
+  return obj && obj.userData.regionId ? obj : null;
+}
+
+function onPointer(e) {
+  const obj = pickAt(e);
+  if (!obj) {
+    shootBubble();
+    return;
+  }
+  const region = REGIONS.find((r) => r.id === obj.userData.regionId);
   if (!region) return;
   flyTo(region, {
     title: obj.userData.title,
@@ -1097,8 +1681,13 @@ function bindInput() {
     if (Math.hypot(dx, dy) < 7) onPointer(e);
   });
   window.addEventListener("keydown", (e) => {
-    keys[e.key.toLowerCase()] = true;
-    if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "q", "e"].includes(e.key.toLowerCase()) || e.key === " ") {
+    const k = e.key.toLowerCase();
+    keys[k] = true;
+    if (k === "f") {
+      e.preventDefault();
+      shootBubble();
+    }
+    if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "q", "e"].includes(k) || e.key === " ") {
       if (["ArrowUp", "ArrowDown", " ", "q", "e", "Q", "E"].includes(e.key)) e.preventDefault();
     }
   });
@@ -1108,6 +1697,7 @@ function bindInput() {
 function tick() {
   requestAnimationFrame(tick);
   const dt = Math.min(clock.getDelta(), 0.05);
+  if (bubbleCool > 0) bubbleCool = Math.max(0, bubbleCool - dt);
 
   if (flight) {
     flight.t += dt;
@@ -1141,6 +1731,9 @@ function tick() {
   camera.position.copy(cam.pos);
   camera.lookAt(cam.pos.x + aim.x * 20, cam.pos.y + aim.y * 20, cam.pos.z + aim.z * 20);
 
+  updateShip(dt);
+  updateBubbles(dt);
+
   scene.traverse((obj) => {
     if (obj.userData && obj.userData.billboard) obj.lookAt(camera.position);
   });
@@ -1155,8 +1748,8 @@ function tick() {
 async function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(ink);
-  scene.fog = new THREE.FogExp2(0x0a1216, 0.0024);
-  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1600);
+  scene.fog = new THREE.FogExp2(0x0a1216, 0.0018);
+  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 2000);
   camera.position.copy(cam.pos);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));
@@ -1169,9 +1762,12 @@ async function main() {
   const rim = new THREE.PointLight(0xd4b05a, 16, 180);
   rim.position.set(-40, 28, -20);
   scene.add(rim);
-  const east = new THREE.PointLight(0x2aa8a0, 14, 220);
-  east.position.set(150, 8, 10);
+  const east = new THREE.PointLight(0x2aa8a0, 14, 260);
+  east.position.set(220, 8, 10);
   scene.add(east);
+  const far = new THREE.PointLight(0xd4b05a, 10, 220);
+  far.position.set(-180, 24, -40);
+  scene.add(far);
 
   addStars();
   setupNav();
