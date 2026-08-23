@@ -2897,7 +2897,20 @@ function populateImmediate() {
   scene.add(avatar);
 }
 
+async function populateGivingGuide() {
+  const tex = await loadTexture("assets/print/giving-guide-cover.jpg");
+  if (!tex) return;
+  const mesh = imagePlane(tex, 7.4);
+  mesh.position.set(-118, 6.4, 10);
+  mesh.rotation.y = Math.PI / 2;
+  mesh.userData.regionId = "prints";
+  mesh.userData.title = "Giving Guide 2022–23";
+  scene.add(mesh);
+  clickables.push(mesh);
+}
+
 async function populateDeferred() {
+  await populateGivingGuide();
   await populateStarIS();
   await populateNetartsMaps();
   await populateStudioArt();
