@@ -1061,7 +1061,7 @@ let flight = null;
 let artFocus = null;
 const WALK_SPEED = 3.4;
 const WALK_RUN = 5.2;
-const INDOOR_SCROLL_STEP = 0.65;
+const INDOOR_SCROLL_STEP = 1.4;
 let bubbleCool = 0;
 const bubbles = [];
 const clock = new THREE.Clock();
@@ -3164,7 +3164,7 @@ function onPointer(e) {
 function bindInput() {
   const el = renderer.domElement;
   const wheelIgnore = (t) => t && t.closest && t.closest("#destinations, #panel, a, button, input, textarea, select");
-  window.addEventListener("wheel", (e) => {
+  function onWheel(e) {
     if (wheelIgnore(e.target)) return;
     e.preventDefault();
     if (flight) flight = null;
@@ -3172,22 +3172,27 @@ function bindInput() {
     let dx = e.deltaX;
     if (e.deltaMode === 1) { dy *= 16; dx *= 16; }
     if (e.deltaMode === 2) { dy *= 800; dx *= 800; }
-    const unitY = THREE.MathUtils.clamp(dy / 100, -1, 1);
+    if (Math.abs(dy) < 1 && Math.abs(dx) >= 1) return;
+    const unitY = THREE.MathUtils.clamp(dy / 80, -1, 1);
     const unitX = THREE.MathUtils.clamp(dx / 100, -1, 1);
+    if (Math.abs(unitY) < 0.02 && Math.abs(unitX) < 0.02) return;
     if (artFocus && !artFocus.exiting) return;
+    const flat = flatLookDir();
     if (isIndoors()) {
-      const flat = flatLookDir();
-      const step = -unitY * INDOOR_SCROLL_STEP;
-      if (Math.abs(step) > 0.02) moveIndoor(flat.clone().multiplyScalar(step));
+      const step = unitY * INDOOR_SCROLL_STEP;
+      if (Math.abs(step) > 0.01) moveIndoor(flat.clone().multiplyScalar(step));
       return;
     }
-    scrollBoost -= unitY * 1.6;
+    scrollBoost += unitY * 1.6;
     scrollBoost = THREE.MathUtils.clamp(scrollBoost, -6, 6);
+    cam.pos.addScaledVector(flat, unitY * 2.4);
     if (Math.abs(dx) > 0.5) {
       strafeBoost += unitX * 28;
       strafeBoost = THREE.MathUtils.clamp(strafeBoost, -50, 50);
     }
-  }, { passive: false });
+  }
+  window.addEventListener("wheel", onWheel, { passive: false });
+  el.addEventListener("wheel", onWheel, { passive: false });
   let downX = 0, downY = 0;
   el.addEventListener("pointerdown", (e) => {
     dragging = true;
