@@ -2900,11 +2900,15 @@ function populateImmediate() {
 async function populateGivingGuide() {
   const tex = await loadTexture("assets/print/giving-guide-cover.jpg");
   if (!tex) return;
-  const mesh = imagePlane(tex, 7.4);
-  mesh.position.set(-118, 6.4, 10);
+  // Park the 2022–23 Giving Guide print on the plaza path (ax-shifted),
+  // facing the approach from arrival so a stranger sees the cover, not a caption.
+  const mesh = imagePlane(tex, 8.6);
+  mesh.position.set(ax(-140), 5.8, 12);
   mesh.rotation.y = Math.PI / 2;
-  mesh.userData.regionId = "prints";
+  mesh.userData.regionId = "art";
   mesh.userData.title = "Giving Guide 2022–23";
+  mesh.userData.body = "Cover of the 2022–23 Giving Guide print. A real object on the field.";
+  mesh.userData.stay = true;
   scene.add(mesh);
   clickables.push(mesh);
 }
