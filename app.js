@@ -21,7 +21,7 @@ const MARKERS = [
   { id: "writing", title: "Writing", pos: [0, 1.4, 22], color: teal, href: "https://graphicoregon.com/", body: "Journalism and media." },
   { id: "websites", title: "Websites", pos: [0, 1.4, -22], color: gold, href: "https://graphicoregon.com/", body: "Website design." },
   { id: "credentials", title: "Credentials", pos: [0, 16, 0], color: teal, href: "https://graphicoregon.com/", body: "Education and practice." },
-  { id: "ground", title: "Ground", pos: [0, -12, 0], color: 0x4a5a58, href: "https://graphicoregon.com/", body: "Below origin." }
+  { id: "ground", title: "Ground", pos: [0, -12, 0], color: 0x4a5a58, href: "https://graphicoregon.com/", body: "The field continues below." }
 ];
 
 let scene, camera, renderer;
@@ -119,9 +119,14 @@ function woodBlockMap() {
 
 function surfaceMat(map, opts) {
   const o = opts || {};
-  map.repeat.set(o.repeat == null ? 1 : o.repeat, o.ry == null ? (o.repeat == null ? 1 : o.repeat) : o.ry);
+  const tex = map && typeof map.clone === "function" ? map.clone() : map;
+  if (tex && tex.repeat) {
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(o.repeat == null ? 1 : o.repeat, o.ry == null ? (o.repeat == null ? 1 : o.repeat) : o.ry);
+  }
   return new THREE.MeshStandardMaterial({
-    map: map,
+    map: tex && tex.isTexture ? tex : null,
     color: o.tint == null ? 0xffffff : o.tint,
     roughness: o.roughness == null ? 0.88 : o.roughness,
     metalness: o.metalness == null ? 0.03 : o.metalness,
@@ -133,11 +138,6 @@ const PLASTER = surfaceMat(plasterMap(), { repeat: 2, ry: 1.1, roughness: 0.93 }
 const FLOOR = surfaceMat(oakMap(), { repeat: 2, ry: 2, roughness: 0.78, metalness: 0.04 });
 const WOOD = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.7, metalness: 0.05 });
 const FRAME = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.52, metalness: 0.1 });
-const BRASS = new THREE.MeshStandardMaterial({
-  color: 0xb08a46,
-  roughness: 0.42,
-  metalness: 0.55
-});
 const INLAY = new THREE.MeshStandardMaterial({
   color: 0x3d5c58,
   roughness: 0.48,
@@ -208,9 +208,9 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function addVolume(marker) {
   const wash = new THREE.Color(0xc2beb2).lerp(new THREE.Color(marker.color), 0.22);
-  const mat = surfaceMat(0xb8b4a8, {
+  const mat = surfaceMat(plasterMap(), {
     repeat: 2,
-    grain: 16,
+    ry: 1.1,
     roughness: 0.9,
     tint: wash.getHex()
   });
@@ -306,15 +306,7 @@ function goHome() {
   hidePanel();
 }
 
-function updatePoseHud() {
-  const el = document.getElementById("pose-xyz");
-  if (el) {
-    el.textContent = pos.x.toFixed(1) + "  " + pos.y.toFixed(1) + "  " + pos.z.toFixed(1);
-  }
-  const near = Math.hypot(pos.x, pos.z) < 3 && Math.abs(pos.y - EYE) < 2;
-  const chip = document.getElementById("origin-chip");
-  if (chip) chip.hidden = !near;
-}
+function updatePoseHud() {}
 
 function pickAt(e) {
   const rect = renderer.domElement.getBoundingClientRect();
@@ -386,9 +378,6 @@ function bindInput() {
 
   document.addEventListener("pointerlockchange", () => {
     lookLocked = document.pointerLockElement === el;
-    const btn = document.getElementById("look-lock");
-    if (btn) btn.textContent = lookLocked ? "Looking" : "Look";
-    btn && btn.classList.toggle("on", lookLocked);
   });
   document.addEventListener("mousemove", (e) => {
     if (!lookLocked) return;
@@ -396,12 +385,6 @@ function bindInput() {
     yaw = next.yaw;
     pitch = next.pitch;
   });
-
-  document.getElementById("look-lock").addEventListener("click", () => {
-    if (lookLocked) document.exitPointerLock();
-    else el.requestPointerLock();
-  });
-  document.getElementById("home").addEventListener("click", goHome);
 
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
@@ -464,19 +447,9 @@ function buildField() {
   ceiling.position.set(0, 5.56, -0.35);
   scene.add(ceiling);
 
-  const origin = shade(new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 18), BRASS), true, true);
-  origin.position.y = 0.12;
-  origin.userData = {
-    title: "Origin",
-    body: "The field opens from here. Art, research, writing, and website work sit out from this floor.",
-    href: "https://graphicoregon.com/",
-    linkLabel: "Open graphicoregon.com"
-  };
-  scene.add(origin);
-  clickables.push(origin);
-  const originLabel = makeLabel("Graphic Oregon", 4.4, true);
-  originLabel.position.set(0, 5.05, -9.38);
-  scene.add(originLabel);
+  const title = makeLabel("Graphic Oregon", 4.4, true);
+  title.position.set(0, 5.05, -9.38);
+  scene.add(title);
 
   MARKERS.forEach(addVolume);
 }
@@ -591,13 +564,6 @@ function main() {
   buildField();
   bindInput();
   applyCamera();
-  showPanel({
-    meta: "Graphic Oregon",
-    title: "Origin",
-    body: "The field opens from here. Art, research, writing, and website work sit out from this floor.",
-    href: "https://graphicoregon.com/",
-    linkLabel: "Open graphicoregon.com"
-  });
   document.getElementById("loader").classList.add("hide");
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
