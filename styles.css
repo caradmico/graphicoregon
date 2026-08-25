@@ -1,5 +1,5 @@
 :root {
-  --ink: #0a1014;
+  --ink: #1c211e;
   --teal: #2aa8a0;
   --gold: #d4b05a;
   --gold-soft: #e8d29a;
@@ -64,10 +64,7 @@ header.top p.tag {
 }
 
 #pose .coords {
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
+  display: none;
 }
 
 #origin-chip {
@@ -87,12 +84,13 @@ header.top p.tag {
 
 #pose button {
   appearance: none;
-  background: rgba(10, 16, 20, 0.62);
-  border: 1px solid rgba(42, 168, 160, 0.35);
-  color: var(--paper);
+  background: rgba(28, 26, 22, 0.28);
+  border: 1px solid rgba(176, 138, 70, 0.22);
+  color: var(--muted);
   font: inherit;
-  font-size: 0.82rem;
-  padding: 5px 12px;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
   cursor: pointer;
   border-radius: 2px;
 }
@@ -111,8 +109,8 @@ header.top p.tag {
   max-height: min(40vh, 320px);
   overflow: auto;
   pointer-events: auto;
-  background: rgba(10, 16, 20, 0.78);
-  border: 1px solid rgba(212, 176, 90, 0.35);
+  background: rgba(22, 24, 20, 0.62);
+  border: 1px solid rgba(176, 138, 70, 0.22);
   padding: 18px 18px 16px;
   backdrop-filter: blur(10px);
 }
@@ -152,12 +150,13 @@ header.top p.tag {
   left: 50%;
   transform: translateX(-50%);
   bottom: 18px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--muted);
   letter-spacing: 0.06em;
   text-align: center;
   pointer-events: none;
   width: min(640px, calc(100vw - 32px));
+  opacity: 0.55;
 }
 
 #loader {

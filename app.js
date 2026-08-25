@@ -1,10 +1,12 @@
 /* Graphic Oregon — origin-centered walkable field */
 
-const ink = 0x0a1014;
+const ink = 0x1a1e1a;
 const teal = 0x2aa8a0;
 const gold = 0xd4b05a;
 const paper = 0xe8efe8;
 const Nav = window.FieldNav;
+const PIXEL_RATIO = 1.25;
+const DUSK = 0x1c211e;
 
 const BOUNDS = 160;
 const EYE = 1.7;
@@ -39,6 +41,69 @@ const billboards = [];
 const clock = new THREE.Clock();
 const loader = new THREE.TextureLoader();
 
+function clampByte(v) {
+  return v < 0 ? 0 : v > 255 ? 255 : v;
+}
+
+function grainTexture(hex, grain, size) {
+  const n = size || 256;
+  const c = document.createElement("canvas");
+  c.width = n;
+  c.height = n;
+  const ctx = c.getContext("2d");
+  const img = ctx.createImageData(n, n);
+  const d = img.data;
+  const r = (hex >> 16) & 255;
+  const g = (hex >> 8) & 255;
+  const b = hex & 255;
+  for (let i = 0, p = 0; i < n * n; i++, p += 4) {
+    const x = i % n;
+    const y = (i / n) | 0;
+    const wave = (Math.sin(x * 0.11) + Math.cos(y * 0.09) + Math.sin((x + y) * 0.05)) * grain * 0.22;
+    const speckle = (Math.random() - 0.5) * grain;
+    const k = wave + speckle;
+    d[p] = clampByte(r + k);
+    d[p + 1] = clampByte(g + k * 0.9);
+    d[p + 2] = clampByte(b + k * 0.72);
+    d[p + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function surfaceMat(hex, opts) {
+  const o = opts || {};
+  const map = grainTexture(hex, o.grain == null ? 20 : o.grain);
+  map.repeat.set(o.repeat == null ? 3 : o.repeat, o.repeat == null ? 3 : o.repeat);
+  return new THREE.MeshStandardMaterial({
+    map: map,
+    color: o.tint == null ? 0xffffff : o.tint,
+    roughness: o.roughness == null ? 0.88 : o.roughness,
+    metalness: o.metalness == null ? 0.03 : o.metalness,
+    side: o.side == null ? THREE.FrontSide : o.side
+  });
+}
+
+const PLASTER = surfaceMat(0xc6c2b6, { repeat: 8, grain: 18, roughness: 0.92 });
+const FLOOR = surfaceMat(0x8a8170, { repeat: 10, grain: 16, roughness: 0.86, metalness: 0.04 });
+const WOOD = surfaceMat(0x5a4a38, { repeat: 2, grain: 14, roughness: 0.72, metalness: 0.06 });
+const FRAME = surfaceMat(0x3a342c, { repeat: 1, grain: 10, roughness: 0.55, metalness: 0.12 });
+const BRASS = new THREE.MeshStandardMaterial({
+  color: 0xb08a46,
+  roughness: 0.42,
+  metalness: 0.55
+});
+const INLAY = new THREE.MeshStandardMaterial({
+  color: 0x3d5c58,
+  roughness: 0.48,
+  metalness: 0.18
+});
+
 function loadTexture(url) {
   return new Promise((resolve) => {
     loader.load(
@@ -61,14 +126,14 @@ function makeLabel(text, scale) {
   c.height = h;
   const ctx = c.getContext("2d");
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(10, 16, 20, 0.72)";
-  roundRect(ctx, 18, 22, w - 36, h - 44, 10);
+  ctx.fillStyle = "rgba(28, 26, 22, 0.42)";
+  roundRect(ctx, 28, 32, w - 56, h - 64, 4);
   ctx.fill();
-  ctx.strokeStyle = "rgba(212, 176, 90, 0.55)";
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(176, 138, 70, 0.28)";
+  ctx.lineWidth = 2;
   ctx.stroke();
-  ctx.fillStyle = "#e8d29a";
-  ctx.font = "600 42px Georgia, serif";
+  ctx.fillStyle = "#d8c8a4";
+  ctx.font = "500 36px Georgia, serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(text, w / 2, h / 2);
@@ -93,19 +158,15 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function addAxis(from, to, color) {
-  const geo = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(from[0], from[1], from[2]),
-    new THREE.Vector3(to[0], to[1], to[2])
-  ]);
-  scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color })));
-}
-
 function addVolume(marker) {
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(3.2, 3.2, 3.2),
-    new THREE.MeshLambertMaterial({ color: marker.color })
-  );
+  const wash = new THREE.Color(0xc2beb2).lerp(new THREE.Color(marker.color), 0.22);
+  const mat = surfaceMat(0xb8b4a8, {
+    repeat: 2,
+    grain: 16,
+    roughness: 0.9,
+    tint: wash.getHex()
+  });
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.35, 1.7), mat);
   mesh.position.set(marker.pos[0], marker.pos[1], marker.pos[2]);
   mesh.userData = {
     title: marker.title,
@@ -115,19 +176,43 @@ function addVolume(marker) {
   };
   scene.add(mesh);
   clickables.push(mesh);
-  const label = makeLabel(marker.title, 5.2);
-  label.position.set(marker.pos[0], marker.pos[1] + 2.6, marker.pos[2]);
+  const label = makeLabel(marker.title, 4.6);
+  label.position.set(marker.pos[0], marker.pos[1] + 1.85, marker.pos[2]);
   scene.add(label);
 }
 
-function imagePlane(tex, height) {
+function framedPiece(tex, height, withBoard) {
   const img = tex.image;
   const aspect = img && img.width && img.height ? img.width / img.height : 1;
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(height * aspect, height),
-    new THREE.MeshLambertMaterial({ map: tex, side: THREE.DoubleSide })
+  const w = height * aspect;
+  const h = height;
+  const group = new THREE.Group();
+  if (withBoard !== false) {
+    const board = new THREE.Mesh(
+      new THREE.BoxGeometry(w + 0.95, h + 1.15, 0.14),
+      PLASTER
+    );
+    board.position.z = -0.12;
+    group.add(board);
+  }
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(w + 0.16, h + 0.16, 0.06),
+    FRAME
   );
-  return mesh;
+  frame.position.z = -0.03;
+  const pic = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshLambertMaterial({
+      map: tex,
+      emissive: 0xffffff,
+      emissiveMap: tex,
+      emissiveIntensity: 0.38,
+      side: THREE.DoubleSide
+    })
+  );
+  pic.position.z = 0.02;
+  group.add(frame, pic);
+  return { group: group, pic: pic };
 }
 
 function faceOrigin(mesh) {
@@ -314,53 +399,32 @@ function travel(dt) {
 }
 
 function buildField() {
-  addAxis([-40, 0, 0], [40, 0, 0], 0xb4544a);
-  addAxis([0, -40, 0], [0, 40, 0], teal);
-  addAxis([0, 0, -40], [0, 0, 40], gold);
+  FLOOR.side = THREE.DoubleSide;
+  const plaza = new THREE.Mesh(new THREE.CircleGeometry(13.4, 72), FLOOR);
+  plaza.rotation.x = -Math.PI / 2;
+  scene.add(plaza);
 
-  const origin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.38, 20, 16),
-    new THREE.MeshLambertMaterial({ color: gold })
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(13.35, 0.045, 10, 72),
+    INLAY
   );
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.01;
+  scene.add(ring);
+
+  const origin = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 18), BRASS);
+  origin.position.y = 0.12;
   origin.userData = {
     title: "Origin",
-    body: "Start here. Travel out along X, Y, and Z.",
+    body: "The field opens from here. Art, research, writing, and website work sit out from this floor.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   };
   scene.add(origin);
   clickables.push(origin);
-  const originLabel = makeLabel("Graphic Oregon", 6.4);
-  originLabel.position.set(0, 2.6, -3.2);
+  const originLabel = makeLabel("Graphic Oregon", 5.8);
+  originLabel.position.set(0, 2.35, -3.2);
   scene.add(originLabel);
-
-  const pad = new THREE.Mesh(
-    new THREE.CircleGeometry(7.2, 64),
-    new THREE.MeshLambertMaterial({ color: 0x152024, side: THREE.DoubleSide })
-  );
-  pad.rotation.x = -Math.PI / 2;
-  pad.position.y = -0.02;
-  scene.add(pad);
-
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(7.2, 0.05, 8, 64),
-    new THREE.MeshBasicMaterial({ color: teal })
-  );
-  ring.rotation.x = Math.PI / 2;
-  scene.add(ring);
-
-  [
-    { text: "+X", pos: [18, 1.2, 0] },
-    { text: "−X", pos: [-18, 1.2, 0] },
-    { text: "+Y", pos: [0, 12, 0] },
-    { text: "−Y", pos: [0, -8, 0] },
-    { text: "+Z", pos: [0, 1.2, 18] },
-    { text: "−Z", pos: [0, 1.2, -18] }
-  ].forEach((axis) => {
-    const tag = makeLabel(axis.text, 3.4);
-    tag.position.set(axis.pos[0], axis.pos[1], axis.pos[2]);
-    scene.add(tag);
-  });
 
   MARKERS.forEach(addVolume);
 }
@@ -373,52 +437,49 @@ async function populatePieces() {
   ]);
 
   if (guideTex) {
-    const guide = imagePlane(guideTex, 3.4);
-    guide.position.set(-5.4, 2.15, -7.2);
-    faceOrigin(guide);
-    guide.userData = {
+    const hung = framedPiece(guideTex, 3.4);
+    hung.group.position.set(-5.4, 2.15, -7.2);
+    faceOrigin(hung.group);
+    hung.pic.userData = {
       title: "Giving Guide 2022–23",
       body: "Cover of the 2022–23 Giving Guide print.",
       href: "https://graphicoregon.com/",
       linkLabel: "Open graphicoregon.com"
     };
-    scene.add(guide);
-    clickables.push(guide);
+    scene.add(hung.group);
+    clickables.push(hung.pic);
     const label = makeLabel("Giving Guide", 4.4);
-    label.position.set(-5.4, 4.3, -7.2);
+    label.position.set(-5.4, 4.35, -7.2);
     scene.add(label);
   }
 
   if (artTex) {
-    const art = imagePlane(artTex, 3.2);
-    art.position.set(5.6, 2.15, -8.4);
-    faceOrigin(art);
-    art.userData = {
+    const hung = framedPiece(artTex, 3.2);
+    hung.group.position.set(5.6, 2.15, -8.4);
+    faceOrigin(hung.group);
+    hung.pic.userData = {
       title: "Neahkahnie",
       body: "Coast work from the studio.",
       href: "https://graphicoregon.com/sample-page/",
       linkLabel: "Open the studio page"
     };
-    scene.add(art);
-    clickables.push(art);
+    scene.add(hung.group);
+    clickables.push(hung.pic);
     const label = makeLabel("Neahkahnie", 4.2);
-    label.position.set(5.6, 4.2, -8.4);
+    label.position.set(5.6, 4.25, -8.4);
     scene.add(label);
   }
 
   if (copperTex) {
     const stand = new THREE.Group();
-    const post = new THREE.Mesh(
-      new THREE.BoxGeometry(0.7, 1.15, 0.7),
-      new THREE.MeshLambertMaterial({ color: 0x2a2420 })
-    );
-    post.position.y = 0.58;
-    const tee = imagePlane(copperTex, 2.5);
-    tee.position.set(0, 2.05, 0);
-    stand.add(post, tee);
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1.2, 0.62), WOOD);
+    post.position.y = 0.6;
+    const hung = framedPiece(copperTex, 2.5, false);
+    hung.group.position.set(0, 2.05, 0);
+    stand.add(post, hung.group);
     stand.position.set(6.8, 0, -4.6);
     stand.lookAt(0, stand.position.y, 0);
-    tee.userData = {
+    hung.pic.userData = {
       title: "Copper Horizon ocean graphic tee",
       body: "A single stand on the field.",
       href: COPPER_HREF,
@@ -426,9 +487,9 @@ async function populatePieces() {
       openUrl: COPPER_HREF
     };
     scene.add(stand);
-    clickables.push(tee);
+    clickables.push(hung.pic);
     const label = makeLabel("Copper Horizon", 4.6);
-    label.position.set(6.8, 3.7, -4.6);
+    label.position.set(6.8, 3.85, -4.6);
     scene.add(label);
   }
 }
@@ -447,19 +508,24 @@ function tick() {
 
 function main() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(ink);
-  scene.fog = new THREE.FogExp2(0x0a1216, 0.012);
+  scene.background = new THREE.Color(DUSK);
+  scene.fog = new THREE.FogExp2(DUSK, 0.018);
   camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 800);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
 
-  scene.add(new THREE.AmbientLight(0x8aa8a4, 0.55));
-  scene.add(new THREE.HemisphereLight(0x9ec4be, 0x12181c, 0.62));
-  const key = new THREE.DirectionalLight(0xf0e6c8, 0.55);
-  key.position.set(12, 22, 8);
+  scene.add(new THREE.AmbientLight(0xc8c4b6, 0.48));
+  scene.add(new THREE.HemisphereLight(0xf2efe4, 0x3a4038, 1.12));
+  const key = new THREE.DirectionalLight(0xf3efe4, 1.35);
+  key.position.set(8, 16, 10);
   scene.add(key);
+  const fill = new THREE.DirectionalLight(0xd8e0dc, 0.42);
+  fill.position.set(-14, 9, -6);
+  scene.add(fill);
 
   buildField();
   bindInput();
@@ -467,7 +533,7 @@ function main() {
   showPanel({
     meta: "Graphic Oregon",
     title: "Origin",
-    body: "Drag to turn. Scroll to travel. Move out along X, Y, and Z.",
+    body: "The field opens from here. Art, research, writing, and website work sit out from this floor.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   });
@@ -475,7 +541,7 @@ function main() {
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
     renderer.setSize(innerWidth, innerHeight);
   });
   tick();
