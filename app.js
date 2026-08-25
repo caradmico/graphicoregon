@@ -759,7 +759,7 @@ const STUDIO = [
 ];
 
 const SHOP_PRODUCTS = [
-  { file: "assets/shop/copper-horizon.jpg", title: "Copper Horizon Softstyle Tee", href: "https://sassmeharder.com/product/30931683", kind: "tee", price: "$22.99" },
+  { file: "assets/shop/copper-horizon-overlay-1000x1500.jpg", title: "Copper Horizon ocean graphic tee", href: "https://sassmeharder.com/product/30931683?utm_source=pinterest&utm_medium=organic&utm_campaign=copper-horizon&utm_content=2026-08-21", kind: "tee", price: "$22.99" },
   { file: "assets/shop/glow-bell.jpg", title: "Glow Bell Softstyle Tee", href: "https://sassmeharder.com/product/30931686", kind: "tee", price: "$22.99" },
   { file: "assets/shop/cliff-sun.jpg", title: "Cliff Sun Softstyle Tee — Gold Rings, Red Rock, Cold Water", href: "https://sassmeharder.com/product/30932080", kind: "tee", price: "$22.99" },
   { file: "assets/shop/prism-wash.jpg", title: "Prism Wash Softstyle Tee — Violet, Ember, Teal", href: "https://sassmeharder.com/product/30932082", kind: "tee", price: "$22.99" },
