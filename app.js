@@ -24,7 +24,7 @@ const MARKERS = [
 
 let scene, camera, renderer;
 let yaw = 0;
-let pitch = -0.06;
+let pitch = -0.2;
 let dragging = false;
 let lookLocked = false;
 let lastX = 0;
@@ -173,7 +173,7 @@ function goHome() {
   pos.y = EYE;
   pos.z = 0;
   yaw = 0;
-  pitch = -0.06;
+  pitch = -0.2;
   hidePanel();
 }
 
@@ -331,15 +331,36 @@ function buildField() {
   scene.add(origin);
   clickables.push(origin);
   const originLabel = makeLabel("Graphic Oregon", 6.4);
-  originLabel.position.set(0, 3.1, 0);
+  originLabel.position.set(0, 2.6, -3.2);
   scene.add(originLabel);
 
+  const pad = new THREE.Mesh(
+    new THREE.CircleGeometry(7.2, 64),
+    new THREE.MeshLambertMaterial({ color: 0x152024, side: THREE.DoubleSide })
+  );
+  pad.rotation.x = -Math.PI / 2;
+  pad.position.y = -0.02;
+  scene.add(pad);
+
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(6.4, 0.045, 8, 64),
+    new THREE.TorusGeometry(7.2, 0.05, 8, 64),
     new THREE.MeshBasicMaterial({ color: teal })
   );
   ring.rotation.x = Math.PI / 2;
   scene.add(ring);
+
+  [
+    { text: "+X", pos: [18, 1.2, 0] },
+    { text: "−X", pos: [-18, 1.2, 0] },
+    { text: "+Y", pos: [0, 12, 0] },
+    { text: "−Y", pos: [0, -8, 0] },
+    { text: "+Z", pos: [0, 1.2, 18] },
+    { text: "−Z", pos: [0, 1.2, -18] }
+  ].forEach((axis) => {
+    const tag = makeLabel(axis.text, 3.4);
+    tag.position.set(axis.pos[0], axis.pos[1], axis.pos[2]);
+    scene.add(tag);
+  });
 
   MARKERS.forEach(addVolume);
 }
@@ -353,7 +374,7 @@ async function populatePieces() {
 
   if (guideTex) {
     const guide = imagePlane(guideTex, 3.4);
-    guide.position.set(-7.2, 2.2, 6.4);
+    guide.position.set(-5.4, 2.15, -7.2);
     faceOrigin(guide);
     guide.userData = {
       title: "Giving Guide 2022–23",
@@ -364,13 +385,13 @@ async function populatePieces() {
     scene.add(guide);
     clickables.push(guide);
     const label = makeLabel("Giving Guide", 4.4);
-    label.position.set(-7.2, 4.4, 6.4);
+    label.position.set(-5.4, 4.3, -7.2);
     scene.add(label);
   }
 
   if (artTex) {
     const art = imagePlane(artTex, 3.2);
-    art.position.set(-8.4, 2.15, -5.2);
+    art.position.set(5.6, 2.15, -8.4);
     faceOrigin(art);
     art.userData = {
       title: "Neahkahnie",
@@ -381,7 +402,7 @@ async function populatePieces() {
     scene.add(art);
     clickables.push(art);
     const label = makeLabel("Neahkahnie", 4.2);
-    label.position.set(-8.4, 4.2, -5.2);
+    label.position.set(5.6, 4.2, -8.4);
     scene.add(label);
   }
 
@@ -395,7 +416,7 @@ async function populatePieces() {
     const tee = imagePlane(copperTex, 2.5);
     tee.position.set(0, 2.05, 0);
     stand.add(post, tee);
-    stand.position.set(7.6, 0, 5.4);
+    stand.position.set(6.8, 0, -4.6);
     stand.lookAt(0, stand.position.y, 0);
     tee.userData = {
       title: "Copper Horizon ocean graphic tee",
@@ -407,7 +428,7 @@ async function populatePieces() {
     scene.add(stand);
     clickables.push(tee);
     const label = makeLabel("Copper Horizon", 4.6);
-    label.position.set(7.6, 3.7, 5.4);
+    label.position.set(6.8, 3.7, -4.6);
     scene.add(label);
   }
 }
