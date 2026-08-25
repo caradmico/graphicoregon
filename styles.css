@@ -1,8 +1,6 @@
 :root {
   --ink: #0a1014;
-  --ink-2: #121a20;
   --teal: #2aa8a0;
-  --teal-dim: #1a6f6a;
   --gold: #d4b05a;
   --gold-soft: #e8d29a;
   --paper: #e8efe8;
@@ -57,101 +55,50 @@ header.top p.tag {
   text-transform: uppercase;
 }
 
-#region-chip {
+#pose {
   position: absolute;
   top: 22px;
   right: 28px;
-  pointer-events: none;
   text-align: right;
+  pointer-events: auto;
 }
 
-#region-chip .label {
-  font-size: 0.72rem;
+#pose .coords {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+#origin-chip {
+  margin-top: 6px;
+  font-size: 0.78rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--teal);
-}
-
-#region-chip .name {
-  font-size: 1.15rem;
   color: var(--gold-soft);
 }
 
-#region-chip .axis {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-#compass {
-  position: absolute;
-  top: 118px;
-  right: 28px;
-  width: 148px;
-  height: 148px;
-  border: 1px solid rgba(42, 168, 160, 0.28);
-  border-radius: 50%;
-  background: rgba(10, 16, 20, 0.42);
-  pointer-events: none;
-}
-
-#compass div {
-  position: absolute;
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--gold-soft);
-  white-space: nowrap;
-}
-
-#compass .c-n { top: 10px; left: 50%; transform: translateX(-50%); }
-#compass .c-s { bottom: 10px; left: 50%; transform: translateX(-50%); }
-#compass .c-e { right: 8px; top: 50%; transform: translateY(-50%); }
-#compass .c-w { left: 8px; top: 50%; transform: translateY(-50%); }
-#compass .c-up { top: 40px; left: 50%; transform: translateX(-50%); color: var(--teal); }
-#compass .c-dn { bottom: 40px; left: 50%; transform: translateX(-50%); color: var(--muted); }
-
-nav#destinations {
-  position: absolute;
-  left: 22px;
-  bottom: 22px;
-  pointer-events: auto;
+#pose .actions {
+  margin-top: 10px;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: min(58vh, 560px);
-  overflow: auto;
-  padding-right: 6px;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
-nav#destinations .group {
-  margin-top: 8px;
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--teal);
-}
-
-nav#destinations .group:first-child { margin-top: 0; }
-
-nav#destinations button {
+#pose button {
   appearance: none;
   background: rgba(10, 16, 20, 0.62);
   border: 1px solid rgba(42, 168, 160, 0.35);
   color: var(--paper);
   font: inherit;
   font-size: 0.82rem;
-  text-align: left;
-  padding: 5px 10px;
+  padding: 5px 12px;
   cursor: pointer;
   border-radius: 2px;
-  backdrop-filter: blur(8px);
 }
 
-nav#destinations button:hover,
-nav#destinations button.active {
+#pose button:hover,
+#pose button.on {
   border-color: var(--gold);
   color: var(--gold-soft);
 }
@@ -160,8 +107,8 @@ nav#destinations button.active {
   position: absolute;
   right: 22px;
   bottom: 22px;
-  width: min(400px, calc(100vw - 44px));
-  max-height: min(52vh, 480px);
+  width: min(360px, calc(100vw - 44px));
+  max-height: min(40vh, 320px);
   overflow: auto;
   pointer-events: auto;
   background: rgba(10, 16, 20, 0.78);
@@ -171,7 +118,7 @@ nav#destinations button.active {
 }
 
 #panel h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   color: var(--gold-soft);
   margin-bottom: 8px;
 }
@@ -210,6 +157,7 @@ nav#destinations button.active {
   letter-spacing: 0.06em;
   text-align: center;
   pointer-events: none;
+  width: min(640px, calc(100vw - 32px));
 }
 
 #loader {
@@ -226,10 +174,15 @@ nav#destinations button.active {
 
 #loader .inner { text-align: center; }
 #loader h1 { color: var(--gold-soft); letter-spacing: 0.08em; }
-#loader p { color: var(--teal); margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+#loader p {
+  color: var(--teal);
+  margin-top: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
 
 @media (max-width: 760px) {
-  nav#destinations { max-height: 26vh; }
-  #panel { max-height: 32vh; }
-  #help, #compass { display: none; }
+  #help { display: none; }
+  #panel { max-height: 28vh; }
 }
