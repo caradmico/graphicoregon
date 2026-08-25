@@ -13,13 +13,13 @@ const MOVE_FAST = 16;
 const TURN = 1.7;
 const COPPER_HREF = "https://sassmeharder.com/product/30931683?utm_source=pinterest&utm_medium=organic&utm_campaign=copper-horizon&utm_content=2026-08-21";
 
-const MARKERS = [
-  { id: "art", title: "Art", pos: [-22, 1.4, 0], color: gold, href: "https://graphicoregon.com/sample-page/", body: "Oil, acrylic, charcoal, and prints." },
-  { id: "research", title: "Research", pos: [22, 1.4, 0], color: teal, href: "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/", body: "Mapping and habitat studies." },
-  { id: "writing", title: "Writing", pos: [0, 1.4, 22], color: teal, href: "https://graphicoregon.com/", body: "Journalism and media." },
-  { id: "websites", title: "Websites", pos: [0, 1.4, -22], color: gold, href: "https://graphicoregon.com/", body: "Website design." },
-  { id: "credentials", title: "Credentials", pos: [0, 16, 0], color: teal, href: "https://graphicoregon.com/", body: "Education and practice." },
-  { id: "ground", title: "Ground", pos: [0, -12, 0], color: 0x4a5a58, href: "https://graphicoregon.com/", body: "Below origin." }
+const PLACES = [
+  { id: "art", title: "Art", pos: [-22, 0, 0], href: "https://graphicoregon.com/sample-page/", body: "Oil, acrylic, charcoal, and prints." },
+  { id: "research", title: "Research", pos: [22, 0, 0], href: "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/", body: "Mapping and habitat studies." },
+  { id: "writing", title: "Writing", pos: [0, 0, 22], href: "https://graphicoregon.com/", body: "Journalism and media." },
+  { id: "websites", title: "Websites", pos: [0, 0, -22], href: "https://graphicoregon.com/", body: "Website design." },
+  { id: "credentials", title: "Credentials", pos: [0, 16, 0], href: "https://graphicoregon.com/", body: "Education and practice." },
+  { id: "ground", title: "Ground", pos: [0, -12, 0], href: "https://graphicoregon.com/", body: "The field continues below." }
 ];
 
 let scene, camera, renderer;
@@ -38,6 +38,9 @@ const clickables = [];
 const billboards = [];
 const clock = new THREE.Clock();
 const loader = new THREE.TextureLoader();
+const stone = new THREE.MeshLambertMaterial({ color: 0x2a322e });
+const stoneDeep = new THREE.MeshLambertMaterial({ color: 0x1a2220 });
+const brass = new THREE.MeshLambertMaterial({ color: 0x8a7040 });
 
 function loadTexture(url) {
   return new Promise((resolve) => {
@@ -53,6 +56,109 @@ function loadTexture(url) {
   });
 }
 
+function canvasTex(draw, w, h) {
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  draw(c.getContext("2d"), w, h);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function fieldTexture() {
+  const tex = canvasTex((ctx, w, h) => {
+    ctx.fillStyle = "#141c1a";
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 14000; i++) {
+      const x = Math.random() * w;
+      const y = Math.random() * h;
+      const v = 18 + Math.random() * 36;
+      ctx.fillStyle = "rgba(" + (v * 0.7) + "," + (v * 1.05) + "," + (v * 0.85) + "," + (0.04 + Math.random() * 0.12) + ")";
+      ctx.fillRect(x, y, 1 + Math.random() * 3, 1 + Math.random() * 2);
+    }
+  }, 1024, 1024);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(14, 14);
+  return tex;
+}
+
+function plazaTexture() {
+  return canvasTex((ctx, w, h) => {
+    const cx = w / 2;
+    const cy = h / 2;
+    const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, w * 0.48);
+    g.addColorStop(0, "#3a423c");
+    g.addColorStop(0.55, "#2c3430");
+    g.addColorStop(1, "#222824");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, w * 0.49, 0, Math.PI * 2);
+    ctx.fill();
+    for (let i = 0; i < 4200; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random()) * w * 0.48;
+      ctx.fillStyle = "rgba(210, 190, 140," + (0.015 + Math.random() * 0.04) + ")";
+      ctx.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 2, 2);
+    }
+    ctx.strokeStyle = "rgba(212, 176, 90, 0.42)";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy, w * 0.44, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(42, 168, 160, 0.22)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, w * 0.28, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(232, 210, 154, 0.78)";
+    ctx.font = "600 42px Georgia, serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("GRAPHIC OREGON", cx, cy);
+    ctx.fillStyle = "rgba(155, 176, 176, 0.72)";
+    ctx.font = "22px Georgia, serif";
+    const rim = [
+      { t: "WRITING", x: cx, y: cy + w * 0.36 },
+      { t: "WEBSITES", x: cx, y: cy - w * 0.36 },
+      { t: "ART", x: cx - w * 0.36, y: cy },
+      { t: "RESEARCH", x: cx + w * 0.36, y: cy }
+    ];
+    rim.forEach((item) => ctx.fillText(item.t, item.x, item.y));
+  }, 1024, 1024);
+}
+
+function skyTexture() {
+  return canvasTex((ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, "#0b1014");
+    g.addColorStop(0.42, "#121a1e");
+    g.addColorStop(0.68, "#243038");
+    g.addColorStop(0.84, "#5a3e28");
+    g.addColorStop(1, "#1c1814");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }, 4, 512);
+}
+
+function tabletTexture() {
+  return canvasTex((ctx, w, h) => {
+    ctx.fillStyle = "#2a322e";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "rgba(212, 176, 90, 0.55)";
+    ctx.lineWidth = 10;
+    ctx.strokeRect(18, 18, w - 36, h - 36);
+    ctx.fillStyle = "#e8d29a";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "600 54px Georgia, serif";
+    ctx.fillText("GRAPHIC OREGON", w / 2, h * 0.42);
+    ctx.fillStyle = "#2aa8a0";
+    ctx.font = "22px Georgia, serif";
+    ctx.fillText("RESEARCH  ·  MAPPING  ·  DESIGN  ·  WRITING  ·  FINE ART", w / 2, h * 0.62);
+  }, 1024, 512);
+}
+
 function makeLabel(text, scale) {
   const w = 512;
   const h = 128;
@@ -61,14 +167,14 @@ function makeLabel(text, scale) {
   c.height = h;
   const ctx = c.getContext("2d");
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(10, 16, 20, 0.72)";
-  roundRect(ctx, 18, 22, w - 36, h - 44, 10);
+  ctx.fillStyle = "rgba(16, 22, 20, 0.7)";
+  roundRect(ctx, 18, 22, w - 36, h - 44, 8);
   ctx.fill();
-  ctx.strokeStyle = "rgba(212, 176, 90, 0.55)";
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(212, 176, 90, 0.4)";
+  ctx.lineWidth = 2;
   ctx.stroke();
   ctx.fillStyle = "#e8d29a";
-  ctx.font = "600 42px Georgia, serif";
+  ctx.font = "600 40px Georgia, serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(text, w / 2, h / 2);
@@ -93,31 +199,82 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function addAxis(from, to, color) {
-  const geo = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(from[0], from[1], from[2]),
-    new THREE.Vector3(to[0], to[1], to[2])
-  ]);
-  scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color })));
-}
-
-function addVolume(marker) {
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(3.2, 3.2, 3.2),
-    new THREE.MeshLambertMaterial({ color: marker.color })
-  );
-  mesh.position.set(marker.pos[0], marker.pos[1], marker.pos[2]);
-  mesh.userData = {
-    title: marker.title,
-    body: marker.body,
-    href: marker.href,
+function placeData(place) {
+  return {
+    title: place.title,
+    body: place.body,
+    href: place.href,
     linkLabel: "Open graphicoregon.com"
   };
-  scene.add(mesh);
-  clickables.push(mesh);
-  const label = makeLabel(marker.title, 5.2);
-  label.position.set(marker.pos[0], marker.pos[1] + 2.6, marker.pos[2]);
+}
+
+function addStele(place) {
+  const group = new THREE.Group();
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(1.05, 2.35, 0.18), stone);
+  slab.position.y = 1.18;
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.18, 0.55), stoneDeep);
+  plinth.position.y = 0.09;
+  const lip = new THREE.Mesh(new THREE.BoxGeometry(1.07, 0.04, 0.2), brass);
+  lip.position.y = 2.36;
+  group.add(slab, plinth, lip);
+  group.position.set(place.pos[0], 0, place.pos[2]);
+  group.lookAt(0, 0, 0);
+  slab.userData = placeData(place);
+  scene.add(group);
+  clickables.push(slab);
+  const label = makeLabel(place.title, 4.6);
+  label.position.set(place.pos[0], 2.85, place.pos[2]);
   scene.add(label);
+}
+
+function addCredentials(place) {
+  const plaque = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 1.2, 0.08),
+    new THREE.MeshLambertMaterial({ color: 0x2a322e, emissive: 0x1a1810, emissiveIntensity: 0.12 })
+  );
+  plaque.position.set(0, place.pos[1], 0);
+  plaque.userData = placeData(place);
+  scene.add(plaque);
+  clickables.push(plaque);
+  const label = makeLabel(place.title, 4.8);
+  label.position.set(0, place.pos[1] + 1.15, 0);
+  scene.add(label);
+}
+
+function addGroundWell(place) {
+  const well = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.8, 0.55, 32), stoneDeep);
+  well.position.set(0, place.pos[1], 0);
+  well.userData = placeData(place);
+  scene.add(well);
+  clickables.push(well);
+  const pool = new THREE.Mesh(
+    new THREE.CircleGeometry(1.7, 32),
+    new THREE.MeshLambertMaterial({ color: 0x152024, emissive: 0x0a1818, emissiveIntensity: 0.2 })
+  );
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.set(0, place.pos[1] + 0.29, 0);
+  scene.add(pool);
+  const label = makeLabel(place.title, 4.2);
+  label.position.set(0, place.pos[1] + 1.4, 0);
+  scene.add(label);
+}
+
+function addHills() {
+  const mat = new THREE.MeshLambertMaterial({ color: 0x101614 });
+  const ridges = [
+    [-70, -4, -95, 38, 10, 22],
+    [80, -5, -88, 44, 12, 20],
+    [-110, -6, 20, 50, 14, 26],
+    [105, -6, 40, 42, 11, 24],
+    [18, -7, 118, 56, 13, 28],
+    [-40, -5, 100, 36, 9, 18]
+  ];
+  ridges.forEach((r) => {
+    const hill = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), mat);
+    hill.position.set(r[0], r[1], r[2]);
+    hill.scale.set(r[3], r[4], r[5]);
+    scene.add(hill);
+  });
 }
 
 function imagePlane(tex, height) {
@@ -175,16 +332,6 @@ function goHome() {
   yaw = 0;
   pitch = -0.2;
   hidePanel();
-}
-
-function updatePoseHud() {
-  const el = document.getElementById("pose-xyz");
-  if (el) {
-    el.textContent = pos.x.toFixed(1) + "  " + pos.y.toFixed(1) + "  " + pos.z.toFixed(1);
-  }
-  const near = Math.hypot(pos.x, pos.z) < 3 && Math.abs(pos.y - EYE) < 2;
-  const chip = document.getElementById("origin-chip");
-  if (chip) chip.hidden = !near;
 }
 
 function pickAt(e) {
@@ -314,55 +461,68 @@ function travel(dt) {
 }
 
 function buildField() {
-  addAxis([-40, 0, 0], [40, 0, 0], 0xb4544a);
-  addAxis([0, -40, 0], [0, 40, 0], teal);
-  addAxis([0, 0, -40], [0, 0, 40], gold);
-
-  const origin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.38, 20, 16),
-    new THREE.MeshLambertMaterial({ color: gold })
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(420, 32, 20),
+    new THREE.MeshBasicMaterial({ map: skyTexture(), side: THREE.BackSide, fog: false, depthWrite: false })
   );
-  origin.userData = {
-    title: "Origin",
-    body: "Start here. Travel out along X, Y, and Z.",
+  scene.add(sky);
+
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(190, 72),
+    new THREE.MeshLambertMaterial({ map: fieldTexture(), color: 0xc8d0cc })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.04;
+  scene.add(ground);
+
+  const plaza = new THREE.Mesh(
+    new THREE.CircleGeometry(8.4, 72),
+    new THREE.MeshLambertMaterial({ map: plazaTexture() })
+  );
+  plaza.rotation.x = -Math.PI / 2;
+  plaza.position.y = 0.01;
+  scene.add(plaza);
+
+  const tablet = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.6, 2.3),
+    new THREE.MeshLambertMaterial({ map: tabletTexture(), side: THREE.DoubleSide })
+  );
+  tablet.position.set(0, 1.55, -3.35);
+  tablet.lookAt(0, 1.55, 0);
+  tablet.userData = {
+    title: "Graphic Oregon",
+    body: "Research, mapping, design, writing, and fine art.",
     href: "https://graphicoregon.com/",
     linkLabel: "Open graphicoregon.com"
   };
-  scene.add(origin);
-  clickables.push(origin);
-  const originLabel = makeLabel("Graphic Oregon", 6.4);
-  originLabel.position.set(0, 2.6, -3.2);
-  scene.add(originLabel);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(4.7, 2.4, 0.14), stone);
+  back.position.copy(tablet.position);
+  back.lookAt(0, 1.55, 0);
+  back.translateZ(-0.08);
+  scene.add(back, tablet);
+  clickables.push(tablet);
 
-  const pad = new THREE.Mesh(
-    new THREE.CircleGeometry(7.2, 64),
-    new THREE.MeshLambertMaterial({ color: 0x152024, side: THREE.DoubleSide })
-  );
-  pad.rotation.x = -Math.PI / 2;
-  pad.position.y = -0.02;
-  scene.add(pad);
-
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(7.2, 0.05, 8, 64),
-    new THREE.MeshBasicMaterial({ color: teal })
-  );
-  ring.rotation.x = Math.PI / 2;
-  scene.add(ring);
-
+  const pathMat = new THREE.MeshLambertMaterial({ color: 0x161e1c });
   [
-    { text: "+X", pos: [18, 1.2, 0] },
-    { text: "−X", pos: [-18, 1.2, 0] },
-    { text: "+Y", pos: [0, 12, 0] },
-    { text: "−Y", pos: [0, -8, 0] },
-    { text: "+Z", pos: [0, 1.2, 18] },
-    { text: "−Z", pos: [0, 1.2, -18] }
-  ].forEach((axis) => {
-    const tag = makeLabel(axis.text, 3.4);
-    tag.position.set(axis.pos[0], axis.pos[1], axis.pos[2]);
-    scene.add(tag);
+    [0, -15.2],
+    [0, 15.2],
+    [-15.2, 0],
+    [15.2, 0]
+  ].forEach((end) => {
+    const path = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 13.4), pathMat);
+    path.rotation.x = -Math.PI / 2;
+    path.position.set(end[0] * 0.5, 0.015, end[1] * 0.5);
+    if (end[0] !== 0) path.rotation.z = Math.PI / 2;
+    scene.add(path);
   });
 
-  MARKERS.forEach(addVolume);
+  addHills();
+
+  PLACES.forEach((place) => {
+    if (place.id === "credentials") addCredentials(place);
+    else if (place.id === "ground") addGroundWell(place);
+    else addStele(place);
+  });
 }
 
 async function populatePieces() {
@@ -441,36 +601,31 @@ function tick() {
   billboards.forEach((obj) => {
     obj.lookAt(camera.position);
   });
-  updatePoseHud();
   renderer.render(scene, camera);
 }
 
 function main() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(ink);
-  scene.fog = new THREE.FogExp2(0x0a1216, 0.012);
+  scene.background = new THREE.Color(0x12181c);
+  scene.fog = new THREE.FogExp2(0x141c1e, 0.011);
   camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 800);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  scene.add(new THREE.AmbientLight(0x8aa8a4, 0.55));
-  scene.add(new THREE.HemisphereLight(0x9ec4be, 0x12181c, 0.62));
-  const key = new THREE.DirectionalLight(0xf0e6c8, 0.55);
-  key.position.set(12, 22, 8);
+  scene.add(new THREE.AmbientLight(0x7a8c84, 0.42));
+  scene.add(new THREE.HemisphereLight(0xc4b08a, 0x141c18, 0.58));
+  const key = new THREE.DirectionalLight(0xf0d4a0, 0.72);
+  key.position.set(-28, 20, 10);
   scene.add(key);
+  const fill = new THREE.DirectionalLight(0x6a8890, 0.22);
+  fill.position.set(24, 12, -8);
+  scene.add(fill);
 
   buildField();
   bindInput();
   applyCamera();
-  showPanel({
-    meta: "Graphic Oregon",
-    title: "Origin",
-    body: "Drag to turn. Scroll to travel. Move out along X, Y, and Z.",
-    href: "https://graphicoregon.com/",
-    linkLabel: "Open graphicoregon.com"
-  });
   document.getElementById("loader").classList.add("hide");
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
