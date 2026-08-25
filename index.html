@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Graphic Oregon</title>
-  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art. A wanderable portfolio of mapping, habitat studies, journalism, and commissioned work.">
+  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art.">
   <meta name="theme-color" content="#0a1014">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
   <link rel="stylesheet" href="styles.css">
@@ -22,29 +22,24 @@
       <h1>Graphic Oregon</h1>
       <p class="tag">Research, website design, media, and fine art</p>
     </header>
-    <div id="region-chip">
-      <div class="label">Now entering</div>
-      <div class="name" id="region-name">Arrival</div>
-      <div class="axis" id="region-axis">Origin</div>
+    <div id="pose">
+      <div class="coords" id="pose-xyz">0.0  1.7  0.0</div>
+      <div id="origin-chip">Origin</div>
+      <div class="actions">
+        <button type="button" id="look-lock">Look</button>
+        <button type="button" id="home">Origin</button>
+      </div>
     </div>
-    <div id="compass" aria-hidden="true">
-      <div class="c-n">Writing +Z</div>
-      <div class="c-e">Research +X</div>
-      <div class="c-s">Websites −Z</div>
-      <div class="c-w">Art −X</div>
-      <div class="c-up">Credentials +Y</div>
-      <div class="c-dn">Ground −Y</div>
-    </div>
-    <nav id="destinations" aria-label="Portfolio regions"></nav>
     <aside id="panel" hidden>
       <div class="meta" id="panel-meta"></div>
       <h2 id="panel-title"></h2>
       <p id="panel-body"></p>
       <div id="panel-links"></div>
     </aside>
-    <div id="help">Indoors: WASD walk · drag to look · click art to step close · Esc backs up · menu jumps career paths</div>
+    <div id="help">Drag to look · scroll to travel · WASD move · arrows turn · Q/E up and down</div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
+  <script src="field-nav.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
