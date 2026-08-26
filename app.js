@@ -14,6 +14,7 @@ const MOVE = 9;
 const MOVE_FAST = 16;
 const TURN = 1.7;
 const COPPER_HREF = "https://sassmeharder.com/product/30931683?utm_source=pinterest&utm_medium=organic&utm_campaign=copper-horizon&utm_content=2026-08-21";
+const STARIS_HREF = "https://staris-b01f2.firebaseapp.com";
 
 const MARKERS = [
   { id: "art", title: "Art", pos: [-22, 1.4, 0], color: gold, href: "https://graphicoregon.com/sample-page/", body: "Oil, acrylic, charcoal, and prints." },
@@ -454,6 +455,65 @@ function buildField() {
   MARKERS.forEach(addVolume);
 }
 
+
+async function populateStarIS() {
+  let rows = [];
+  try {
+    const res = await fetch("assets/staris/stars.json");
+    rows = await res.json();
+  } catch (err) {
+    return;
+  }
+  if (!Array.isArray(rows) || !rows.length) return;
+  const origin = { x: 16.2, y: 3.1, z: 0 };
+  const posArr = [];
+  const col = [];
+  const tealC = new THREE.Color(teal);
+  const goldC = new THREE.Color(gold);
+  const sc = 0.08;
+  rows.forEach((s) => {
+    if (!s || (s.x === 0 && s.y === 0 && s.z === 0)) return;
+    posArr.push(s.x * sc + origin.x, s.y * sc + origin.y, s.z * sc + origin.z);
+    const tcol = Math.min(1, Math.max(0, (2.2 - (s.mag || 5)) / 7));
+    const c = goldC.clone().lerp(tealC, 1 - tcol);
+    col.push(c.r, c.g, c.b);
+  });
+  if (!posArr.length) return;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(posArr, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+  const data = {
+    title: "StarIS",
+    body: "Star Visualizer on the field.",
+    href: STARIS_HREF,
+    linkLabel: "Open StarIS",
+    openUrl: STARIS_HREF
+  };
+  const pts = new THREE.Points(
+    g,
+    new THREE.PointsMaterial({
+      size: 0.1,
+      sizeAttenuation: true,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.94,
+      depthWrite: false
+    })
+  );
+  pts.userData = data;
+  scene.add(pts);
+  clickables.push(pts);
+  const rim = new THREE.Mesh(
+    new THREE.TorusGeometry(4.2, 0.035, 8, 64),
+    INLAY
+  );
+  rim.rotation.x = Math.PI / 2;
+  rim.position.set(origin.x, 0.04, origin.z);
+  rim.userData = data;
+  scene.add(rim);
+  clickables.push(rim);
+}
+
 async function populatePieces() {
   const [guideTex, artTex, copperTex] = await Promise.all([
     loadTexture("assets/print/giving-guide-cover.jpg"),
@@ -515,6 +575,8 @@ async function populatePieces() {
     label.position.set(6.8, 3.85, -4.6);
     scene.add(label);
   }
+
+  await populateStarIS();
 }
 
 function tick() {
