@@ -4,8 +4,8 @@ const teal = 0x2aa8a0;
 const gold = 0xd4b05a;
 const Nav = window.FieldNav;
 const PIXEL_RATIO = 1.25;
-const DUSK = 0x1a1712;
-const HAZE = 0x2a241c;
+const DUSK = 0x3d2a1c;
+const HAZE = 0x7a5230;
 
 const BOUNDS = 220;
 const EYE = 1.7;
@@ -28,8 +28,8 @@ const WALKS = [
 ];
 
 let scene, camera, renderer;
-let yaw = 0;
-let pitch = -0.16;
+let yaw = -0.38;
+let pitch = -0.08;
 let dragging = false;
 let lookLocked = false;
 let lastX = 0;
@@ -79,12 +79,43 @@ function earthMap() {
       const blade = (hash2(x * 1.9, y * 0.35) - 0.5) * 16;
       const grit = (hash2(x * 2.4, y * 2.1) - 0.5) * 8;
       const k = blot + blade + grit;
-      d[p] = clampByte(86 + k * 0.7);
-      d[p + 1] = clampByte(92 + k);
-      d[p + 2] = clampByte(58 + k * 0.45);
+      d[p] = clampByte(78 + k * 0.55);
+      d[p + 1] = clampByte(96 + k);
+      d[p + 2] = clampByte(58 + k * 0.4);
       d[p + 3] = 255;
     }
   });
+}
+
+function skyMap() {
+  const tex = canvasTex((d, n) => {
+    for (let i = 0, p = 0; i < n * n; i++, p += 4) {
+      const t = ((i / n) | 0) / (n - 1);
+      let r;
+      let g;
+      let b;
+      if (t < 0.56) {
+        const u = t / 0.56;
+        const s = u * u;
+        r = 28 + (228 - 28) * s;
+        g = 32 + (142 - 32) * s;
+        b = 48 + (78 - 48) * s;
+      } else {
+        const u = (t - 0.56) / 0.44;
+        r = 228 + (62 - 228) * u;
+        g = 142 + (52 - 142) * u;
+        b = 78 + (44 - 78) * u;
+      }
+      d[p] = clampByte(r);
+      d[p + 1] = clampByte(g);
+      d[p + 2] = clampByte(b);
+      d[p + 3] = 255;
+    }
+  }, 512);
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.repeat.set(1, 1);
+  return tex;
 }
 
 function rockMap() {
@@ -160,9 +191,9 @@ const TIMBER = surfaceMat(timberMap(), { repeat: 1, roughness: 0.72, metalness: 
 const FRAME = surfaceMat(timberMap(), { repeat: 1, roughness: 0.55, metalness: 0.08 });
 const WATER = surfaceMat(waterMap(), { repeat: 10, ry: 4, roughness: 0.28, metalness: 0.22 });
 const RING = new THREE.MeshStandardMaterial({
-  color: 0xb08a42,
-  roughness: 0.42,
-  metalness: 0.28
+  color: 0x8a6a38,
+  roughness: 0.55,
+  metalness: 0.18
 });
 const NEEDLE = new THREE.MeshStandardMaterial({
   color: 0x1f2a22,
@@ -192,9 +223,9 @@ function shade(mesh, cast, receive) {
 
 function heightAt(x, z) {
   const r = Math.hypot(x, z);
-  const flatten = Math.min(1, Math.max(0, (r - 12) / 26));
-  const hills = Math.sin(x * 0.042 + 0.4) * Math.cos(z * 0.036) * 1.65
-    + Math.sin(x * 0.11 + z * 0.08) * 0.45;
+  const flatten = Math.min(1, Math.max(0, (r - 7) / 22));
+  const hills = Math.sin(x * 0.042 + 0.4) * Math.cos(z * 0.036) * 2.35
+    + Math.sin(x * 0.11 + z * 0.08) * 0.7;
   const west = x < -16
     ? ((-16 - x) / 46) * 3.6 * Math.max(0, 1 - Math.abs(z) / 56)
     : 0;
@@ -358,8 +389,8 @@ function goHome() {
   pos.x = 0;
   pos.y = EYE;
   pos.z = 0;
-  yaw = 0;
-  pitch = -0.16;
+  yaw = -0.38;
+  pitch = -0.08;
   hidePanel();
 }
 
@@ -493,9 +524,20 @@ function buildLand() {
   geo.computeVertexNormals();
   scene.add(shade(new THREE.Mesh(geo, EARTH), false, true));
 
-  const sea = shade(new THREE.Mesh(new THREE.PlaneGeometry(220, 280), WATER), false, true);
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(380, 40, 20),
+    new THREE.MeshBasicMaterial({
+      map: skyMap(),
+      side: THREE.BackSide,
+      fog: false,
+      depthWrite: false
+    })
+  );
+  scene.add(sky);
+
+  const sea = shade(new THREE.Mesh(new THREE.PlaneGeometry(200, 300), WATER), false, true);
   sea.rotation.x = -Math.PI / 2;
-  sea.position.set(-148, -0.55, -8);
+  sea.position.set(-118, -0.45, -6);
   scene.add(sea);
 
   const ring = new THREE.Mesh(new THREE.TorusGeometry(7.4, 0.045, 10, 72), RING);
@@ -514,10 +556,8 @@ function buildLand() {
   fir(7, 30, 6.1);
   fir(-8, 33, 7.0);
   fir(12, 28, 5.2);
-
-  const title = makeSign("Graphic Oregon", 6.4);
-  title.position.set(0, 2.35, -7.2);
-  scene.add(title);
+  fir(-22, -18, 6.8);
+  fir(-18, -28, 5.4);
 }
 
 function addWalkSigns() {
@@ -749,20 +789,20 @@ function tick() {
 function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
-  scene.fog = new THREE.Fog(HAZE, 38, 210);
+  scene.fog = new THREE.Fog(HAZE, 70, 240);
   camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 900);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 1.22;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  scene.add(new THREE.AmbientLight(0xc8b89a, 0.32));
-  scene.add(new THREE.HemisphereLight(0xf0d4a0, 0x1a2a26, 0.7));
-  const sun = new THREE.DirectionalLight(0xffd2a0, 1.7);
+  scene.add(new THREE.AmbientLight(0xd4c2a0, 0.4));
+  scene.add(new THREE.HemisphereLight(0xffe0b0, 0x243028, 0.78));
+  const sun = new THREE.DirectionalLight(0xffd2a0, 2.05);
   sun.position.set(-42, 22, 10);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
