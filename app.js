@@ -6,8 +6,8 @@ const gold = 0xd4b05a;
 const paper = 0xe8efe8;
 const Nav = window.FieldNav;
 const PIXEL_RATIO = 1.25;
-const DUSK = 0x1a2422;
-const FOG = 0x24302c;
+const DUSK = 0x4a5448;
+const FOG = 0x4a5448;
 
 const BOUNDS = 160;
 const EYE = 1.7;
@@ -111,13 +111,13 @@ function fieldMap() {
     for (let i = 0, p = 0; i < n * n; i++, p += 4) {
       const x = i % n;
       const y = (i / n) | 0;
-      const blot = (hash2(x / 28, y / 34) - 0.5) * 22;
-      const wet = hash2(x / 90, y / 70) > 0.64 ? -20 : 0;
-      const grit = (hash2(x * 1.9, y * 1.6) - 0.5) * 11;
+      const blot = (hash2(x / 16, y / 20) - 0.5) * 36;
+      const wet = hash2(x / 48, y / 40) > 0.58 ? -28 : 0;
+      const grit = (hash2(x * 1.4, y * 1.2) - 0.5) * 14;
       const k = blot + wet + grit;
-      d[p] = clampByte(78 + k * 0.7);
-      d[p + 1] = clampByte(84 + k * 0.86);
-      d[p + 2] = clampByte(68 + k * 0.52);
+      d[p] = clampByte(92 + k * 0.75);
+      d[p + 1] = clampByte(96 + k * 0.9);
+      d[p + 2] = clampByte(74 + k * 0.5);
       d[p + 3] = 255;
     }
   });
@@ -157,13 +157,22 @@ function skyTex() {
   c.height = 512;
   const ctx = c.getContext("2d");
   const g = ctx.createLinearGradient(0, 0, 0, 512);
-  g.addColorStop(0, "#0d1214");
-  g.addColorStop(0.34, "#1a2424");
-  g.addColorStop(0.5, "#5a6454");
-  g.addColorStop(0.56, "#3e4a40");
-  g.addColorStop(1, "#1c221c");
+  g.addColorStop(0, "#10161a");
+  g.addColorStop(0.32, "#1e2a2a");
+  g.addColorStop(0.48, "#6a7460");
+  g.addColorStop(0.54, "#4a5448");
+  g.addColorStop(1, "#2a322c");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 8, 512);
+  const spec = ctx.getImageData(0, 0, 8, 512);
+  const d = spec.data;
+  for (let i = 0, p = 0; i < 8 * 512; i++, p += 4) {
+    const n = (hash2(i % 8, (i / 8) | 0) - 0.5) * 8;
+    d[p] = clampByte(d[p] + n);
+    d[p + 1] = clampByte(d[p + 1] + n);
+    d[p + 2] = clampByte(d[p + 2] + n);
+  }
+  ctx.putImageData(spec, 0, 0);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.magFilter = THREE.LinearFilter;
@@ -210,10 +219,10 @@ function surfaceMat(map, opts) {
 }
 
 const BUMP = bumpMap();
-const PLASTER = surfaceMat(plasterMap(), { repeat: 2, ry: 1.1, roughness: 0.94, bump: BUMP, bumpScale: 0.045 });
-const CEILING = surfaceMat(plasterMap(), { repeat: 2, ry: 1.4, roughness: 0.97, tint: 0xa8a49c, bump: BUMP, bumpScale: 0.03 });
-const FLOOR = surfaceMat(oakMap(), { repeat: 2, ry: 2, roughness: 0.74, metalness: 0.05, bump: BUMP, bumpScale: 0.06 });
-const FIELD = surfaceMat(fieldMap(), { repeat: 14, roughness: 0.86, metalness: 0.05, bump: BUMP, bumpScale: 0.09 });
+const PLASTER = surfaceMat(plasterMap(), { repeat: 2, ry: 1.1, roughness: 0.94, bump: BUMP, bumpScale: 0.07 });
+const CEILING = surfaceMat(plasterMap(), { repeat: 2, ry: 1.4, roughness: 0.96, tint: 0xc8c4ba, bump: BUMP, bumpScale: 0.04 });
+const FLOOR = surfaceMat(oakMap(), { repeat: 2, ry: 2, roughness: 0.72, metalness: 0.05, bump: BUMP, bumpScale: 0.075 });
+const FIELD = surfaceMat(fieldMap(), { repeat: 8, roughness: 0.84, metalness: 0.04, bump: BUMP, bumpScale: 0.12 });
 const WOOD = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.68, metalness: 0.06, bump: BUMP, bumpScale: 0.05 });
 const FRAME = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.48, metalness: 0.12, bump: BUMP, bumpScale: 0.04 });
 const INLAY = new THREE.MeshStandardMaterial({
@@ -257,20 +266,11 @@ function makeLabel(text, scale, pinned) {
   ctx.clearRect(0, 0, w, h);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  if (pinned) {
-    ctx.shadowColor = "rgba(12, 14, 12, 0.55)";
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = "#c4b48a";
-    ctx.font = "500 40px Georgia, serif";
-    ctx.fillText(text, w / 2, h / 2);
-  } else {
-    ctx.fillStyle = "rgba(22, 24, 20, 0.38)";
-    roundRect(ctx, 48, 44, w - 96, h - 88, 2);
-    ctx.fill();
-    ctx.fillStyle = "#c8bea4";
-    ctx.font = "500 30px Georgia, serif";
-    ctx.fillText(text, w / 2, h / 2);
-  }
+  ctx.shadowColor = "rgba(8, 10, 8, 0.7)";
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = "#c4b48a";
+  ctx.font = pinned ? "500 40px Georgia, serif" : "500 30px Georgia, serif";
+  ctx.fillText(text, w / 2, h / 2);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   const mesh = new THREE.Mesh(
@@ -282,16 +282,6 @@ function makeLabel(text, scale, pinned) {
     billboards.push(mesh);
   }
   return mesh;
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
 }
 
 function addVolume(marker) {
@@ -608,9 +598,8 @@ async function populateStarIS() {
   pts.userData = data;
   scene.add(pts);
   clickables.push(pts);
-  const disc = shade(new THREE.Mesh(new THREE.CircleGeometry(4.25, 64), PAD), false, true);
-  disc.rotation.x = -Math.PI / 2;
-  disc.position.set(origin.x, 0.035, origin.z);
+  const disc = shade(new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.2, 0.1, 64), PAD), true, true);
+  disc.position.set(origin.x, 0.06, origin.z);
   disc.userData = data;
   scene.add(disc);
   clickables.push(disc);
@@ -625,7 +614,7 @@ async function populateStarIS() {
     })
   );
   rim.rotation.x = Math.PI / 2;
-  rim.position.set(origin.x, 0.05, origin.z);
+  rim.position.set(origin.x, 0.12, origin.z);
   rim.userData = data;
   scene.add(rim);
   clickables.push(rim);
@@ -711,7 +700,7 @@ function tick() {
 function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
-  scene.fog = new THREE.FogExp2(FOG, 0.011);
+  scene.fog = new THREE.FogExp2(FOG, 0.013);
   camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 800);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
@@ -724,8 +713,8 @@ function main() {
 
   scene.add(new THREE.AmbientLight(0x9aa298, 0.28));
   scene.add(new THREE.HemisphereLight(0xd0ccbc, 0x3a4238, 0.64));
-  const key = new THREE.DirectionalLight(0xf2d8a8, 1.18);
-  key.position.set(-10, 16, 7);
+  const key = new THREE.DirectionalLight(0xf2d8a8, 1.22);
+  key.position.set(-16, 11, 2);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
   key.shadow.camera.near = 2;
