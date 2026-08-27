@@ -1,10 +1,10 @@
 :root {
-  --ink: #1c211e;
+  --ink: #151c1c;
   --teal: #2aa8a0;
   --gold: #d4b05a;
-  --gold-soft: #e8d29a;
-  --paper: #e8efe8;
-  --muted: #9bb0b0;
+  --gold-soft: #c4b48a;
+  --paper: #d8ddd8;
+  --muted: #7a8884;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,19 +40,19 @@ header.top {
 }
 
 header.top h1 {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--gold-soft);
   line-height: 1.1;
+  opacity: 0.78;
 }
 
 header.top p.tag {
-  margin-top: 6px;
-  color: var(--teal);
-  font-size: 0.92rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
 }
 
 #panel {
@@ -63,8 +63,8 @@ header.top p.tag {
   max-height: min(40vh, 320px);
   overflow: auto;
   pointer-events: auto;
-  background: rgba(22, 24, 20, 0.62);
-  border: 1px solid rgba(176, 138, 70, 0.22);
+  background: rgba(16, 20, 18, 0.55);
+  border: 1px solid rgba(176, 138, 70, 0.16);
   padding: 18px 18px 16px;
   backdrop-filter: blur(10px);
 }
@@ -104,19 +104,24 @@ header.top p.tag {
   left: 50%;
   transform: translateX(-50%);
   bottom: 18px;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--muted);
   letter-spacing: 0.06em;
   text-align: center;
   pointer-events: none;
   width: min(640px, calc(100vw - 32px));
-  opacity: 0.55;
+  animation: recede 9s ease forwards;
+}
+
+@keyframes recede {
+  0%, 40% { opacity: 0.42; }
+  100% { opacity: 0; }
 }
 
 #loader {
   position: fixed;
   inset: 0;
-  background: var(--ink);
+  background: #151c1c;
   z-index: 8;
   display: grid;
   place-items: center;
