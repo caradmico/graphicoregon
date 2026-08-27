@@ -153,7 +153,7 @@ function bumpMap() {
 
 function skyTex() {
   const c = document.createElement("canvas");
-  c.width = 8;
+  c.width = 64;
   c.height = 512;
   const ctx = c.getContext("2d");
   const g = ctx.createLinearGradient(0, 0, 0, 512);
@@ -163,11 +163,11 @@ function skyTex() {
   g.addColorStop(0.54, "#4a5448");
   g.addColorStop(1, "#2a322c");
   ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 8, 512);
-  const spec = ctx.getImageData(0, 0, 8, 512);
+  ctx.fillRect(0, 0, 64, 512);
+  const spec = ctx.getImageData(0, 0, 64, 512);
   const d = spec.data;
-  for (let i = 0, p = 0; i < 8 * 512; i++, p += 4) {
-    const n = (hash2(i % 8, (i / 8) | 0) - 0.5) * 8;
+  for (let i = 0, p = 0; i < 64 * 512; i++, p += 4) {
+    const n = (hash2(i % 64, (i / 64) | 0) - 0.5) * 6;
     d[p] = clampByte(d[p] + n);
     d[p + 1] = clampByte(d[p + 1] + n);
     d[p + 2] = clampByte(d[p + 2] + n);
