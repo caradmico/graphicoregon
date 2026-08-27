@@ -37,6 +37,7 @@ header.top {
   left: 28px;
   pointer-events: auto;
   max-width: min(420px, calc(100vw - 56px));
+  animation: recede 11s ease forwards;
 }
 
 header.top h1 {

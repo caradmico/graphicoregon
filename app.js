@@ -6,8 +6,8 @@ const gold = 0xd4b05a;
 const paper = 0xe8efe8;
 const Nav = window.FieldNav;
 const PIXEL_RATIO = 1.25;
-const DUSK = 0x151c1c;
-const FOG = 0x1a2220;
+const DUSK = 0x1a2422;
+const FOG = 0x24302c;
 
 const BOUNDS = 160;
 const EYE = 1.7;
@@ -98,9 +98,9 @@ function oakMap() {
       const grain = (hash2(x * 0.11, id * 3.1) - 0.5) * 14;
       const pore = (hash2(x * 2.3, y * 1.1) - 0.5) * 7;
       const k = stain + grain + pore + seam;
-      d[p] = clampByte(96 + k);
-      d[p + 1] = clampByte(84 + k * 0.88);
-      d[p + 2] = clampByte(64 + k * 0.58);
+      d[p] = clampByte(112 + k);
+      d[p + 1] = clampByte(98 + k * 0.88);
+      d[p + 2] = clampByte(74 + k * 0.58);
       d[p + 3] = 255;
     }
   });
@@ -115,9 +115,9 @@ function fieldMap() {
       const wet = hash2(x / 90, y / 70) > 0.64 ? -20 : 0;
       const grit = (hash2(x * 1.9, y * 1.6) - 0.5) * 11;
       const k = blot + wet + grit;
-      d[p] = clampByte(46 + k * 0.72);
-      d[p + 1] = clampByte(52 + k * 0.88);
-      d[p + 2] = clampByte(44 + k * 0.55);
+      d[p] = clampByte(78 + k * 0.7);
+      d[p + 1] = clampByte(84 + k * 0.86);
+      d[p + 2] = clampByte(68 + k * 0.52);
       d[p + 3] = 255;
     }
   });
@@ -157,11 +157,11 @@ function skyTex() {
   c.height = 512;
   const ctx = c.getContext("2d");
   const g = ctx.createLinearGradient(0, 0, 0, 512);
-  g.addColorStop(0, "#0b1012");
-  g.addColorStop(0.36, "#141c1c");
-  g.addColorStop(0.5, "#334038");
-  g.addColorStop(0.58, "#2a342e");
-  g.addColorStop(1, "#1a201c");
+  g.addColorStop(0, "#0d1214");
+  g.addColorStop(0.34, "#1a2424");
+  g.addColorStop(0.5, "#5a6454");
+  g.addColorStop(0.56, "#3e4a40");
+  g.addColorStop(1, "#1c221c");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 8, 512);
   const tex = new THREE.CanvasTexture(c);
@@ -213,7 +213,7 @@ const BUMP = bumpMap();
 const PLASTER = surfaceMat(plasterMap(), { repeat: 2, ry: 1.1, roughness: 0.94, bump: BUMP, bumpScale: 0.045 });
 const CEILING = surfaceMat(plasterMap(), { repeat: 2, ry: 1.4, roughness: 0.97, tint: 0xa8a49c, bump: BUMP, bumpScale: 0.03 });
 const FLOOR = surfaceMat(oakMap(), { repeat: 2, ry: 2, roughness: 0.74, metalness: 0.05, bump: BUMP, bumpScale: 0.06 });
-const FIELD = surfaceMat(fieldMap(), { repeat: 18, roughness: 0.9, metalness: 0.06, bump: BUMP, bumpScale: 0.08 });
+const FIELD = surfaceMat(fieldMap(), { repeat: 14, roughness: 0.86, metalness: 0.05, bump: BUMP, bumpScale: 0.09 });
 const WOOD = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.68, metalness: 0.06, bump: BUMP, bumpScale: 0.05 });
 const FRAME = surfaceMat(woodBlockMap(), { repeat: 1, roughness: 0.48, metalness: 0.12, bump: BUMP, bumpScale: 0.04 });
 const INLAY = new THREE.MeshStandardMaterial({
@@ -222,9 +222,9 @@ const INLAY = new THREE.MeshStandardMaterial({
   metalness: 0.28
 });
 const PAD = new THREE.MeshStandardMaterial({
-  color: 0x1c221f,
-  roughness: 0.4,
-  metalness: 0.32
+  color: 0x2c3430,
+  roughness: 0.38,
+  metalness: 0.36
 });
 
 function loadTexture(url) {
@@ -608,9 +608,9 @@ async function populateStarIS() {
   pts.userData = data;
   scene.add(pts);
   clickables.push(pts);
-  const disc = shade(new THREE.Mesh(new THREE.CircleGeometry(4.15, 64), PAD), false, true);
+  const disc = shade(new THREE.Mesh(new THREE.CircleGeometry(4.25, 64), PAD), false, true);
   disc.rotation.x = -Math.PI / 2;
-  disc.position.set(origin.x, 0.03, origin.z);
+  disc.position.set(origin.x, 0.035, origin.z);
   disc.userData = data;
   scene.add(disc);
   clickables.push(disc);
@@ -711,20 +711,20 @@ function tick() {
 function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
-  scene.fog = new THREE.FogExp2(FOG, 0.016);
+  scene.fog = new THREE.FogExp2(FOG, 0.011);
   camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 800);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  scene.add(new THREE.AmbientLight(0x8a9088, 0.2));
-  scene.add(new THREE.HemisphereLight(0xc4c0b0, 0x2a3228, 0.52));
-  const key = new THREE.DirectionalLight(0xf0d4a4, 1.05);
+  scene.add(new THREE.AmbientLight(0x9aa298, 0.28));
+  scene.add(new THREE.HemisphereLight(0xd0ccbc, 0x3a4238, 0.64));
+  const key = new THREE.DirectionalLight(0xf2d8a8, 1.18);
   key.position.set(-10, 16, 7);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
