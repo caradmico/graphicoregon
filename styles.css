@@ -151,14 +151,43 @@ header.top p.tag {
 
 #paper .sheet {
   position: relative;
-  width: min(720px, calc(100vw - 32px));
-  max-height: min(86vh, 760px);
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(88vh, 820px);
   overflow: auto;
-  background: #f3ead4;
+  background:
+    linear-gradient(90deg, rgba(26, 23, 18, 0.05) 0 50%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(26, 23, 18, 0.035) 28px),
+    #f3ead4;
   color: #1c1710;
   border: 1px solid #c9b48a;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 248, 230, 0.55);
   padding: 28px 32px 26px;
+  transform: rotate(-0.9deg);
+  animation: handed 0.28s ease-out;
+}
+
+#paper .sheet::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(26, 23, 18, 0.12);
+  pointer-events: none;
+}
+
+@keyframes handed {
+  from {
+    transform: rotate(3.5deg) translateY(22px);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-0.9deg) translateY(0);
+    opacity: 1;
+  }
 }
 
 #paper .kicker {
@@ -182,6 +211,8 @@ header.top p.tag {
   text-transform: uppercase;
   font-size: 0.78rem;
   margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #1a1712;
 }
 
 #paper .spread {
@@ -193,9 +224,17 @@ header.top p.tag {
 
 #paper figure img {
   width: 100%;
-  height: auto;
+  height: 148px;
+  object-fit: cover;
   display: block;
-  filter: grayscale(0.15) contrast(1.05);
+  filter: grayscale(0.12) contrast(1.05);
+  background: #e6d8b8;
+}
+
+#paper .folio {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(26, 23, 18, 0.14);
 }
 
 #paper figcaption {
