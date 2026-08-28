@@ -465,6 +465,9 @@ function enterMuseum() {
   pos.x = museumDoorX() - 2.4;
   pos.y = MUSEUM.y + EYE;
   pos.z = MUSEUM.z;
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
   yaw = -Math.PI / 2;
   pitch = 0;
   portalSide = "museum";
@@ -477,6 +480,9 @@ function exitMuseum() {
   pos.x = fx;
   pos.y = heightAt(fx, fz) + EYE;
   pos.z = fz;
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
   yaw = Math.PI / 2;
   pitch = 0;
   portalSide = "forest";
@@ -780,9 +786,9 @@ function fitVolume() {
   if (!camera || !scene) return;
   if (portalSide === "museum") {
     scene.fog = null;
-    if (camera.far !== 86) {
+    if (camera.far !== 48) {
       camera.near = 0.12;
-      camera.far = 86;
+      camera.far = 48;
       camera.updateProjectionMatrix();
     }
     return;
@@ -931,8 +937,10 @@ function bindInput() {
     pitch = next.pitch;
   });
 
-  window.addEventListener("keydown", (e) => {
+  el.addEventListener("pointerenter", () => {
     wakeHand(el);
+  });
+  window.addEventListener("keydown", (e) => {
     const flags = Nav.setHeld(held, e.code, e.key, true);
     if (Nav.isMoveKey(e.code, e.key)) e.preventDefault();
     if (flags.escape) {
