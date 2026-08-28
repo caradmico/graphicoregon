@@ -759,55 +759,48 @@ function buildNewsie() {
   const y = heightAt(x, z);
   const g = new THREE.Group();
   const head = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), SKIN), true, true);
-  head.position.set(-0.02, 1.4, 0.08);
-  head.rotation.x = 0.1;
+  head.position.set(0, 1.42, 0.06);
+  head.rotation.x = 0.08;
   const brim = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.04, 0.38), CAP), true, true);
-  brim.position.set(-0.02, 1.54, 0.08);
+  brim.position.set(0, 1.56, 0.06);
   const crown = shade(new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.12, 0.26), CAP), true, true);
-  crown.position.set(-0.02, 1.62, 0.08);
-  const body = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.46, 0.22), TEAL_PANEL), true, true);
-  body.position.set(0, 1.02, -0.02);
-  body.rotation.x = 0.16;
-  const armL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.34, 0.1), SKIN), true, true);
-  armL.position.set(-0.28, 0.96, -0.04);
-  armL.rotation.z = 0.78;
-  armL.rotation.x = -0.35;
-  const extras = shade(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.08), PAPER), true, true);
-  extras.position.set(-0.36, 0.84, -0.08);
-  extras.rotation.z = 0.58;
-  extras.rotation.x = -0.18;
+  crown.position.set(0, 1.64, 0.06);
+  const body = shade(new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.48, 0.2), TEAL_PANEL), true, true);
+  body.position.set(0, 1.04, 0);
+  const armL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.36, 0.09), SKIN), true, true);
+  armL.position.set(-0.24, 1.02, 0);
   const legL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
-  legL.position.set(-0.1, 0.4, -0.06);
+  legL.position.set(-0.1, 0.4, 0);
   const legR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
-  legR.position.set(0.11, 0.4, 0.14);
+  legR.position.set(0.1, 0.4, 0.08);
   const offer = new THREE.Group();
-  offer.position.set(0, 1.2, 0);
-  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.56), SKIN), true, true);
-  armR.position.set(0.32, 0.06, 0.34);
-  const hand = shade(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.1, 0.13), SKIN), true, true);
-  hand.position.set(0.34, 0.02, 0.64);
+  offer.position.set(0.22, 1.32, 0.04);
+  offer.rotation.x = -0.18;
+  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.46), SKIN), true, true);
+  armR.position.set(0.04, 0.02, 0.24);
+  const hand = new THREE.Group();
+  hand.position.set(0.05, 0.03, 0.5);
+  const palm = shade(new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.09, 0.11), SKIN), true, true);
   const sheetTex = paintOfferedSheet();
   const sheetMat = new THREE.MeshLambertMaterial({
     map: sheetTex,
     emissive: 0xffffff,
     emissiveMap: sheetTex,
-    emissiveIntensity: 0.24,
+    emissiveIntensity: 0.26,
     side: THREE.DoubleSide
   });
-  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.7), sheetMat), true, false);
-  sheet.position.set(0.42, 0.22, 0.86);
-  sheet.rotation.set(0.2, -0.22, -0.06);
-  const leaf = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.68), PAPER), false, false);
-  leaf.position.set(0.4, 0.2, 0.82);
-  leaf.rotation.set(0.16, -0.32, -0.1);
+  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.54), sheetMat), true, false);
+  sheet.position.set(-0.1, 0.2, 0.05);
+  sheet.rotation.set(0.04, 0.18, 0.08);
   const hit = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.72, 0.92),
+    new THREE.PlaneGeometry(0.5, 0.66),
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
   );
   hit.position.copy(sheet.position);
   hit.rotation.copy(sheet.rotation);
-  offer.add(armR, hand, leaf, sheet, hit);
-  g.add(head, brim, crown, body, armL, extras, offer, legL, legR);
+  hand.add(palm, sheet, hit);
+  offer.add(armR, hand);
+  g.add(head, brim, crown, body, armL, offer, legL, legR);
   g.position.set(x, y, z);
   faceCenter(g);
   const data = {

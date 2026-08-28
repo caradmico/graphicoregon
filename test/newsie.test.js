@@ -11,10 +11,13 @@ const newsie = app.slice(app.indexOf("function buildNewsie"), app.indexOf("funct
 assert.ok(newsie.includes("function buildNewsie"), "newsie stays on the field");
 assert.ok(newsie.includes("PlaneGeometry"), "the offered sheet is a page, not a box");
 assert.ok(newsie.includes("paintOfferedSheet"), "the in-hand sheet is drawn, not a gray slab");
+assert.ok(newsie.includes("hand.add("), "the paper is parented to the hand, not planted on the dirt");
+assert.ok(!/extras/.test(newsie), "no spare board beside the kid");
 assert.ok(!/assets\/news\//.test(newsie), "do not stream the news folder onto the kid");
 assert.ok(newsie.includes("paper: true"), "clicking the kid or the sheet still opens the paper");
 assert.ok(app.includes("newsieHold"), "a cheap offer hold is wired");
 assert.ok(!/new THREE\.PointLight/.test(app), "no extra PointLights");
+assert.ok(!/art-inventory/.test(newsie), "hang stays off this look");
 
 assert.ok(html.includes('id="paper-close"'), "Fold stays");
 assert.ok(html.includes("a paper from the path"), "the overlay still reads as a handed paper");
