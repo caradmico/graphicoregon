@@ -57,28 +57,29 @@ assert.ok(Math.abs(rise.x) < 1e-9 && Math.abs(rise.z) < 1e-9, "climb is vertical
 const right = nav.rightVector(0);
 assert.ok(Math.abs(right.x - 1) < 1e-9, "strafe-right at yaw 0 is +X");
 
-const sky = nav.lookDolly(0, 0.7, -80, 0);
-assert.ok(sky.y > 0, "look-up + wheel-up travels +Y (sky is legal)");
-assert.ok(sky.step > 0, "wheel-up still dollies forward (not inverted)");
+const cherry = nav.travelDolly(0, -80, 0);
+assert.ok(cherry.step > 0, "wheel-up still dollies forward (not inverted)");
+assert.ok(Math.abs(cherry.y) < 1e-9, "scroll travel has no look-Y (sky is WASD/Q/E)");
+assert.ok(cherry.z < 0, "level wheel-up still travels −Z");
 
-const level = nav.lookDolly(0, 0, -80, 0);
-assert.ok(Math.abs(level.y) < 1e-9, "level look wheel has no Y");
-assert.ok(level.z < 0, "level wheel-up still travels -Z");
+const back = nav.travelDolly(0, 80, 0);
+assert.ok(back.step < 0, "wheel-down dollies backward");
+assert.ok(Math.abs(back.y) < 1e-9, "backward scroll stays on the travel plane");
 
 assert.ok(
   Math.abs(nav.clearGround(1.7, 2.3) - (2.3 + nav.GROUND_CLEARANCE)) < 1e-9,
   "hill lifts the camera over dirt"
 );
-assert.ok(nav.clearGround(20, 2.3) === 20, "sky stay is not pulled down to the hill");
+assert.ok(nav.clearGround(20, 2.3) === 20, "a high camera is not pulled down to the hill");
 assert.ok(
   nav.clearGround(1.7, 0) === 1.7,
   "plaza grass does not pin a standing eye (no EYE floor)"
 );
 
 const fromSpawn = { x: 0, y: 1.7, z: 0 };
-const skyRide = nav.applyLookDolly(fromSpawn, 0, 0.9, -80, 0);
-assert.ok(skyRide.y > fromSpawn.y + 0.8, "look-up scroll still climbs after terrain resolve");
-assert.ok(skyRide.y >= nav.heightAt(skyRide.x, skyRide.z) + nav.GROUND_CLEARANCE - 1e-9, "sky step stays out of dirt");
+const stay = nav.applyTravelDolly(fromSpawn, 0, -80, 0);
+assert.ok(Math.abs(stay.y - 1.7) < 1e-9, "scroll from spawn does not eject into the sky");
+assert.ok(stay.z < fromSpawn.z, "scroll still travels forward");
 
 const research = { x: 34, y: 2.2, z: 2 };
 const yawResearch = Math.atan2(research.x, -research.z);
@@ -86,7 +87,7 @@ let toward = { x: 0, y: 1.7, z: 0 };
 let maxHill = nav.heightAt(0, 0);
 let yOnCrest = 1.7;
 for (let i = 0; i < 28; i++) {
-  toward = nav.applyLookDolly(toward, yawResearch, -0.12, -80, 0);
+  toward = nav.applyTravelDolly(toward, yawResearch, -80, 0);
   const ground = nav.heightAt(toward.x, toward.z);
   const floor = ground + nav.GROUND_CLEARANCE;
   if (ground > maxHill) {

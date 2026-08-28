@@ -437,7 +437,7 @@ function bindInput() {
     if (hud(e.target)) return;
     e.preventDefault();
     wakeHand(el);
-    const next = Nav.applyLookDolly(pos, yaw, pitch, e.deltaY, e.deltaMode);
+    const next = Nav.applyTravelDolly(pos, yaw, e.deltaY, e.deltaMode);
     pos.x = next.x;
     pos.y = next.y;
     pos.z = next.z;

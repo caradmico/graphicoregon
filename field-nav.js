@@ -58,10 +58,10 @@
     return -wheelUnit(deltaY, deltaMode) * (scale == null ? DOLLY : scale);
   }
 
-  function lookDolly(yaw, pitch, deltaY, deltaMode, scale) {
+  function travelDolly(yaw, deltaY, deltaMode, scale) {
     const step = dollyStep(deltaY, deltaMode, scale);
-    const look = lookVector(yaw, pitch);
-    return { x: look.x * step, y: look.y * step, z: look.z * step, step: step };
+    const flat = flatForward(yaw);
+    return { x: flat.x * step, y: 0, z: flat.z * step, step: step };
   }
 
   function heightAt(x, z) {
@@ -101,8 +101,8 @@
     return { x: x, y: y, z: z };
   }
 
-  function applyLookDolly(pos, yaw, pitch, deltaY, deltaMode, scale) {
-    return stepOverTerrain(pos, lookDolly(yaw, pitch, deltaY, deltaMode, scale));
+  function applyTravelDolly(pos, yaw, deltaY, deltaMode, scale) {
+    return stepOverTerrain(pos, travelDolly(yaw, deltaY, deltaMode, scale));
   }
 
   function flatForward(yaw, out) {
@@ -212,11 +212,11 @@
     applyLook: applyLook,
     wheelUnit: wheelUnit,
     dollyStep: dollyStep,
-    lookDolly: lookDolly,
+    travelDolly: travelDolly,
     heightAt: heightAt,
     clearGround: clearGround,
     stepOverTerrain: stepOverTerrain,
-    applyLookDolly: applyLookDolly,
+    applyTravelDolly: applyTravelDolly,
     emptyHeld: emptyHeld,
     keyFlags: keyFlags,
     setHeld: setHeld,
