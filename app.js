@@ -337,6 +337,7 @@ function shade(mesh, cast, receive) {
 }
 
 function heightAt(x, z) {
+  if (x > -38 && x < 38 && z > -7 && z < 15) return 0;
   const r = Math.hypot(x, z);
   const flatten = Math.min(1, Math.max(0, (r - 7) / 22));
   const hills = Math.sin(x * 0.042 + 0.4) * Math.cos(z * 0.036) * 2.35
@@ -1441,7 +1442,7 @@ function buildLand() {
   for (let i = 0; i < attr.count; i++) {
     const x = attr.getX(i);
     const z = attr.getZ(i);
-    attr.setY(i, heightAt(x, z));
+    attr.setY(i, (x > -38 && x < 38 && z > -7 && z < 15) ? -4 : heightAt(x, z));
   }
   attr.needsUpdate = true;
   geo.computeVertexNormals();
@@ -1463,17 +1464,9 @@ function buildLand() {
   sea.position.set(-118, -0.45, -6);
   scene.add(sea);
 
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(7.4, 0.045, 10, 72), RING);
-  ring.rotation.x = Math.PI / 2;
-  ring.position.y = 0.04;
-  scene.add(ring);
-
-  boulder(-38, -4, 7.2, 4.6, 5.4);
   boulder(-44, 6, 5.4, 3.4, 4.8);
-  boulder(-32, 10, 3.6, 2.2, 3.2);
   boulder(-41, -14, 4.2, 2.8, 3.6);
 
-  fir(-30, 12, 6.4);
   fir(-36, -10, 7.2);
   fir(-27, 20, 5.6);
   fir(7, 30, 6.1);
@@ -1485,6 +1478,9 @@ function buildLand() {
 
 function addWalkSigns() {
   WALKS.forEach((walk) => {
+    const x = walk.pos[0];
+    const z = walk.pos[2];
+    if (x > -38 && x < 38 && z > -7 && z < 15) return;
     const sign = makeSign(walk.title, walk.id === "credentials" || walk.id === "ground" ? 6.2 : 7.2);
     sign.position.set(walk.pos[0], walk.pos[1], walk.pos[2]);
     addClick(sign, {

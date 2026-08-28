@@ -15,6 +15,7 @@ assert.ok(app.includes("function buildLineupBackdrop"), "one shared backdrop");
 assert.ok(app.includes("function buildLineup"), "the row is built as a lineup");
 const cloth = app.slice(app.indexOf("function buildLineupBackdrop"), app.indexOf("function buildLineup()"));
 assert.ok(cloth.includes("BoxGeometry(72, 0.22, 22)"), "a stage kills the leftover lawn under spawn");
+assert.ok(app.includes("z > -7 && z < 15"), "spawn volume is flattened so hills cannot leak");
 assert.ok(cloth.includes("left") && cloth.includes("right") && cloth.includes("roof"), "the backdrop fills the first frame");
 assert.ok(css.includes("bottom: 16px") && css.includes("#roster button"), "Orbit's name list stays a quiet tap, not the first paint");
 assert.ok((app.match(/z: -3\.2/g) || []).length >= 6, "the six share one row z");
