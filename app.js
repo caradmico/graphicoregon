@@ -60,6 +60,9 @@ const loader = new THREE.TextureLoader();
 let portalSide = "forest";
 let portalCool = 0;
 let fieldFog = null;
+let museumRoot = null;
+let hallSun = null;
+let museumArtStarted = false;
 let wheelBudget = 3.2;
 let wheelReset = 0;
 
@@ -461,6 +464,12 @@ function museumDoorX() {
 
 const prevPos = { x: 0, y: EYE, z: 0 };
 
+function showMuseum(on) {
+  const vis = !!on;
+  if (museumRoot) museumRoot.visible = vis;
+  if (hallSun) hallSun.visible = vis;
+}
+
 function enterMuseum() {
   pos.x = museumDoorX() - 2.4;
   pos.y = MUSEUM.y + EYE;
@@ -472,6 +481,11 @@ function enterMuseum() {
   pitch = 0;
   portalSide = "museum";
   portalCool = 0.85;
+  showMuseum(true);
+  if (!museumArtStarted) {
+    museumArtStarted = true;
+    streamMuseumArt().catch((err) => console.warn(err));
+  }
 }
 
 function exitMuseum() {
@@ -487,6 +501,7 @@ function exitMuseum() {
   pitch = 0;
   portalSide = "forest";
   portalCool = 0.85;
+  showMuseum(false);
 }
 
 function stepPortal() {
@@ -624,11 +639,14 @@ function buildMuseum() {
   const runner = shade(new THREE.Mesh(new THREE.BoxGeometry(L - 6, 0.03, 2.4), TEAL_PANEL), false, true);
   runner.position.set(ox, oy + 0.02, oz);
   g.add(floor, ceil, north, south, west, eastN, eastS, eastLintel, corniceN, corniceS, jambN, jambS, doorLint, veil, benchA, benchB, runner);
-  scene.add(g);
+  museumRoot = g;
+  museumRoot.visible = false;
+  scene.add(museumRoot);
 
-  const hallSun = new THREE.DirectionalLight(0xffe4c0, 0.9);
+  hallSun = new THREE.DirectionalLight(0xffe4c0, 0.9);
   hallSun.position.set(ox + 10, oy + 22, oz + 8);
   hallSun.target.position.set(ox, oy + 2, oz);
+  hallSun.visible = false;
   scene.add(hallSun);
   scene.add(hallSun.target);
 }
@@ -674,10 +692,11 @@ function hangMuseumPiece(file, tex, slot) {
     linkLabel: "Open the studio page",
     meta: "Graphic Oregon"
   });
-  scene.add(hung.group);
+  const root = museumRoot || scene;
+  root.add(hung.group);
   const cap = quietCaption(title);
   cap.position.set(slot.x, slot.y - hung.height * 0.5 - 0.22, slot.z);
-  scene.add(cap);
+  root.add(cap);
   hungArt.push(file);
 }
 
@@ -826,6 +845,7 @@ function goHome() {
   yaw = -0.38;
   pitch = -0.08;
   portalSide = "forest";
+  showMuseum(false);
   hidePanel();
   hidePaper();
 }
@@ -1258,6 +1278,8 @@ function tick() {
     if (veil.material) veil.material.opacity = pulse;
   });
   billboards.forEach((obj) => {
+    if (!obj.visible) return;
+    if (obj.parent && obj.parent.visible === false) return;
     const dx = obj.position.x - camera.position.x;
     const dy = obj.position.y - camera.position.y;
     const dz = obj.position.z - camera.position.z;
@@ -1268,6 +1290,9 @@ function tick() {
 }
 
 function main() {
+  if (location.search) {
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1317,7 +1342,6 @@ function main() {
   tick();
   afterFirstPaint(() => {
     populatePieces().catch((err) => console.warn(err));
-    streamMuseumArt().catch((err) => console.warn(err));
   });
 }
 
@@ -1331,6 +1355,7 @@ window.__field = {
     if (p.pitch != null) pitch = p.pitch;
     if (p.side === "museum" || pos.y < MUSEUM.y + 10) portalSide = "museum";
     if (p.side === "forest") portalSide = "forest";
+    showMuseum(portalSide === "museum");
     clampPos();
     stepPortal();
   },
