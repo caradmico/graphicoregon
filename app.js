@@ -759,51 +759,54 @@ function buildNewsie() {
   const y = heightAt(x, z);
   const g = new THREE.Group();
   const head = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), SKIN), true, true);
-  head.position.set(0.02, 1.4, -0.06);
-  head.rotation.x = -0.08;
+  head.position.set(-0.02, 1.4, 0.08);
+  head.rotation.x = 0.1;
   const brim = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.04, 0.38), CAP), true, true);
-  brim.position.set(0.02, 1.54, -0.06);
+  brim.position.set(-0.02, 1.54, 0.08);
   const crown = shade(new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.12, 0.26), CAP), true, true);
-  crown.position.set(0.02, 1.62, -0.06);
+  crown.position.set(-0.02, 1.62, 0.08);
   const body = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.46, 0.22), TEAL_PANEL), true, true);
-  body.position.set(0, 1.02, 0);
-  body.rotation.x = -0.16;
+  body.position.set(0, 1.02, -0.02);
+  body.rotation.x = 0.16;
   const armL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.34, 0.1), SKIN), true, true);
-  armL.position.set(-0.28, 0.98, 0.04);
-  armL.rotation.z = 0.72;
-  armL.rotation.x = 0.35;
-  const extras = shade(new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.26, 0.08), PAPER), true, true);
-  extras.position.set(-0.34, 0.86, 0.1);
-  extras.rotation.z = 0.55;
-  extras.rotation.x = 0.2;
+  armL.position.set(-0.28, 0.96, -0.04);
+  armL.rotation.z = 0.78;
+  armL.rotation.x = -0.35;
+  const extras = shade(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.08), PAPER), true, true);
+  extras.position.set(-0.36, 0.84, -0.08);
+  extras.rotation.z = 0.58;
+  extras.rotation.x = -0.18;
   const legL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
-  legL.position.set(-0.1, 0.4, 0.06);
+  legL.position.set(-0.1, 0.4, -0.06);
   const legR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
-  legR.position.set(0.1, 0.4, -0.12);
+  legR.position.set(0.11, 0.4, 0.14);
   const offer = new THREE.Group();
-  offer.position.set(0.08, 1.16, -0.02);
-  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.42, 0.1), SKIN), true, true);
-  armR.position.set(0.2, 0.02, -0.16);
-  armR.rotation.x = -1.12;
-  armR.rotation.z = -0.28;
-  armR.rotation.y = 0.22;
-  const hand = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.1), SKIN), true, true);
-  hand.position.set(0.18, -0.02, -0.42);
+  offer.position.set(0, 1.2, 0);
+  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.56), SKIN), true, true);
+  armR.position.set(0.32, 0.06, 0.34);
+  const hand = shade(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.1, 0.13), SKIN), true, true);
+  hand.position.set(0.34, 0.02, 0.64);
   const sheetTex = paintOfferedSheet();
   const sheetMat = new THREE.MeshLambertMaterial({
     map: sheetTex,
     emissive: 0xffffff,
     emissiveMap: sheetTex,
-    emissiveIntensity: 0.22,
+    emissiveIntensity: 0.24,
     side: THREE.DoubleSide
   });
-  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.66), sheetMat), true, false);
-  sheet.position.set(0.16, 0.08, -0.5);
-  sheet.rotation.set(-0.12, Math.PI, 0.1);
-  const leaf = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.48, 0.64), PAPER), false, false);
-  leaf.position.set(0.17, 0.07, -0.48);
-  leaf.rotation.set(-0.1, Math.PI + 0.08, 0.14);
-  offer.add(armR, hand, leaf, sheet);
+  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.7), sheetMat), true, false);
+  sheet.position.set(0.42, 0.22, 0.86);
+  sheet.rotation.set(0.2, -0.22, -0.06);
+  const leaf = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.68), PAPER), false, false);
+  leaf.position.set(0.4, 0.2, 0.82);
+  leaf.rotation.set(0.16, -0.32, -0.1);
+  const hit = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.72, 0.92),
+    new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
+  );
+  hit.position.copy(sheet.position);
+  hit.rotation.copy(sheet.rotation);
+  offer.add(armR, hand, leaf, sheet, hit);
   g.add(head, brim, crown, body, armL, extras, offer, legL, legR);
   g.position.set(x, y, z);
   faceCenter(g);
@@ -1455,7 +1458,22 @@ window.__field = {
     const el = document.getElementById("paper");
     return !!(el && !el.hidden);
   },
-  newsieOffering: () => !!(newsieHold && newsieHold.sheet)
+  newsieOffering: () => !!(newsieHold && newsieHold.sheet),
+  newsieSheet: () => {
+    if (!newsieHold || !newsieHold.sheet) return null;
+    newsieHold.sheet.updateWorldMatrix(true, false);
+    const v = newsieHold.sheet.getWorldPosition(new THREE.Vector3());
+    return { x: v.x, y: v.y, z: v.z };
+  },
+  projectSheet: () => {
+    if (!newsieHold || !newsieHold.sheet || !camera) return null;
+    newsieHold.sheet.updateWorldMatrix(true, false);
+    const v = newsieHold.sheet.getWorldPosition(new THREE.Vector3());
+    v.project(camera);
+    return { x: v.x, y: v.y, z: v.z };
+  },
+  showPaper: showPaper,
+  hidePaper: hidePaper
 };
 
 main();

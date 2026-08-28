@@ -217,9 +217,15 @@ header.top p.tag {
 
 #paper .spread {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
+  grid-template-columns: 1fr 1fr;
   gap: 22px;
   align-items: start;
+}
+
+#paper .spread figure + figure,
+#paper .spread figure + .cols {
+  padding-left: 18px;
+  border-left: 1px solid rgba(26, 23, 18, 0.16);
 }
 
 #paper figure img {
