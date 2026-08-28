@@ -222,14 +222,7 @@ function shade(mesh, cast, receive) {
 }
 
 function heightAt(x, z) {
-  const r = Math.hypot(x, z);
-  const flatten = Math.min(1, Math.max(0, (r - 7) / 22));
-  const hills = Math.sin(x * 0.042 + 0.4) * Math.cos(z * 0.036) * 2.35
-    + Math.sin(x * 0.11 + z * 0.08) * 0.7;
-  const west = x < -16
-    ? ((-16 - x) / 46) * 3.6 * Math.max(0, 1 - Math.abs(z) / 56)
-    : 0;
-  return hills * flatten + west;
+  return Nav.heightAt(x, z);
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -390,7 +383,7 @@ function clampPos() {
   pos.x = Nav.clamp(pos.x, -BOUNDS, BOUNDS);
   pos.z = Nav.clamp(pos.z, -BOUNDS, BOUNDS);
   pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
-  pos.y = Nav.rideGround(pos.y, heightAt(pos.x, pos.z), EYE);
+  pos.y = Nav.clearGround(pos.y, heightAt(pos.x, pos.z));
 }
 
 function goHome() {
@@ -444,15 +437,17 @@ function bindInput() {
     if (hud(e.target)) return;
     e.preventDefault();
     wakeHand(el);
-    const dolly = Nav.lookDolly(yaw, pitch, e.deltaY, e.deltaMode);
-    pos.x += dolly.x;
-    pos.y += dolly.y;
-    pos.z += dolly.z;
+    const next = Nav.applyLookDolly(pos, yaw, pitch, e.deltaY, e.deltaMode);
+    pos.x = next.x;
+    pos.y = next.y;
+    pos.z = next.z;
     if (Math.abs(e.deltaX) > 0.5) {
       const side = Nav.wheelUnit(e.deltaX, e.deltaMode) * Nav.DOLLY;
       const right = Nav.rightVector(yaw);
-      pos.x += right.x * side;
-      pos.z += right.z * side;
+      const slid = Nav.stepOverTerrain(pos, { x: right.x * side, y: 0, z: right.z * side });
+      pos.x = slid.x;
+      pos.y = slid.y;
+      pos.z = slid.z;
     }
     clampPos();
   }
@@ -522,9 +517,10 @@ function travel(dt) {
   if (held.turnRight) yaw += TURN * dt;
   const speed = held.fast ? MOVE_FAST : MOVE;
   const offset = Nav.moveOffset(yaw, pitch, held, dt, speed);
-  pos.x += offset.x;
-  pos.y += offset.y;
-  pos.z += offset.z;
+  const next = Nav.stepOverTerrain(pos, offset);
+  pos.x = next.x;
+  pos.y = next.y;
+  pos.z = next.z;
   clampPos();
 }
 

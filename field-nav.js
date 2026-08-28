@@ -6,6 +6,7 @@
   const PITCH_LIMIT = 1.35;
   const LOOK_SENS = 0.0024;
   const DOLLY = 1.6;
+  const GROUND_CLEARANCE = 0.55;
 
   function clamp(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v));
@@ -63,9 +64,45 @@
     return { x: look.x * step, y: look.y * step, z: look.z * step, step: step };
   }
 
-  function rideGround(y, groundY, eye) {
-    const floor = (groundY || 0) + (eye == null ? 1.7 : eye);
+  function heightAt(x, z) {
+    const r = Math.hypot(x, z);
+    const flatten = Math.min(1, Math.max(0, (r - 7) / 22));
+    const hills = Math.sin(x * 0.042 + 0.4) * Math.cos(z * 0.036) * 2.35
+      + Math.sin(x * 0.11 + z * 0.08) * 0.7;
+    const west = x < -16
+      ? ((-16 - x) / 46) * 3.6 * Math.max(0, 1 - Math.abs(z) / 56)
+      : 0;
+    return hills * flatten + west;
+  }
+
+  function clearGround(y, groundY, clearance) {
+    const g = groundY == null ? 0 : groundY;
+    const pad = clearance == null ? GROUND_CLEARANCE : clearance;
+    const floor = g + pad;
     return y < floor ? floor : y;
+  }
+
+  function stepOverTerrain(pos, delta, clearance) {
+    const pad = clearance == null ? GROUND_CLEARANCE : clearance;
+    const samples = 8;
+    let x = pos.x;
+    let y = pos.y;
+    let z = pos.z;
+    const dx = delta.x / samples;
+    const dy = delta.y / samples;
+    const dz = delta.z / samples;
+    for (let i = 0; i < samples; i++) {
+      x += dx;
+      y += dy;
+      z += dz;
+      const floor = heightAt(x, z) + pad;
+      if (y < floor) y = floor;
+    }
+    return { x: x, y: y, z: z };
+  }
+
+  function applyLookDolly(pos, yaw, pitch, deltaY, deltaMode, scale) {
+    return stepOverTerrain(pos, lookDolly(yaw, pitch, deltaY, deltaMode, scale));
   }
 
   function flatForward(yaw, out) {
@@ -167,6 +204,7 @@
     PITCH_LIMIT: PITCH_LIMIT,
     LOOK_SENS: LOOK_SENS,
     DOLLY: DOLLY,
+    GROUND_CLEARANCE: GROUND_CLEARANCE,
     clamp: clamp,
     lookVector: lookVector,
     rightVector: rightVector,
@@ -175,7 +213,10 @@
     wheelUnit: wheelUnit,
     dollyStep: dollyStep,
     lookDolly: lookDolly,
-    rideGround: rideGround,
+    heightAt: heightAt,
+    clearGround: clearGround,
+    stepOverTerrain: stepOverTerrain,
+    applyLookDolly: applyLookDolly,
     emptyHeld: emptyHeld,
     keyFlags: keyFlags,
     setHeld: setHeld,

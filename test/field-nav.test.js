@@ -65,7 +65,38 @@ const level = nav.lookDolly(0, 0, -80, 0);
 assert.ok(Math.abs(level.y) < 1e-9, "level look wheel has no Y");
 assert.ok(level.z < 0, "level wheel-up still travels -Z");
 
-assert.ok(nav.rideGround(1.7, 2.3, 1.7) === 4.0, "hill lifts the eye over dirt");
-assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "sky stay is not pulled down to the hill");
+assert.ok(
+  Math.abs(nav.clearGround(1.7, 2.3) - (2.3 + nav.GROUND_CLEARANCE)) < 1e-9,
+  "hill lifts the camera over dirt"
+);
+assert.ok(nav.clearGround(20, 2.3) === 20, "sky stay is not pulled down to the hill");
+assert.ok(
+  nav.clearGround(1.7, 0) === 1.7,
+  "plaza grass does not pin a standing eye (no EYE floor)"
+);
+
+const fromSpawn = { x: 0, y: 1.7, z: 0 };
+const skyRide = nav.applyLookDolly(fromSpawn, 0, 0.9, -80, 0);
+assert.ok(skyRide.y > fromSpawn.y + 0.8, "look-up scroll still climbs after terrain resolve");
+assert.ok(skyRide.y >= nav.heightAt(skyRide.x, skyRide.z) + nav.GROUND_CLEARANCE - 1e-9, "sky step stays out of dirt");
+
+const research = { x: 34, y: 2.2, z: 2 };
+const yawResearch = Math.atan2(research.x, -research.z);
+let toward = { x: 0, y: 1.7, z: 0 };
+let maxHill = nav.heightAt(0, 0);
+let yOnCrest = 1.7;
+for (let i = 0; i < 28; i++) {
+  toward = nav.applyLookDolly(toward, yawResearch, -0.12, -80, 0);
+  const ground = nav.heightAt(toward.x, toward.z);
+  const floor = ground + nav.GROUND_CLEARANCE;
+  if (ground > maxHill) {
+    maxHill = ground;
+    yOnCrest = toward.y;
+  }
+  assert.ok(toward.y + 1e-9 >= floor, "Research heading does not clip dirt at x=" + toward.x.toFixed(2));
+}
+assert.ok(toward.x > 20, "Research heading actually travels east");
+assert.ok(maxHill > 1.7, "the Research path crosses a hill taller than spawn eye");
+assert.ok(yOnCrest >= maxHill, "camera rides over the Research hill instead of through it");
 
 console.log("field-nav: all assertions passed");
