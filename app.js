@@ -17,6 +17,18 @@ const STARIS_HREF = "https://staris-b01f2.firebaseapp.com";
 const ART_HREF = "https://graphicoregon.com/sample-page/";
 const RESEARCH_HREF = "https://graphicoregon.com/astronomical-mapping-an-iau-proposal/";
 const HOME_HREF = "https://graphicoregon.com/";
+const PIONEER_HREF = "https://www.tillamookcountypioneer.net/author/assistant-editor/";
+const Art = window.ArtInventory;
+
+const MUSEUM = {
+  x: 0,
+  y: -56,
+  z: 0,
+  len: 42,
+  wid: 15.2,
+  h: 8.6
+};
+const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
 const WALKS = [
   { id: "art", title: "Art", pos: [-36, 2.4, -2], href: ART_HREF, body: "Oil, acrylic, charcoal, and prints." },
@@ -41,8 +53,12 @@ const pos = { x: 0, y: EYE, z: 0 };
 const look = { x: 0, y: 0, z: -1 };
 const clickables = [];
 const billboards = [];
+const hungArt = [];
+const portalVeils = [];
 const clock = new THREE.Clock();
 const loader = new THREE.TextureLoader();
+let portalSide = "forest";
+let portalCool = 0;
 
 function clampByte(v) {
   return v < 0 ? 0 : v > 255 ? 255 : v;
@@ -200,6 +216,41 @@ const NEEDLE = new THREE.MeshStandardMaterial({
   roughness: 0.86,
   metalness: 0.04
 });
+const PLASTER = new THREE.MeshStandardMaterial({
+  color: 0xc4b396,
+  roughness: 0.92,
+  metalness: 0.02
+});
+const PLASTER_IN = new THREE.MeshStandardMaterial({
+  color: 0xd8cbb0,
+  roughness: 0.88,
+  metalness: 0.02
+});
+const DECO = new THREE.MeshStandardMaterial({
+  color: gold,
+  roughness: 0.42,
+  metalness: 0.28
+});
+const TEAL_PANEL = new THREE.MeshStandardMaterial({
+  color: 0x1e6e6a,
+  roughness: 0.55,
+  metalness: 0.12
+});
+const SKIN = new THREE.MeshStandardMaterial({
+  color: 0xc4a07a,
+  roughness: 0.86,
+  metalness: 0.02
+});
+const CAP = new THREE.MeshStandardMaterial({
+  color: 0x3a2a18,
+  roughness: 0.8,
+  metalness: 0.04
+});
+const PAPER = new THREE.MeshStandardMaterial({
+  color: 0xeee6d4,
+  roughness: 0.62,
+  metalness: 0.02
+});
 
 function loadTexture(url) {
   return new Promise((resolve) => {
@@ -292,6 +343,18 @@ function addClick(mesh, data) {
   clickables.push(mesh);
 }
 
+function addClickTree(obj, data) {
+  obj.traverse((child) => {
+    if (child.isMesh) addClick(child, data);
+  });
+}
+
+function afterFirstPaint(fn) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(fn);
+  });
+}
+
 function framedPiece(tex, height) {
   const img = tex.image;
   const aspect = img && img.width && img.height ? img.width / img.height : 1;
@@ -338,6 +401,289 @@ function easelAt(x, z, hung, data, label, labelScale) {
   return stand;
 }
 
+function quietCaption(text) {
+  const w = 512;
+  const h = 80;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "rgba(22, 18, 12, 0.42)";
+  ctx.fillRect(0, 18, w, 44);
+  ctx.fillStyle = "#d8c9a4";
+  ctx.font = "400 28px Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, w / 2, h / 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.7, 0.26),
+    new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
+  );
+  return billboard(mesh, text, "caption");
+}
+
+function forestDoorX() {
+  return PORTAL_FOREST.x + 1.02;
+}
+
+function museumDoorX() {
+  return MUSEUM.x + MUSEUM.len / 2 - 0.18;
+}
+
+function stepPortal() {
+  if (portalCool > 0) return;
+  const doorW = 0.95;
+  if (portalSide === "forest") {
+    const along = Math.abs(pos.z - PORTAL_FOREST.z);
+    const y0 = heightAt(PORTAL_FOREST.x, PORTAL_FOREST.z);
+    const nearY = pos.y > y0 - 0.4 && pos.y < y0 + 4.2;
+    if (along < doorW && nearY && pos.x < forestDoorX() && pos.x > PORTAL_FOREST.x - 0.4) {
+      pos.x = museumDoorX() - 1.7;
+      pos.y = MUSEUM.y + EYE;
+      pos.z = MUSEUM.z;
+      portalSide = "museum";
+      portalCool = 0.85;
+    }
+    return;
+  }
+  const along = Math.abs(pos.z - MUSEUM.z);
+  const nearY = pos.y > MUSEUM.y + 0.4 && pos.y < MUSEUM.y + 5.2;
+  if (along < 1.15 && nearY && pos.x > museumDoorX() && pos.x < museumDoorX() + 1.8) {
+    const fx = forestDoorX() + 1.55;
+    const fz = PORTAL_FOREST.z;
+    pos.x = fx;
+    pos.y = heightAt(fx, fz) + EYE;
+    pos.z = fz;
+    portalSide = "forest";
+    portalCool = 0.85;
+  }
+}
+
+function buildPortal() {
+  const x = PORTAL_FOREST.x;
+  const z = PORTAL_FOREST.z;
+  const y = heightAt(x, z);
+  const g = new THREE.Group();
+  const postL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.5, 0.28), TEAL_PANEL), true, true);
+  postL.position.set(-0.92, 1.75, 0.92);
+  const postR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.5, 0.28), TEAL_PANEL), true, true);
+  postR.position.set(-0.92, 1.75, -0.92);
+  const postLB = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.5, 0.28), TEAL_PANEL), true, true);
+  postLB.position.set(0.92, 1.75, 0.92);
+  const postRB = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.5, 0.28), TEAL_PANEL), true, true);
+  postRB.position.set(0.92, 1.75, -0.92);
+  const sideN = shade(new THREE.Mesh(new THREE.BoxGeometry(2.0, 3.5, 0.12), TEAL_PANEL), true, true);
+  sideN.position.set(0, 1.75, 1.04);
+  const sideS = shade(new THREE.Mesh(new THREE.BoxGeometry(2.0, 3.5, 0.12), TEAL_PANEL), true, true);
+  sideS.position.set(0, 1.75, -1.04);
+  const back = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.5, 2.08), TEAL_PANEL), true, true);
+  back.position.set(-1.04, 1.75, 0);
+  const roof = shade(new THREE.Mesh(new THREE.BoxGeometry(2.28, 0.18, 2.28), DECO), true, true);
+  roof.position.set(0, 3.62, 0);
+  const cap = shade(new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.22, 1.55), DECO), true, true);
+  cap.position.set(0, 3.82, 0);
+  const step = shade(new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.16, 2.05), DECO), true, true);
+  step.position.set(1.15, 0.08, 0);
+  const jambN = shade(new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.05, 0.2), DECO), true, true);
+  jambN.position.set(1.02, 1.58, 0.86);
+  const jambS = shade(new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.05, 0.2), DECO), true, true);
+  jambS.position.set(1.02, 1.58, -0.86);
+  const lintel = shade(new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 1.92), DECO), true, true);
+  lintel.position.set(1.02, 3.18, 0);
+  const inner = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 1.55), DECO), true, true);
+  inner.position.set(1.02, 3.0, 0);
+  const veil = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.55, 2.85),
+    new THREE.MeshBasicMaterial({
+      color: 0x3ec8c0,
+      transparent: true,
+      opacity: 0.38,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    })
+  );
+  veil.position.set(1.02, 1.58, 0);
+  veil.rotation.y = Math.PI / 2;
+  portalVeils.push(veil);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 8, 28), DECO);
+  ring.position.set(1.02, 1.62, 0);
+  ring.rotation.y = Math.PI / 2;
+  g.add(postL, postR, postLB, postRB, sideN, sideS, back, roof, cap, step, jambN, jambS, lintel, inner, veil, ring);
+  g.position.set(x, y, z);
+  scene.add(g);
+}
+
+function buildMuseum() {
+  const ox = MUSEUM.x;
+  const oy = MUSEUM.y;
+  const oz = MUSEUM.z;
+  const L = MUSEUM.len;
+  const W = MUSEUM.wid;
+  const H = MUSEUM.h;
+  const g = new THREE.Group();
+  const floor = shade(new THREE.Mesh(new THREE.BoxGeometry(L + 0.4, 0.2, W + 0.4), TIMBER), false, true);
+  floor.position.set(ox, oy - 0.1, oz);
+  const ceil = shade(new THREE.Mesh(new THREE.BoxGeometry(L + 0.4, 0.16, W + 0.4), PLASTER), false, true);
+  ceil.position.set(ox, oy + H, oz);
+  const north = shade(new THREE.Mesh(new THREE.BoxGeometry(L + 0.4, H, 0.28), PLASTER_IN), false, true);
+  north.position.set(ox, oy + H / 2, oz + W / 2);
+  const south = shade(new THREE.Mesh(new THREE.BoxGeometry(L + 0.4, H, 0.28), PLASTER_IN), false, true);
+  south.position.set(ox, oy + H / 2, oz - W / 2);
+  const west = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, H, W), PLASTER_IN), false, true);
+  west.position.set(ox - L / 2, oy + H / 2, oz);
+  const doorW = 2.2;
+  const doorH = 3.25;
+  const eastY = oy + H / 2;
+  const sideW = (W - doorW) / 2;
+  const eastN = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, H, sideW), PLASTER_IN), false, true);
+  eastN.position.set(ox + L / 2, eastY, oz + (doorW + sideW) / 2);
+  const eastS = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, H, sideW), PLASTER_IN), false, true);
+  eastS.position.set(ox + L / 2, eastY, oz - (doorW + sideW) / 2);
+  const lintelH = H - doorH;
+  const eastLintel = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, lintelH, doorW), PLASTER_IN), false, true);
+  eastLintel.position.set(ox + L / 2, oy + doorH + lintelH / 2, oz);
+  const corniceN = shade(new THREE.Mesh(new THREE.BoxGeometry(L, 0.1, 0.18), DECO), false, true);
+  corniceN.position.set(ox, oy + H - 0.28, oz + W / 2 - 0.2);
+  const corniceS = shade(new THREE.Mesh(new THREE.BoxGeometry(L, 0.1, 0.18), DECO), false, true);
+  corniceS.position.set(ox, oy + H - 0.28, oz - W / 2 + 0.2);
+  const jambN = shade(new THREE.Mesh(new THREE.BoxGeometry(0.22, doorH, 0.22), DECO), true, true);
+  jambN.position.set(ox + L / 2, oy + doorH / 2, oz + doorW / 2);
+  const jambS = shade(new THREE.Mesh(new THREE.BoxGeometry(0.22, doorH, 0.22), DECO), true, true);
+  jambS.position.set(ox + L / 2, oy + doorH / 2, oz - doorW / 2);
+  const doorLint = shade(new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, doorW + 0.2), DECO), true, true);
+  doorLint.position.set(ox + L / 2, oy + doorH + 0.02, oz);
+  const veil = new THREE.Mesh(
+    new THREE.PlaneGeometry(doorW - 0.15, doorH - 0.12),
+    new THREE.MeshBasicMaterial({
+      color: 0x3ec8c0,
+      transparent: true,
+      opacity: 0.32,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    })
+  );
+  veil.position.set(ox + L / 2 - 0.02, oy + doorH / 2, oz);
+  veil.rotation.y = Math.PI / 2;
+  portalVeils.push(veil);
+  const benchA = shade(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.42, 0.7), TIMBER), true, true);
+  benchA.position.set(ox - 6, oy + 0.21, oz);
+  const benchB = shade(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.42, 0.7), TIMBER), true, true);
+  benchB.position.set(ox + 6, oy + 0.21, oz);
+  const runner = shade(new THREE.Mesh(new THREE.BoxGeometry(L - 6, 0.03, 2.4), TEAL_PANEL), false, true);
+  runner.position.set(ox, oy + 0.02, oz);
+  g.add(floor, ceil, north, south, west, eastN, eastS, eastLintel, corniceN, corniceS, jambN, jambS, doorLint, veil, benchA, benchB, runner);
+  scene.add(g);
+
+  const hallSun = new THREE.DirectionalLight(0xffe4c0, 0.9);
+  hallSun.position.set(ox + 10, oy + 22, oz + 8);
+  hallSun.target.position.set(ox, oy + 2, oz);
+  scene.add(hallSun);
+  scene.add(hallSun.target);
+}
+
+function museumSlots(count) {
+  const slots = [];
+  const perRow = Math.ceil(count / 4);
+  const usable = MUSEUM.len - 4.4;
+  const cell = usable / perRow;
+  const x0 = MUSEUM.x - MUSEUM.len / 2 + 2.2;
+  const rows = [MUSEUM.y + 2.12, MUSEUM.y + 5.32];
+  const walls = [
+    { z: MUSEUM.z + MUSEUM.wid / 2 - 0.2, rotY: Math.PI },
+    { z: MUSEUM.z - MUSEUM.wid / 2 + 0.2, rotY: 0 }
+  ];
+  let i = 0;
+  walls.forEach((wall) => {
+    rows.forEach((y) => {
+      for (let k = 0; k < perRow && i < count; k += 1, i += 1) {
+        slots.push({
+          x: x0 + k * cell + cell / 2,
+          y: y,
+          z: wall.z,
+          rotY: wall.rotY
+        });
+      }
+    });
+  });
+  return slots;
+}
+
+function hangMuseumPiece(file, tex, slot) {
+  const title = Art.titleFromFile(file);
+  const hung = framedPiece(tex, 1.85);
+  hung.group.position.set(slot.x, slot.y, slot.z);
+  hung.group.rotation.y = slot.rotY;
+  billboard(hung.group, title, "print");
+  addClick(hung.pic, {
+    title: title,
+    body: "",
+    href: ART_HREF,
+    linkLabel: "Open the studio page",
+    meta: "Graphic Oregon"
+  });
+  scene.add(hung.group);
+  const cap = quietCaption(title);
+  cap.position.set(slot.x, slot.y - hung.height * 0.5 - 0.22, slot.z);
+  scene.add(cap);
+  hungArt.push(file);
+}
+
+async function streamMuseumArt() {
+  const files = Art.HANG.filter((f) => Art.shouldHang(f) && !Art.isPrivate(f));
+  const slots = museumSlots(files.length);
+  for (let i = 0; i < files.length; i += 1) {
+    const tex = await loadTexture("assets/art/" + files[i]);
+    if (tex && slots[i]) hangMuseumPiece(files[i], tex, slots[i]);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+}
+
+function buildNewsie() {
+  const x = PORTAL_FOREST.x + 2.55;
+  const z = PORTAL_FOREST.z + 1.85;
+  const y = heightAt(x, z);
+  const g = new THREE.Group();
+  const head = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), SKIN), true, true);
+  head.position.y = 1.42;
+  const brim = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.04, 0.38), CAP), true, true);
+  brim.position.y = 1.56;
+  const crown = shade(new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.12, 0.26), CAP), true, true);
+  crown.position.y = 1.64;
+  const body = shade(new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.46, 0.22), TEAL_PANEL), true, true);
+  body.position.y = 1.02;
+  const armL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.36, 0.1), SKIN), true, true);
+  armL.position.set(-0.26, 1.04, 0);
+  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.36, 0.1), SKIN), true, true);
+  armR.position.set(0.26, 1.08, 0.08);
+  armR.rotation.z = -0.45;
+  const legL = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
+  legL.position.set(-0.1, 0.4, 0);
+  const legR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
+  legR.position.set(0.1, 0.4, 0);
+  const sheet = shade(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.38, 0.03), PAPER), true, true);
+  sheet.position.set(0.34, 1.12, 0.16);
+  sheet.rotation.z = -0.25;
+  g.add(head, brim, crown, body, armL, armR, legL, legR, sheet);
+  g.position.set(x, y, z);
+  faceCenter(g);
+  const data = {
+    paper: true,
+    title: "A paper",
+    body: "The newsie holds the coast papers.",
+    meta: "Writing"
+  };
+  addClickTree(g, data);
+  scene.add(g);
+}
+
 function fir(x, z, h) {
   const y = heightAt(x, z);
   const g = new THREE.Group();
@@ -380,6 +726,17 @@ function hidePanel() {
   document.getElementById("panel").hidden = true;
 }
 
+function hidePaper() {
+  const el = document.getElementById("paper");
+  if (el) el.hidden = true;
+}
+
+function showPaper() {
+  hidePanel();
+  const el = document.getElementById("paper");
+  if (el) el.hidden = false;
+}
+
 function applyCamera() {
   Nav.lookVector(yaw, pitch, look);
   camera.position.set(pos.x, pos.y, pos.z);
@@ -399,7 +756,9 @@ function goHome() {
   pos.z = 0;
   yaw = -0.38;
   pitch = -0.08;
+  portalSide = "forest";
   hidePanel();
+  hidePaper();
 }
 
 function pickAt(e) {
@@ -416,6 +775,10 @@ function onClick(e) {
   const obj = pickAt(e);
   if (!obj) {
     hidePanel();
+    return;
+  }
+  if (obj.userData.paper) {
+    showPaper();
     return;
   }
   showPanel(obj.userData);
@@ -455,6 +818,7 @@ function bindInput() {
       pos.z += right.z * side;
     }
     clampPos();
+    stepPortal();
   }
   window.addEventListener("wheel", onWheel, { passive: false });
 
@@ -499,6 +863,7 @@ function bindInput() {
     if (flags.escape) {
       if (lookLocked) document.exitPointerLock();
       hidePanel();
+      hidePaper();
     }
     if (flags.lock) {
       if (lookLocked) document.exitPointerLock();
@@ -515,6 +880,14 @@ function bindInput() {
       held[k] = false;
     });
   });
+  const fold = document.getElementById("paper-close");
+  if (fold) fold.addEventListener("click", hidePaper);
+  const paper = document.getElementById("paper");
+  if (paper) {
+    paper.addEventListener("click", (e) => {
+      if (e.target === paper) hidePaper();
+    });
+  }
 }
 
 function travel(dt) {
@@ -526,6 +899,8 @@ function travel(dt) {
   pos.y += offset.y;
   pos.z += offset.z;
   clampPos();
+  if (portalCool > 0) portalCool = Math.max(0, portalCool - dt);
+  stepPortal();
 }
 
 function buildLand() {
@@ -677,9 +1052,8 @@ async function populateStarIS() {
 }
 
 async function populatePieces() {
-  const [guideTex, artTex, copperTex, mapTex, newsTex, webTex] = await Promise.all([
+  const [guideTex, copperTex, mapTex, newsTex, webTex] = await Promise.all([
     loadTexture("assets/print/giving-guide-cover.jpg"),
-    loadTexture("assets/art/neahkahnie.jpg"),
     loadTexture("assets/shop/copper-horizon-overlay-1000x1500.jpg"),
     loadTexture("assets/maps/01-context.jpg"),
     loadTexture("assets/news/gazette-puffin.jpg"),
@@ -693,15 +1067,6 @@ async function populatePieces() {
       href: HOME_HREF,
       linkLabel: "Open graphicoregon.com"
     }, "Giving Guide", 4.2);
-  }
-
-  if (artTex) {
-    easelAt(-17.4, -3.2, framedPiece(artTex, 3.4), {
-      title: "Neahkahnie",
-      body: "Coast work from the studio.",
-      href: ART_HREF,
-      linkLabel: "Open the studio page"
-    }, "Neahkahnie", 4.0);
   }
 
   if (copperTex) {
@@ -800,6 +1165,10 @@ function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
   travel(dt);
   applyCamera();
+  const pulse = 0.3 + Math.sin(clock.elapsedTime * 1.55) * 0.1;
+  portalVeils.forEach((veil) => {
+    if (veil.material) veil.material.opacity = pulse;
+  });
   billboards.forEach((obj) => {
     obj.lookAt(camera.position);
   });
@@ -839,6 +1208,9 @@ function main() {
   scene.add(fill);
 
   buildLand();
+  buildPortal();
+  buildMuseum();
+  buildNewsie();
   addWalkSigns();
   bindInput();
   applyCamera();
@@ -850,7 +1222,10 @@ function main() {
     renderer.setSize(innerWidth, innerHeight);
   });
   tick();
-  populatePieces().catch((err) => console.warn(err));
+  afterFirstPaint(() => {
+    populatePieces().catch((err) => console.warn(err));
+    streamMuseumArt().catch((err) => console.warn(err));
+  });
 }
 
 window.__field = {
@@ -875,7 +1250,14 @@ window.__field = {
     x: o.position.x,
     y: o.position.y,
     z: o.position.z
-  }))
+  })),
+  hungArt: () => hungArt.slice(),
+  hungCount: () => hungArt.length,
+  portalSide: () => portalSide,
+  paperOpen: () => {
+    const el = document.getElementById("paper");
+    return !!(el && !el.hidden);
+  }
 };
 
 main();
