@@ -402,7 +402,7 @@ function easelAt(x, z, hung, data, label, labelScale) {
 }
 
 function quietCaption(text) {
-  const w = 512;
+  const w = 640;
   const h = 80;
   const c = document.createElement("canvas");
   c.width = w;
@@ -412,14 +412,14 @@ function quietCaption(text) {
   ctx.fillStyle = "rgba(22, 18, 12, 0.42)";
   ctx.fillRect(0, 18, w, 44);
   ctx.fillStyle = "#d8c9a4";
-  ctx.font = "400 28px Georgia, serif";
+  ctx.font = text.length > 20 ? "400 22px Georgia, serif" : "400 26px Georgia, serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(text, w / 2, h / 2);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.7, 0.26),
+    new THREE.PlaneGeometry(2.15, 0.26),
     new THREE.MeshBasicMaterial({
       map: tex,
       transparent: true,
@@ -743,11 +743,15 @@ function applyCamera() {
   camera.lookAt(pos.x + look.x, pos.y + look.y, pos.z + look.z);
 }
 
+function groundY() {
+  return portalSide === "museum" ? MUSEUM.y : heightAt(pos.x, pos.z);
+}
+
 function clampPos() {
   pos.x = Nav.clamp(pos.x, -BOUNDS, BOUNDS);
   pos.z = Nav.clamp(pos.z, -BOUNDS, BOUNDS);
   pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
-  pos.y = Nav.rideGround(pos.y, heightAt(pos.x, pos.z), EYE);
+  pos.y = Nav.rideGround(pos.y, groundY(), EYE);
 }
 
 function goHome() {
@@ -799,7 +803,7 @@ function wakeHand(el) {
 
 function bindInput() {
   const el = renderer.domElement;
-  const hud = (t) => t && t.closest && t.closest("#hud a, #hud button, #panel");
+  const hud = (t) => t && t.closest && t.closest("#hud a, #hud button, #panel, #paper");
   el.tabIndex = 0;
   wakeHand(el);
 
@@ -1237,6 +1241,7 @@ window.__field = {
     if (p.yaw != null) yaw = p.yaw;
     if (p.pitch != null) pitch = p.pitch;
     clampPos();
+    stepPortal();
   },
   lookVector: () => Nav.lookVector(yaw, pitch),
   goHome: goHome,
