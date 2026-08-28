@@ -75,4 +75,17 @@ assert.ok(nav.wheelCap(-1.6, 4.8) === -1.6, "a cherry notch is unchanged");
 const arrows = nav.keyFlags("ArrowUp", "ArrowUp");
 assert.ok(arrows.lookUp && !arrows.forward, "arrow-up looks up, it does not walk");
 
+const mid = nav.lerpPose(
+  { x: 0, y: 0, z: 0, yaw: 0, pitch: 0 },
+  { x: 10, y: 0, z: 0, yaw: 0, pitch: 0 },
+  0.5
+);
+assert.ok(mid.x > 0 && mid.x < 10, "fly ease stays between the poses");
+const lookStill = nav.applyLook(0, 0, 12, 0);
+assert.ok(lookStill.yaw > 0, "hand-right still increases yaw after fly math");
+assert.ok(nav.dollyStep(-80, 0) > 0, "wheel-up still dollies forward after fly math");
+const eye = nav.eyeToward({ x: 0, z: -8 }, { x: 0, z: 0 }, 3);
+assert.ok(Math.abs(eye.yaw) < 1e-9, "approach a south mark looks −Z");
+assert.ok(eye.z > -8 && eye.z < 0, "eye stands short of the mark");
+
 console.log("field-nav: all assertions passed");

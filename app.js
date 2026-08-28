@@ -3,6 +3,7 @@
 const teal = 0x2aa8a0;
 const gold = 0xd4b05a;
 const Nav = window.FieldNav;
+const Roster = window.Roster;
 const PIXEL_RATIO = 1.25;
 const DUSK = 0x3d2a1c;
 const HAZE = 0x7a5230;
@@ -258,6 +259,8 @@ const PAPER = new THREE.MeshStandardMaterial({
   metalness: 0.02
 });
 let newsieHold = null;
+const hand = Roster.createHand();
+let fly = null;
 
 function capTexture(tex, max) {
   const img = tex && tex.image;
@@ -471,15 +474,17 @@ function showMuseum(on) {
   if (hallSun) hallSun.visible = vis;
 }
 
-function enterMuseum() {
-  pos.x = museumDoorX() - 2.4;
-  pos.y = MUSEUM.y + EYE;
-  pos.z = MUSEUM.z;
-  prevPos.x = pos.x;
-  prevPos.y = pos.y;
-  prevPos.z = pos.z;
-  yaw = -Math.PI / 2;
-  pitch = 0;
+function museumEye() {
+  return {
+    x: museumDoorX() - 2.4,
+    y: MUSEUM.y + EYE,
+    z: MUSEUM.z,
+    yaw: -Math.PI / 2,
+    pitch: 0
+  };
+}
+
+function openMuseumVolume() {
   portalSide = "museum";
   portalCool = 0.85;
   showMuseum(true);
@@ -487,6 +492,14 @@ function enterMuseum() {
     museumArtStarted = true;
     streamMuseumArt().catch((err) => console.warn(err));
   }
+}
+
+function enterMuseum() {
+  openMuseumVolume();
+  applyPose(museumEye());
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
 }
 
 function exitMuseum() {
@@ -846,21 +859,68 @@ function showPanel(data) {
   document.getElementById("panel-meta").textContent = data.meta || "Graphic Oregon";
   document.getElementById("panel-title").textContent = data.title || "";
   document.getElementById("panel-body").textContent = data.body || "";
+  const fig = document.getElementById("panel-figure");
+  const img = document.getElementById("panel-img");
+  if (fig && img) {
+    if (data.figure && data.figure.src) {
+      img.src = data.figure.src;
+      img.alt = data.figure.alt || "";
+      fig.hidden = false;
+    } else {
+      img.removeAttribute("src");
+      img.alt = "";
+      fig.hidden = true;
+    }
+  }
+  const subs = document.getElementById("panel-subs");
+  if (subs) {
+    subs.innerHTML = "";
+    const names = data.subclasses || [];
+    if (names.length) {
+      names.forEach((name) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = Roster.SUB_LABEL[name] || name;
+        b.setAttribute("aria-pressed", name === data.subclass ? "true" : "false");
+        b.addEventListener("click", () => {
+          const id = hand.selected();
+          if (!id) return;
+          hand.setSubclass(id, name);
+          showClassSheet(id);
+        });
+        subs.appendChild(b);
+      });
+      subs.hidden = false;
+    } else {
+      subs.hidden = true;
+    }
+  }
   const links = document.getElementById("panel-links");
   links.innerHTML = "";
-  if (data.href) {
+  const list = data.links && data.links.length
+    ? data.links
+    : (data.href ? [{ href: data.href, label: data.linkLabel || "Open" }] : []);
+  list.forEach((item) => {
     const a = document.createElement("a");
-    a.href = data.href;
+    a.href = item.href;
     a.target = "_blank";
     a.rel = "noopener";
-    a.textContent = data.linkLabel || "Open";
+    a.textContent = item.label || "Open";
     links.appendChild(a);
-  }
+  });
   panel.hidden = false;
 }
 
 function hidePanel() {
-  document.getElementById("panel").hidden = true;
+  const panel = document.getElementById("panel");
+  if (panel) panel.hidden = true;
+  const fig = document.getElementById("panel-figure");
+  if (fig) fig.hidden = true;
+  const subs = document.getElementById("panel-subs");
+  if (subs) {
+    subs.innerHTML = "";
+    subs.hidden = true;
+  }
 }
 
 function hidePaper() {
@@ -911,16 +971,102 @@ function clampPos() {
   pos.y = Nav.rideGround(pos.y, groundY(), EYE);
 }
 
-function goHome() {
-  pos.x = 0;
-  pos.y = EYE;
-  pos.z = 0;
-  yaw = -0.38;
-  pitch = -0.08;
+function currentPose() {
+  return { x: pos.x, y: pos.y, z: pos.z, yaw: yaw, pitch: pitch };
+}
+
+function applyPose(p) {
+  if (!p) return;
+  if (p.x != null) pos.x = p.x;
+  if (p.y != null) pos.y = p.y;
+  if (p.z != null) pos.z = p.z;
+  if (p.yaw != null) yaw = p.yaw;
+  if (p.pitch != null) pitch = p.pitch;
+}
+
+function startFly(to) {
+  fly = {
+    from: currentPose(),
+    to: to,
+    t: 0,
+    dur: Roster.FLY_SEC
+  };
+}
+
+function stepFly(dt) {
+  if (!fly) return false;
+  fly.t += dt;
+  const u = Math.min(1, fly.t / fly.dur);
+  applyPose(Nav.lerpPose(fly.from, fly.to, u));
+  if (u >= 1) fly = null;
+  return true;
+}
+
+function poseForClass(id) {
+  if (id === "artist") return museumEye();
+  const m = Roster.mark(id);
+  if (!m) return Object.assign({}, Roster.ROSTER_POSE);
+  const eye = Nav.eyeToward({ x: m.x, z: m.z }, { x: 0, z: 0 }, id === "journalist" ? 3.6 : 3.4);
+  return {
+    x: eye.x,
+    y: heightAt(eye.x, eye.z) + EYE,
+    z: eye.z,
+    yaw: eye.yaw,
+    pitch: -0.06
+  };
+}
+
+function setRosterChrome(onRoster) {
+  const roster = document.getElementById("roster");
+  const back = document.getElementById("back");
+  if (roster) roster.hidden = !onRoster;
+  if (back) back.hidden = onRoster;
+}
+
+function showClassSheet(id) {
+  const data = hand.sheet(id);
+  if (!data) return;
+  if (data.action === "paper") {
+    hidePanel();
+    showPaper();
+    return;
+  }
+  hidePaper();
+  showPanel(data);
+}
+
+function pickClass(id) {
+  const next = hand.pick(id);
+  if (!next) return null;
+  setRosterChrome(false);
+  if (next.action === "museum") {
+    openMuseumVolume();
+  } else if (portalSide === "museum") {
+    portalSide = "forest";
+    showMuseum(false);
+  }
+  startFly(poseForClass(id));
+  showClassSheet(id);
+  return next;
+}
+
+function returnToRoster() {
+  fly = null;
+  const home = hand.goHome();
   portalSide = "forest";
+  portalCool = 0;
   showMuseum(false);
   hidePanel();
   hidePaper();
+  applyPose(home.pose);
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
+  setRosterChrome(true);
+}
+
+function goHome() {
+  returnToRoster();
 }
 
 function pickAt(e) {
@@ -961,7 +1107,7 @@ function wakeHand(el) {
 
 function bindInput() {
   const el = renderer.domElement;
-  const hud = (t) => t && t.closest && t.closest("#hud a, #hud button, #panel, #paper");
+  const hud = (t) => t && t.closest && t.closest("#hud a, #hud button, #panel, #paper, #roster, #back");
   el.tabIndex = 0;
   wakeHand(el);
 
@@ -1038,8 +1184,11 @@ function bindInput() {
     if (Nav.isMoveKey(e.code, e.key)) e.preventDefault();
     if (flags.escape) {
       if (lookLocked) document.exitPointerLock();
-      hidePanel();
-      hidePaper();
+      if (hand.selected()) returnToRoster();
+      else {
+        hidePanel();
+        hidePaper();
+      }
     }
     if (flags.lock) {
       if (lookLocked) document.exitPointerLock();
@@ -1066,7 +1215,21 @@ function bindInput() {
   }
 }
 
+function bindRoster() {
+  const nav = document.getElementById("roster");
+  if (nav) {
+    nav.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-class]");
+      if (!btn) return;
+      pickClass(btn.getAttribute("data-class"));
+    });
+  }
+  const back = document.getElementById("back");
+  if (back) back.addEventListener("click", returnToRoster);
+}
+
 function travel(dt) {
+  if (fly) return;
   if (held.turnLeft) yaw -= TURN * dt;
   if (held.turnRight) yaw += TURN * dt;
   if (held.lookUp) pitch = Nav.clamp(pitch + TURN * dt, -Nav.PITCH_LIMIT, Nav.PITCH_LIMIT);
@@ -1344,7 +1507,7 @@ async function populatePieces() {
 function tick() {
   requestAnimationFrame(tick);
   const dt = Math.min(clock.getDelta(), 0.05);
-  travel(dt);
+  if (!stepFly(dt)) travel(dt);
   applyCamera();
   const pulse = 0.3 + Math.sin(clock.elapsedTime * 1.55) * 0.1;
   portalVeils.forEach((veil) => {
@@ -1407,6 +1570,11 @@ function main() {
   buildNewsie();
   addWalkSigns();
   bindInput();
+  bindRoster();
+  applyPose(Roster.ROSTER_POSE);
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
   applyCamera();
   document.getElementById("loader").classList.add("hide");
   window.addEventListener("resize", () => {
@@ -1440,7 +1608,11 @@ window.__field = {
   held: () => Object.assign({}, held),
   lookVector: () => Nav.lookVector(yaw, pitch),
   goHome: goHome,
-  spawn: { x: 0, y: EYE, z: 0 },
+  pickClass: pickClass,
+  returnToRoster: returnToRoster,
+  selectedClass: () => hand.selected(),
+  rosterIds: () => Roster.IDS.slice(),
+  spawn: Object.assign({}, Roster.ROSTER_POSE),
   billboardCount: () => billboards.length,
   billboardLabels: () => billboards.map((o) => o.userData.label).filter(Boolean),
   billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label),
