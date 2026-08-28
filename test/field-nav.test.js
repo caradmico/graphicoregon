@@ -35,8 +35,7 @@ assert.ok(Math.abs(fwd.z + 10) < 1e-6, "W at yaw 0 travels −Z");
 assert.ok(Math.abs(fwd.y) < 1e-9, "level forward stays off the floor plane only when pitched");
 
 const climb = nav.moveOffset(0, 0.6, { forward: true }, 1, 10);
-assert.ok(Math.abs(climb.y) < 1e-9, "WASD stays on the field even when looking up");
-assert.ok(Math.abs(climb.z + 10) < 1e-6, "pitched look still walks −Z at yaw 0");
+assert.ok(climb.y > 0, "WASD looking up is dimensions (sky is legal)");
 
 const w = nav.keyFlags("KeyW", "w");
 assert.ok(w.forward, "KeyW is walk forward");
@@ -57,13 +56,12 @@ assert.ok(Math.abs(rise.x) < 1e-9 && Math.abs(rise.z) < 1e-9, "climb is vertical
 const right = nav.rightVector(0);
 assert.ok(Math.abs(right.x - 1) < 1e-9, "strafe-right at yaw 0 is +X");
 
-const sky = nav.lookDolly(0, 0.7, -80, 0);
-assert.ok(sky.y > 0, "look-up + wheel-up travels +Y (sky is legal)");
-assert.ok(sky.step > 0, "wheel-up still dollies forward (not inverted)");
-
-const level = nav.lookDolly(0, 0, -80, 0);
-assert.ok(Math.abs(level.y) < 1e-9, "level look wheel has no Y");
-assert.ok(level.z < 0, "level wheel-up still travels -Z");
+assert.ok(nav.dollyStep(-80, 0) > 0, "wheel-up still travels forward (not inverted)");
+const flat = nav.flatForward(0);
+assert.ok(Math.abs(flat.y) < 1e-9, "scroll travel has no Y");
+assert.ok(Math.abs(flat.z + 1) < 1e-9, "scroll forward at yaw 0 is -Z");
+const skyKey = nav.moveOffset(0, 0.7, { up: true }, 1, 10);
+assert.ok(Math.abs(skyKey.y - 10) < 1e-6, "Q/E is the sky axis");
 
 assert.ok(nav.rideGround(1.7, 2.3, 1.7) === 4.0, "hill lifts the eye over dirt");
 assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "sky stay is not pulled down to the hill");

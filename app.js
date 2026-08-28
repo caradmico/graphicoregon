@@ -444,10 +444,10 @@ function bindInput() {
     if (hud(e.target)) return;
     e.preventDefault();
     wakeHand(el);
-    const dolly = Nav.lookDolly(yaw, pitch, e.deltaY, e.deltaMode);
-    pos.x += dolly.x;
-    pos.y += dolly.y;
-    pos.z += dolly.z;
+    const step = Nav.dollyStep(e.deltaY, e.deltaMode);
+    const flat = Nav.flatForward(yaw);
+    pos.x += flat.x * step;
+    pos.z += flat.z * step;
     if (Math.abs(e.deltaX) > 0.5) {
       const side = Nav.wheelUnit(e.deltaX, e.deltaMode) * Nav.DOLLY;
       const right = Nav.rightVector(yaw);
