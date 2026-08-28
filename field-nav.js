@@ -57,6 +57,17 @@
     return -wheelUnit(deltaY, deltaMode) * (scale == null ? DOLLY : scale);
   }
 
+  function lookDolly(yaw, pitch, deltaY, deltaMode, scale) {
+    const step = dollyStep(deltaY, deltaMode, scale);
+    const look = lookVector(yaw, pitch);
+    return { x: look.x * step, y: look.y * step, z: look.z * step, step: step };
+  }
+
+  function rideGround(y, groundY, eye) {
+    const floor = (groundY || 0) + (eye == null ? 1.7 : eye);
+    return y < floor ? floor : y;
+  }
+
   function flatForward(yaw, out) {
     const x = Math.sin(yaw);
     const y = 0;
@@ -163,6 +174,8 @@
     applyLook: applyLook,
     wheelUnit: wheelUnit,
     dollyStep: dollyStep,
+    lookDolly: lookDolly,
+    rideGround: rideGround,
     emptyHeld: emptyHeld,
     keyFlags: keyFlags,
     setHeld: setHeld,

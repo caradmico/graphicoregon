@@ -57,4 +57,15 @@ assert.ok(Math.abs(rise.x) < 1e-9 && Math.abs(rise.z) < 1e-9, "climb is vertical
 const right = nav.rightVector(0);
 assert.ok(Math.abs(right.x - 1) < 1e-9, "strafe-right at yaw 0 is +X");
 
+const sky = nav.lookDolly(0, 0.7, -80, 0);
+assert.ok(sky.y > 0, "look-up + wheel-up travels +Y (sky is legal)");
+assert.ok(sky.step > 0, "wheel-up still dollies forward (not inverted)");
+
+const level = nav.lookDolly(0, 0, -80, 0);
+assert.ok(Math.abs(level.y) < 1e-9, "level look wheel has no Y");
+assert.ok(level.z < 0, "level wheel-up still travels -Z");
+
+assert.ok(nav.rideGround(1.7, 2.3, 1.7) === 4.0, "hill lifts the eye over dirt");
+assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "sky stay is not pulled down to the hill");
+
 console.log("field-nav: all assertions passed");

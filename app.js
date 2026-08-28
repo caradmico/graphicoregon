@@ -388,8 +388,9 @@ function applyCamera() {
 
 function clampPos() {
   pos.x = Nav.clamp(pos.x, -BOUNDS, BOUNDS);
-  pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
   pos.z = Nav.clamp(pos.z, -BOUNDS, BOUNDS);
+  pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
+  pos.y = Nav.rideGround(pos.y, heightAt(pos.x, pos.z), EYE);
 }
 
 function goHome() {
@@ -443,10 +444,10 @@ function bindInput() {
     if (hud(e.target)) return;
     e.preventDefault();
     wakeHand(el);
-    const step = Nav.dollyStep(e.deltaY, e.deltaMode);
-    const flat = Nav.flatForward(yaw);
-    pos.x += flat.x * step;
-    pos.z += flat.z * step;
+    const dolly = Nav.lookDolly(yaw, pitch, e.deltaY, e.deltaMode);
+    pos.x += dolly.x;
+    pos.y += dolly.y;
+    pos.z += dolly.z;
     if (Math.abs(e.deltaX) > 0.5) {
       const side = Nav.wheelUnit(e.deltaX, e.deltaMode) * Nav.DOLLY;
       const right = Nav.rightVector(yaw);
