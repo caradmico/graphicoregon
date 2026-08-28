@@ -31,6 +31,16 @@ const MUSEUM = {
 };
 const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
+// Fighter lineup in the ROSTER_POSE look. One row, one backdrop. Rooms later.
+const LINEUP = {
+  journalist: { x: -5.0, z: -3.2 },
+  scientist: { x: -3.0, z: -3.2 },
+  radio: { x: -1.0, z: -3.2 },
+  artist: { x: 1.0, z: -3.2 },
+  teacher: { x: 3.0, z: -3.2 },
+  musician: { x: 5.0, z: -3.2 }
+};
+
 const WALKS = [
   { id: "art", title: "Art", pos: [-36, 2.4, -2], href: ART_HREF, body: "Oil, acrylic, charcoal, and prints." },
   { id: "research", title: "Research", pos: [34, 2.2, 2], href: RESEARCH_HREF, body: "Mapping and habitat studies." },
@@ -258,6 +268,31 @@ const PAPER = new THREE.MeshStandardMaterial({
   roughness: 0.62,
   metalness: 0.02
 });
+const COPPER = new THREE.MeshStandardMaterial({
+  color: 0xb8734a,
+  roughness: 0.44,
+  metalness: 0.52
+});
+const HAIR = new THREE.MeshStandardMaterial({
+  color: 0x2a1c14,
+  roughness: 0.8,
+  metalness: 0.02
+});
+const SMOCK = new THREE.MeshStandardMaterial({
+  color: 0xc9b896,
+  roughness: 0.88,
+  metalness: 0.02
+});
+const COAT = new THREE.MeshStandardMaterial({
+  color: 0x2f4a44,
+  roughness: 0.74,
+  metalness: 0.06
+});
+const DUSK_CLOTH = new THREE.MeshStandardMaterial({
+  color: 0x3a2e28,
+  roughness: 0.86,
+  metalness: 0.04
+});
 let newsieHold = null;
 const hand = Roster.createHand();
 let fly = null;
@@ -365,6 +400,18 @@ function makeSign(text, scale) {
 
 function faceCenter(obj) {
   obj.lookAt(0, obj.position.y, 0);
+}
+
+function lookSlot(id) {
+  const p = LINEUP[id];
+  if (!p) return { x: 0, y: 0, z: 0 };
+  return { x: p.x, y: heightAt(p.x, p.z), z: p.z };
+}
+
+function facePrintedPage(mesh, target) {
+  if (!mesh || !target) return;
+  mesh.lookAt(target.x, target.y, target.z);
+  mesh.rotateY(Math.PI);
 }
 
 function addClick(mesh, data) {
@@ -731,45 +778,44 @@ function paintOfferedSheet() {
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d");
-  ctx.fillStyle = "#f4ead2";
+  ctx.fillStyle = "#f3efe4";
   ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(26, 23, 18, 0.07)";
-  ctx.fillRect(w * 0.5, 0, 1, h);
-  ctx.fillRect(w * 0.5, 0, w * 0.5, h);
-  ctx.fillStyle = "#1a1712";
+  ctx.fillStyle = "#2a2418";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   ctx.font = "700 26px Georgia, serif";
   ctx.fillText("GRAPHIC OREGON", w / 2, 40);
-  ctx.fillStyle = "#2aa8a0";
-  ctx.fillRect(18, 50, w - 36, 3);
-  ctx.fillStyle = "#6a5a3c";
-  ctx.font = "400 11px Georgia, serif";
+  ctx.fillStyle = "#0d7377";
+  ctx.fillRect(18, 50, w - 36, 4);
+  ctx.fillStyle = "#3d5348";
+  ctx.font = "600 11px Georgia, serif";
   ctx.fillText("WRITING  ·  THE COAST PAPERS", w / 2, 70);
-  ctx.strokeStyle = "rgba(26, 23, 18, 0.16)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(42, 36, 24, 0.55)";
+  ctx.lineWidth = 1.4;
   ctx.beginPath();
   ctx.moveTo(w * 0.5, 84);
   ctx.lineTo(w * 0.5, h - 18);
   ctx.stroke();
-  ctx.fillStyle = "rgba(26, 23, 18, 0.14)";
+  ctx.fillStyle = "rgba(42, 36, 24, 0.38)";
   for (let i = 0; i < 8; i++) {
     const y0 = 90 + i * 28;
-    ctx.fillRect(20, y0, 92, 5);
+    ctx.fillRect(20, y0, 92, 6);
     ctx.fillRect(20, y0 + 9, 78, 3);
-    ctx.fillRect(w * 0.5 + 10, y0, 88, 5);
+    ctx.fillRect(w * 0.5 + 10, y0, 88, 6);
     ctx.fillRect(w * 0.5 + 10, y0 + 9, 70, 3);
   }
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
   tex.anisotropy = 4;
   return tex;
 }
 
 function buildNewsie() {
-  const x = PORTAL_FOREST.x + 2.55;
-  const z = PORTAL_FOREST.z + 1.85;
-  const y = heightAt(x, z);
+  const slot = lookSlot("journalist");
+  const x = slot.x;
+  const z = slot.z;
+  const y = slot.y;
   const g = new THREE.Group();
   const head = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), SKIN), true, true);
   head.position.set(-0.02, 1.4, 0.08);
@@ -796,42 +842,164 @@ function buildNewsie() {
   const offer = new THREE.Group();
   offer.position.set(0, 1.2, 0);
   const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.56), SKIN), true, true);
-  armR.position.set(0.32, 0.06, 0.34);
-  const hand = shade(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.1, 0.13), SKIN), true, true);
-  hand.position.set(0.34, 0.02, 0.64);
+  armR.position.set(0.3, 0.04, -0.22);
+  const palm = shade(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.1, 0.13), SKIN), true, true);
+  palm.position.set(0.34, 0.02, -0.52);
   const sheetTex = paintOfferedSheet();
-  const sheetMat = new THREE.MeshLambertMaterial({
+  const sheetMat = new THREE.MeshBasicMaterial({
     map: sheetTex,
-    emissive: 0xffffff,
-    emissiveMap: sheetTex,
-    emissiveIntensity: 0.24,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    toneMapped: false
   });
-  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.7), sheetMat), true, false);
-  sheet.position.set(0.42, 0.22, 0.86);
-  sheet.rotation.set(0.2, -0.22, -0.06);
-  const leaf = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.68), PAPER), false, false);
-  leaf.position.set(0.4, 0.2, 0.82);
-  leaf.rotation.set(0.16, -0.32, -0.1);
+  const sheet = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.7), sheetMat);
+  sheet.position.set(0.52, 0.36, -0.68);
   const hit = new THREE.Mesh(
     new THREE.PlaneGeometry(0.72, 0.92),
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
   );
-  hit.position.copy(sheet.position);
-  hit.rotation.copy(sheet.rotation);
-  offer.add(armR, hand, leaf, sheet, hit);
+  sheet.add(hit);
+  offer.add(armR, palm, sheet);
   g.add(head, brim, crown, body, armL, extras, offer, legL, legR);
   g.position.set(x, y, z);
   faceCenter(g);
+  g.updateMatrixWorld(true);
+  facePrintedPage(sheet, camera ? camera.position : Roster.ROSTER_POSE);
   const data = {
     paper: true,
+    self: "journalist",
+    id: "journalist",
     title: "A paper",
     body: "A paper from the path.",
     meta: "Writing"
   };
   addClickTree(g, data);
   scene.add(g);
+  const sign = classSign("Journalist");
+  sign.position.set(x, y + 2.42, z);
+  scene.add(sign);
   newsieHold = { offer: offer, sheet: sheet, rest: offer.rotation.x };
+}
+
+function boxPart(w, h, d, mat, x, y, z, rx, ry, rz) {
+  const mesh = shade(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), true, true);
+  mesh.position.set(x, y, z);
+  if (rx) mesh.rotation.x = rx;
+  if (ry) mesh.rotation.y = ry;
+  if (rz) mesh.rotation.z = rz;
+  return mesh;
+}
+
+function classSign(text) {
+  const w = 512;
+  const h = 120;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#ead7a4";
+  ctx.font = "600 46px Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(12, 8, 4, 0.72)";
+  ctx.shadowBlur = 10;
+  ctx.fillText(text, w / 2, h / 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.72, 0.4),
+    new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
+  );
+  return billboard(mesh, text, "sign");
+}
+
+function buildBoxSelf(opts) {
+  const g = new THREE.Group();
+  const bodyMat = opts.body || TEAL_PANEL;
+  const legMat = opts.leg || CAP;
+  g.add(boxPart(0.28, 0.28, 0.28, SKIN, 0, 1.42, 0.02));
+  g.add(boxPart(0.32, 0.16, 0.3, HAIR, 0, 1.58, 0));
+  g.add(boxPart(0.4, 0.5, 0.24, bodyMat, 0, 1.05, 0));
+  g.add(boxPart(0.1, 0.38, 0.1, SKIN, -0.28, 1.0, 0, 0, 0, 0.1));
+  g.add(boxPart(0.1, 0.38, 0.1, SKIN, 0.28, 1.0, 0, 0, 0, -0.1));
+  g.add(boxPart(0.12, 0.52, 0.14, legMat, -0.1, 0.4, 0));
+  g.add(boxPart(0.12, 0.52, 0.14, legMat, 0.1, 0.4, 0));
+  if (opts.decorate) opts.decorate(g);
+  return g;
+}
+
+function standLineup(id, group, title) {
+  const slot = lookSlot(id);
+  group.position.set(slot.x, slot.y, slot.z);
+  faceCenter(group);
+  group.userData.self = id;
+  group.userData.id = id;
+  addClickTree(group, { self: id, id: id });
+  scene.add(group);
+  const sign = classSign(title);
+  sign.position.set(slot.x, slot.y + 2.42, slot.z);
+  sign.userData.self = id;
+  sign.userData.id = id;
+  scene.add(sign);
+  return slot;
+}
+
+function buildLineupBackdrop() {
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(19.2, 6.0),
+    new THREE.MeshBasicMaterial({ color: gold, toneMapped: false })
+  );
+  frame.position.set(0, 2.7, -4.92);
+  const cloth = new THREE.Mesh(
+    new THREE.PlaneGeometry(18.4, 5.4),
+    new THREE.MeshBasicMaterial({ color: 0x1e6e6a, toneMapped: false })
+  );
+  cloth.position.set(0, 2.7, -4.85);
+  scene.add(frame, cloth);
+}
+
+function buildLineup() {
+  buildLineupBackdrop();
+  buildNewsie();
+  standLineup("scientist", buildBoxSelf({
+    body: COAT,
+    decorate: (root) => {
+      root.add(boxPart(0.46, 0.62, 0.3, COAT, 0, 1.02, 0.02));
+    }
+  }), "Scientist");
+  standLineup("radio", buildBoxSelf({
+    body: COPPER,
+    decorate: (root) => {
+      const band = shade(new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.04, 10, 20), COPPER), true, true);
+      band.position.set(0, 1.52, 0.02);
+      band.rotation.x = Math.PI / 2;
+      root.add(band, boxPart(0.12, 0.14, 0.08, COPPER, -0.22, 1.46, 0.02), boxPart(0.12, 0.14, 0.08, COPPER, 0.22, 1.46, 0.02));
+    }
+  }), "Radio");
+  standLineup("artist", buildBoxSelf({
+    body: SMOCK,
+    decorate: (root) => {
+      root.add(boxPart(0.44, 0.56, 0.2, SMOCK, 0, 0.98, 0.04));
+    }
+  }), "Artist");
+  standLineup("teacher", buildBoxSelf({
+    body: TEAL_PANEL,
+    decorate: (root) => {
+      root.add(boxPart(0.46, 0.68, 0.28, TEAL_PANEL, 0, 1.0, 0));
+    }
+  }), "Teacher");
+  const musicSlot = standLineup("musician", buildBoxSelf({
+    body: DUSK_CLOTH,
+    leg: DUSK_CLOTH
+  }), "Musician");
+  const note = quietCaption("empty stage");
+  note.position.set(musicSlot.x, musicSlot.y + 0.28, musicSlot.z + 0.42);
+  scene.add(note);
 }
 
 function fir(x, z, h) {
@@ -1515,6 +1683,7 @@ function tick() {
   });
   if (newsieHold) {
     newsieHold.offer.rotation.x = newsieHold.rest + Math.sin(clock.elapsedTime * 1.3) * 0.045;
+    facePrintedPage(newsieHold.sheet, camera.position);
   }
   billboards.forEach((obj) => {
     if (!obj.visible) return;
@@ -1567,7 +1736,7 @@ function main() {
   buildLand();
   buildPortal();
   buildMuseum();
-  buildNewsie();
+  buildLineup();
   addWalkSigns();
   bindInput();
   bindRoster();
