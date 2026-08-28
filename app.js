@@ -59,7 +59,8 @@ const clock = new THREE.Clock();
 const loader = new THREE.TextureLoader();
 let portalSide = "forest";
 let portalCool = 0;
-let wheelBudget = 4.8;
+let fieldFog = null;
+let wheelBudget = 3.2;
 let wheelReset = 0;
 
 function clampByte(v) {
@@ -254,12 +255,31 @@ const PAPER = new THREE.MeshStandardMaterial({
   metalness: 0.02
 });
 
+function capTexture(tex, max) {
+  const img = tex && tex.image;
+  if (!img || !img.width || !img.height) return tex;
+  const m = Math.max(img.width, img.height);
+  if (m <= max) return tex;
+  const s = max / m;
+  const w = Math.max(1, Math.round(img.width * s));
+  const h = Math.max(1, Math.round(img.height * s));
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(img, 0, 0, w, h);
+  tex.image = c;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 function loadTexture(url) {
   return new Promise((resolve) => {
     loader.load(
       url,
       (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace;
+        capTexture(tex, 1024);
         resolve(tex);
       },
       undefined,
@@ -639,7 +659,8 @@ function hangMuseumPiece(file, tex, slot) {
   const hung = framedPiece(tex, 1.85);
   hung.group.position.set(slot.x, slot.y, slot.z);
   hung.group.rotation.y = slot.rotY;
-  billboard(hung.group, title, "print");
+  hung.group.userData.label = title;
+  hung.group.userData.kind = "print";
   addClick(hung.pic, {
     title: title,
     body: "",
@@ -755,7 +776,27 @@ function showPaper() {
   if (el) el.hidden = false;
 }
 
+function fitVolume() {
+  if (!camera || !scene) return;
+  if (portalSide === "museum") {
+    scene.fog = null;
+    if (camera.far !== 86) {
+      camera.near = 0.12;
+      camera.far = 86;
+      camera.updateProjectionMatrix();
+    }
+    return;
+  }
+  if (fieldFog) scene.fog = fieldFog;
+  if (camera.far !== 900) {
+    camera.near = 0.1;
+    camera.far = 900;
+    camera.updateProjectionMatrix();
+  }
+}
+
 function applyCamera() {
+  fitVolume();
   Nav.lookVector(yaw, pitch, look);
   camera.position.set(pos.x, pos.y, pos.z);
   camera.lookAt(pos.x + look.x, pos.y + look.y, pos.z + look.z);
@@ -831,7 +872,7 @@ function bindInput() {
     wakeHand(el);
     const now = performance.now();
     if (now - wheelReset > 90) {
-      wheelBudget = 4.8;
+      wheelBudget = 3.2;
       wheelReset = now;
     }
     const step = Nav.wheelCap(Nav.dollyStep(e.deltaY, e.deltaMode), wheelBudget);
@@ -1209,6 +1250,10 @@ function tick() {
     if (veil.material) veil.material.opacity = pulse;
   });
   billboards.forEach((obj) => {
+    const dx = obj.position.x - camera.position.x;
+    const dy = obj.position.y - camera.position.y;
+    const dz = obj.position.z - camera.position.z;
+    if (dx * dx + dy * dy + dz * dz < 0.04) return;
     obj.lookAt(camera.position);
   });
   renderer.render(scene, camera);
@@ -1217,7 +1262,8 @@ function tick() {
 function main() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
-  scene.fog = new THREE.Fog(HAZE, 70, 240);
+  fieldFog = new THREE.Fog(HAZE, 70, 240);
+  scene.fog = fieldFog;
   camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 900);
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
@@ -1275,9 +1321,14 @@ window.__field = {
     if (p.z != null) pos.z = p.z;
     if (p.yaw != null) yaw = p.yaw;
     if (p.pitch != null) pitch = p.pitch;
+    if (p.side === "museum" || pos.y < MUSEUM.y + 10) portalSide = "museum";
+    if (p.side === "forest") portalSide = "forest";
     clampPos();
     stepPortal();
   },
+  enterHall: enterMuseum,
+  exitHall: exitMuseum,
+  held: () => Object.assign({}, held),
   lookVector: () => Nav.lookVector(yaw, pitch),
   goHome: goHome,
   spawn: { x: 0, y: EYE, z: 0 },
