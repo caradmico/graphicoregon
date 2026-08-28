@@ -28,10 +28,24 @@
       <p id="panel-body"></p>
       <div id="panel-links"></div>
     </aside>
-    <div id="help">Drag to look · scroll to travel · WASD move · arrows turn · Q/E leave the ground · H home</div>
+    <div id="hint" hidden></div>
+    <div id="help">Drag to look · scroll to travel · WASD move · arrows turn · Q/E leave the ground · H home · take a paper</div>
+  </div>
+  <div id="wipe" hidden></div>
+  <div id="paper" hidden>
+    <article class="broadsheet" id="paper-sheet">
+      <header class="mast">
+        <p class="ears">Tillamook · Seaside · Cannon Beach · Portland</p>
+        <h1>The Coast Extra</h1>
+        <p class="date">North Oregon Coast · Two Cents · Cara Mico, late edition</p>
+      </header>
+      <div id="paper-body"></div>
+      <button type="button" id="paper-fold">Fold it up</button>
+    </article>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
   <script src="field-nav.js"></script>
+  <script src="museum-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
