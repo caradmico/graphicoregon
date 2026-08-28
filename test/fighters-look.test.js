@@ -13,6 +13,10 @@ assert.ok(app.includes("const LINEUP"), "lineup is the first paint");
 const lineup = app.slice(app.indexOf("const LINEUP"), app.indexOf("const WALKS"));
 assert.ok(app.includes("function buildLineupBackdrop"), "one shared backdrop");
 assert.ok(app.includes("function buildLineup"), "the row is built as a lineup");
+const cloth = app.slice(app.indexOf("function buildLineupBackdrop"), app.indexOf("function buildLineup()"));
+assert.ok(cloth.includes("BoxGeometry(48, 0.2, 17.2)"), "a stage kills the leftover lawn under spawn");
+assert.ok(cloth.includes("left") && cloth.includes("right") && cloth.includes("roof"), "the backdrop fills the first frame");
+assert.ok(css.includes("bottom: 16px") && css.includes("#roster button"), "Orbit's name list stays a quiet tap, not the first paint");
 assert.ok((app.match(/z: -3\.2/g) || []).length >= 6, "the six share one row z");
 Roster.IDS.forEach((id) => {
   assert.ok(new RegExp(id + ": \\{ x:").test(app), "lineup plants " + id);

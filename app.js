@@ -950,17 +950,36 @@ function standLineup(id, group, title) {
 }
 
 function buildLineupBackdrop() {
-  const frame = new THREE.Mesh(
-    new THREE.PlaneGeometry(19.2, 6.0),
-    new THREE.MeshBasicMaterial({ color: gold, toneMapped: false })
-  );
-  frame.position.set(0, 2.7, -4.92);
-  const cloth = new THREE.Mesh(
-    new THREE.PlaneGeometry(18.4, 5.4),
-    new THREE.MeshBasicMaterial({ color: 0x1e6e6a, toneMapped: false })
-  );
-  cloth.position.set(0, 2.7, -4.85);
-  scene.add(frame, cloth);
+  const clothMat = new THREE.MeshBasicMaterial({
+    color: 0x1a5c58,
+    toneMapped: false,
+    side: THREE.DoubleSide
+  });
+  const goldMat = new THREE.MeshBasicMaterial({
+    color: gold,
+    toneMapped: false,
+    side: THREE.DoubleSide
+  });
+  const floorMat = new THREE.MeshBasicMaterial({
+    color: 0x123834,
+    toneMapped: false
+  });
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(48, 22), clothMat);
+  cloth.position.set(0, 10.4, -5.15);
+  const frame = new THREE.Mesh(new THREE.PlaneGeometry(49.2, 23), goldMat);
+  frame.position.set(0, 10.4, -5.28);
+  const left = new THREE.Mesh(new THREE.PlaneGeometry(20, 22), clothMat);
+  left.rotation.y = Math.PI / 2;
+  left.position.set(-23.8, 10.4, 3.6);
+  const right = new THREE.Mesh(new THREE.PlaneGeometry(20, 22), clothMat);
+  right.rotation.y = -Math.PI / 2;
+  right.position.set(23.8, 10.4, 3.6);
+  const roof = new THREE.Mesh(new THREE.PlaneGeometry(48, 20), clothMat);
+  roof.rotation.x = Math.PI / 2;
+  roof.position.set(0, 21.2, 3.6);
+  const stage = new THREE.Mesh(new THREE.BoxGeometry(48, 0.2, 17.2), floorMat);
+  stage.position.set(0, 0.04, 2.6);
+  scene.add(frame, cloth, left, right, roof, stage);
 }
 
 function buildLineup() {
