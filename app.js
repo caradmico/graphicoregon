@@ -845,12 +845,27 @@ function main() {
 
 window.__field = {
   getPose: () => ({ x: pos.x, y: pos.y, z: pos.z, yaw: yaw, pitch: pitch }),
+  setPose: (p) => {
+    if (p.x != null) pos.x = p.x;
+    if (p.y != null) pos.y = p.y;
+    if (p.z != null) pos.z = p.z;
+    if (p.yaw != null) yaw = p.yaw;
+    if (p.pitch != null) pitch = p.pitch;
+    clampPos();
+  },
   lookVector: () => Nav.lookVector(yaw, pitch),
   goHome: goHome,
   spawn: { x: 0, y: EYE, z: 0 },
   billboardCount: () => billboards.length,
   billboardLabels: () => billboards.map((o) => o.userData.label).filter(Boolean),
-  billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label)
+  billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label),
+  billboardPoses: () => billboards.map((o) => ({
+    label: o.userData.label,
+    kind: o.userData.kind,
+    x: o.position.x,
+    y: o.position.y,
+    z: o.position.z
+  }))
 };
 
 main();
