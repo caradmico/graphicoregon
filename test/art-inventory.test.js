@@ -7,9 +7,12 @@ const onDisk = fs.readdirSync(path.join(__dirname, "../assets/art")).filter((f) 
 
 assert.strictEqual(new Set(inv.HANG).size, inv.HANG.length, "hang each work once");
 assert.ok(inv.HANG.includes("mixed-media-gouache.jpg"), "prefer the file already in assets/art");
-assert.ok(!inv.HANG.includes("mixed-media-gouache-on-canson.jpg"), "do not hang the Canson alias");
-assert.ok(inv.ALIAS["mixed-media-gouache-on-canson.jpg"] === "mixed-media-gouache.jpg");
-assert.ok(!inv.shouldHang("mixed-media-gouache-on-canson.jpg"));
+assert.ok(inv.HANG.includes("mixed-media-gouache-on-canson.jpg"), "hang the Canson work once");
+assert.strictEqual(inv.HANG.filter((f) => f === "mixed-media-gouache.jpg").length, 1);
+assert.strictEqual(inv.HANG.filter((f) => f === "mixed-media-gouache-on-canson.jpg").length, 1);
+assert.ok(!(inv.ALIAS && inv.ALIAS["mixed-media-gouache-on-canson.jpg"]), "Canson is not an alias");
+assert.ok(inv.shouldHang("mixed-media-gouache.jpg"));
+assert.ok(inv.shouldHang("mixed-media-gouache-on-canson.jpg"));
 assert.ok(!inv.shouldHang("identity-canvas.jpg"), "identity-canvas stays private");
 assert.ok(!inv.HANG.some((f) => /identity-canvas/i.test(f)));
 

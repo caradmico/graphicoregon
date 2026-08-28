@@ -5,11 +5,6 @@
 })(typeof self !== "undefined" ? self : this, function () {
   const PRIVATE = ["identity-canvas.jpg", "identity-canvas.png"];
 
-  /* Same work as mixed-media-gouache.jpg — keep the file, do not hang twice. */
-  const ALIAS = {
-    "mixed-media-gouache-on-canson.jpg": "mixed-media-gouache.jpg"
-  };
-
   const HANG = [
     "0321232309_HDR.jpg",
     "0517232026.jpg",
@@ -64,6 +59,7 @@
     "linoleum-print.jpg",
     "male-portrait.jpg",
     "mixed-media-gouache.jpg",
+    "mixed-media-gouache-on-canson.jpg",
     "mono-print.jpg",
     "monochromatic-self-portrait.jpg",
     "neahkahnie.jpg",
@@ -99,14 +95,12 @@
 
   function shouldHang(file) {
     if (!file || isPrivate(file)) return false;
-    if (ALIAS[file]) return false;
     return HANG.indexOf(file) !== -1;
   }
 
   return {
     HANG: HANG,
     PRIVATE: PRIVATE,
-    ALIAS: ALIAS,
     titleFromFile: titleFromFile,
     isPrivate: isPrivate,
     shouldHang: shouldHang
