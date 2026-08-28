@@ -22,13 +22,26 @@
       <h1>Graphic Oregon</h1>
       <p class="tag">Research, website design, media, and fine art</p>
     </header>
+    <button type="button" id="back" hidden>Back</button>
+    <nav id="roster" aria-label="Classes">
+      <button type="button" data-class="journalist">Journalist</button>
+      <button type="button" data-class="scientist">Scientist</button>
+      <button type="button" data-class="radio">Radio</button>
+      <button type="button" data-class="artist">Artist</button>
+      <button type="button" data-class="teacher">Teacher</button>
+      <button type="button" data-class="musician">Musician</button>
+    </nav>
     <aside id="panel" hidden>
       <div class="meta" id="panel-meta"></div>
       <h2 id="panel-title"></h2>
       <p id="panel-body"></p>
+      <figure id="panel-figure" hidden>
+        <img id="panel-img" alt="">
+      </figure>
+      <div id="panel-subs" hidden></div>
       <div id="panel-links"></div>
     </aside>
-    <div id="help">Click the field · WASD walk · arrows look · Q/E leave the ground · H home</div>
+    <div id="help">Tap a name · Back or Esc returns</div>
   </div>
   <div id="paper" hidden>
     <div class="sheet">
@@ -51,17 +64,22 @@
           <img src="assets/news/pioneer-archive.jpg" alt="Pioneer">
           <figcaption>Pioneer</figcaption>
         </figure>
-        <nav class="cols">
-          <a href="https://graphicoregon.com/" target="_blank" rel="noopener">graphicoregon.com</a>
-          <a href="https://graphicoregon.com/" target="_blank" rel="noopener">Writing</a>
-          <a href="https://www.tillamookcountypioneer.net/author/assistant-editor/" target="_blank" rel="noopener">Tillamook County Pioneer</a>
-        </nav>
+        <figure>
+          <img src="assets/news/signal-beach-books.jpg" alt="Signal">
+          <figcaption>Signal</figcaption>
+        </figure>
       </div>
+      <nav class="cols">
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">graphicoregon.com</a>
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">Writing</a>
+        <a href="https://www.tillamookcountypioneer.net/author/assistant-editor/" target="_blank" rel="noopener">Tillamook County Pioneer</a>
+      </nav>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
   <script src="field-nav.js"></script>
   <script src="art-inventory.js"></script>
+  <script src="roster.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

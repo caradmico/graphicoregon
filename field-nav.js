@@ -191,6 +191,48 @@
     return (step < 0 ? -1 : 1) * budget;
   }
 
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function lerpAngle(a, b, t) {
+    let d = b - a;
+    d -= Math.PI * 2 * Math.round(d / (Math.PI * 2));
+    return a + d * t;
+  }
+
+  function easeInOutCubic(t) {
+    const x = clamp(t, 0, 1);
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  }
+
+  function yawToward(dx, dz) {
+    return Math.atan2(dx, -dz);
+  }
+
+  function eyeToward(target, from, dist) {
+    const dx = target.x - from.x;
+    const dz = target.z - from.z;
+    const len = Math.hypot(dx, dz) || 1;
+    const d = dist == null ? 3.4 : dist;
+    return {
+      x: target.x - (dx / len) * d,
+      z: target.z - (dz / len) * d,
+      yaw: yawToward(dx, dz)
+    };
+  }
+
+  function lerpPose(from, to, t) {
+    const k = easeInOutCubic(t);
+    return {
+      x: lerp(from.x, to.x, k),
+      y: lerp(from.y, to.y, k),
+      z: lerp(from.z, to.z, k),
+      yaw: lerpAngle(from.yaw, to.yaw, k),
+      pitch: lerp(from.pitch, to.pitch, k)
+    };
+  }
+
   return {
     PITCH_LIMIT: PITCH_LIMIT,
     LOOK_SENS: LOOK_SENS,
@@ -210,6 +252,12 @@
     isMoveKey: isMoveKey,
     moveOffset: moveOffset,
     crossedSlab: crossedSlab,
-    wheelCap: wheelCap
+    wheelCap: wheelCap,
+    lerp: lerp,
+    lerpAngle: lerpAngle,
+    easeInOutCubic: easeInOutCubic,
+    yawToward: yawToward,
+    eyeToward: eyeToward,
+    lerpPose: lerpPose
   };
 });
