@@ -440,12 +440,11 @@ function museumDoorX() {
 
 function stepPortal() {
   if (portalCool > 0) return;
-  const doorW = 0.95;
   if (portalSide === "forest") {
     const along = Math.abs(pos.z - PORTAL_FOREST.z);
     const y0 = heightAt(PORTAL_FOREST.x, PORTAL_FOREST.z);
     const nearY = pos.y > y0 - 0.4 && pos.y < y0 + 4.2;
-    if (along < doorW && nearY && pos.x < forestDoorX() && pos.x > PORTAL_FOREST.x - 0.4) {
+    if (along < 1.2 && nearY && pos.x < forestDoorX() + 0.35 && pos.x > PORTAL_FOREST.x - 0.85) {
       pos.x = museumDoorX() - 1.7;
       pos.y = MUSEUM.y + EYE;
       pos.z = MUSEUM.z;
