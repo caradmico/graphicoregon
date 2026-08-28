@@ -242,6 +242,14 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+function billboard(obj, label, kind) {
+  obj.userData.billboard = true;
+  if (label) obj.userData.label = label;
+  if (kind) obj.userData.kind = kind;
+  billboards.push(obj);
+  return obj;
+}
+
 function makeSign(text, scale) {
   const w = 640;
   const h = 160;
@@ -272,9 +280,7 @@ function makeSign(text, scale) {
       side: THREE.DoubleSide
     })
   );
-  mesh.userData.billboard = true;
-  billboards.push(mesh);
-  return mesh;
+  return billboard(mesh, text, "sign");
 }
 
 function faceCenter(obj) {
@@ -282,7 +288,7 @@ function faceCenter(obj) {
 }
 
 function addClick(mesh, data) {
-  mesh.userData = data;
+  Object.assign(mesh.userData, data);
   clickables.push(mesh);
 }
 
@@ -323,6 +329,7 @@ function easelAt(x, z, hung, data, label, labelScale) {
   stand.add(post, rail, hung.group);
   stand.position.set(x, y, z);
   faceCenter(stand);
+  billboard(stand, label, "print");
   addClick(hung.pic, data);
   scene.add(stand);
   const sign = makeSign(label, labelScale || 4.4);
@@ -699,6 +706,7 @@ async function populatePieces() {
     stand.add(post, hung.group);
     stand.position.set(x, y, z);
     faceCenter(stand);
+    billboard(stand, "Copper Horizon", "print");
     addClick(hung.pic, {
       title: "Copper Horizon ocean graphic tee",
       body: "Teal sky. Copper rays.",
@@ -745,6 +753,7 @@ async function populatePieces() {
     const hung = framedPiece(newsTex, 1.7);
     hung.group.position.set(lectern.x, lectern.y + 0.9, lectern.z);
     faceCenter(hung.group);
+    billboard(hung.group, "Writing", "print");
     addClick(hung.pic, {
       title: "Writing",
       body: "Coast journalism and the papers.",
@@ -763,6 +772,7 @@ async function populatePieces() {
     const y = heightAt(x, z);
     hung.group.position.set(x, y + 2.0, z);
     faceCenter(hung.group);
+    billboard(hung.group, "Websites", "print");
     addClick(hung.pic, {
       title: "Websites",
       body: "Website design for the coast.",
@@ -838,7 +848,9 @@ window.__field = {
   lookVector: () => Nav.lookVector(yaw, pitch),
   goHome: goHome,
   spawn: { x: 0, y: EYE, z: 0 },
-  billboardCount: () => billboards.length
+  billboardCount: () => billboards.length,
+  billboardLabels: () => billboards.map((o) => o.userData.label).filter(Boolean),
+  billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label)
 };
 
 main();
