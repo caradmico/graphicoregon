@@ -774,13 +774,16 @@ function buildNewsie() {
   const legR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.52, 0.12), CAP), true, true);
   legR.position.set(0.1, 0.4, 0.08);
   const offer = new THREE.Group();
-  offer.position.set(0.22, 1.32, 0.04);
-  offer.rotation.x = -0.18;
-  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.46), SKIN), true, true);
-  armR.position.set(0.04, 0.02, 0.24);
+  offer.position.set(0.2, 1.36, 0.06);
+  offer.rotation.x = -0.28;
+  offer.rotation.y = 0.48;
+  const armR = shade(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.5), SKIN), true, true);
+  armR.position.set(0.02, 0.02, 0.26);
   const hand = new THREE.Group();
-  hand.position.set(0.05, 0.03, 0.5);
-  const palm = shade(new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.09, 0.11), SKIN), true, true);
+  hand.position.set(0.02, 0.02, 0.54);
+  const palm = shade(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.11, 0.13), SKIN), true, true);
+  const grip = shade(new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), SKIN), true, true);
+  grip.position.set(0.05, 0.06, 0.06);
   const sheetTex = paintOfferedSheet();
   const sheetMat = new THREE.MeshLambertMaterial({
     map: sheetTex,
@@ -789,16 +792,16 @@ function buildNewsie() {
     emissiveIntensity: 0.26,
     side: THREE.DoubleSide
   });
-  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.54), sheetMat), true, false);
-  sheet.position.set(-0.1, 0.2, 0.05);
-  sheet.rotation.set(0.04, 0.18, 0.08);
+  const sheet = shade(new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.48), sheetMat), true, false);
+  sheet.position.set(0.12, 0.18, 0.08);
+  sheet.rotation.set(0.08, 0.35, 0.12);
   const hit = new THREE.Mesh(
     new THREE.PlaneGeometry(0.5, 0.66),
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
   );
   hit.position.copy(sheet.position);
   hit.rotation.copy(sheet.rotation);
-  hand.add(palm, sheet, hit);
+  hand.add(palm, grip, sheet, hit);
   offer.add(armR, hand);
   g.add(head, brim, crown, body, armL, offer, legL, legR);
   g.position.set(x, y, z);
