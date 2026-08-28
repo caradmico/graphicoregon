@@ -63,8 +63,8 @@
     return { x: look.x * step, y: look.y * step, z: look.z * step, step: step };
   }
 
-  function rideGround(y, groundY, eye) {
-    const floor = (groundY || 0) + (eye == null ? 1.7 : eye);
+  function rideGround(y, groundY, eye, pad) {
+    const floor = (groundY || 0) + (eye == null ? 1.7 : eye) + (pad == null ? 0.2 : pad);
     return y < floor ? floor : y;
   }
 
@@ -134,19 +134,17 @@
   }
 
   function moveOffset(yaw, pitch, keys, dt, speed) {
-    const look = lookVector(yaw, pitch);
+    const look = flatForward(yaw);
     const right = rightVector(yaw);
     let x = 0;
     let y = 0;
     let z = 0;
     if (keys.forward) {
       x += look.x;
-      y += look.y;
       z += look.z;
     }
     if (keys.back) {
       x -= look.x;
-      y -= look.y;
       z -= look.z;
     }
     if (keys.left) {

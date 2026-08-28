@@ -35,7 +35,8 @@ assert.ok(Math.abs(fwd.z + 10) < 1e-6, "W at yaw 0 travels −Z");
 assert.ok(Math.abs(fwd.y) < 1e-9, "level forward stays off the floor plane only when pitched");
 
 const climb = nav.moveOffset(0, 0.6, { forward: true }, 1, 10);
-assert.ok(climb.y > 0, "WASD looking up is dimensions (sky is legal)");
+assert.ok(Math.abs(climb.y) < 1e-9, "look-up + W stays on the field");
+assert.ok(Math.abs(climb.z + 10) < 1e-6, "W at yaw 0 still travels -Z");
 
 const w = nav.keyFlags("KeyW", "w");
 assert.ok(w.forward, "KeyW is walk forward");
@@ -63,7 +64,7 @@ assert.ok(Math.abs(flat.z + 1) < 1e-9, "scroll forward at yaw 0 is -Z");
 const skyKey = nav.moveOffset(0, 0.7, { up: true }, 1, 10);
 assert.ok(Math.abs(skyKey.y - 10) < 1e-6, "Q/E is the sky axis");
 
-assert.ok(nav.rideGround(1.7, 2.3, 1.7) === 4.0, "hill lifts the eye over dirt");
-assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "sky stay is not pulled down to the hill");
+assert.ok(Math.abs(nav.rideGround(1.7, 2.3, 1.7) - 4.2) < 1e-9, "hill lifts the eye with a small clearance");
+assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "Q/E sky stay is not pulled down to the hill");
 
 console.log("field-nav: all assertions passed");
