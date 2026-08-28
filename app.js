@@ -59,6 +59,8 @@ const clock = new THREE.Clock();
 const loader = new THREE.TextureLoader();
 let portalSide = "forest";
 let portalCool = 0;
+let wheelBudget = 4.8;
+let wheelReset = 0;
 
 function clampByte(v) {
   return v < 0 ? 0 : v > 255 ? 255 : v;
@@ -392,7 +394,6 @@ function easelAt(x, z, hung, data, label, labelScale) {
   stand.add(post, rail, hung.group);
   stand.position.set(x, y, z);
   faceCenter(stand);
-  billboard(stand, label, "print");
   addClick(hung.pic, data);
   scene.add(stand);
   const sign = makeSign(label, labelScale || 4.4);
@@ -438,32 +439,50 @@ function museumDoorX() {
   return MUSEUM.x + MUSEUM.len / 2 - 0.18;
 }
 
+const prevPos = { x: 0, y: EYE, z: 0 };
+
+function enterMuseum() {
+  pos.x = museumDoorX() - 2.4;
+  pos.y = MUSEUM.y + EYE;
+  pos.z = MUSEUM.z;
+  yaw = -Math.PI / 2;
+  pitch = 0;
+  portalSide = "museum";
+  portalCool = 0.85;
+}
+
+function exitMuseum() {
+  const fx = forestDoorX() + 2.1;
+  const fz = PORTAL_FOREST.z;
+  pos.x = fx;
+  pos.y = heightAt(fx, fz) + EYE;
+  pos.z = fz;
+  yaw = Math.PI / 2;
+  pitch = 0;
+  portalSide = "forest";
+  portalCool = 0.85;
+}
+
 function stepPortal() {
   if (portalCool > 0) return;
   if (portalSide === "forest") {
-    const along = Math.abs(pos.z - PORTAL_FOREST.z);
     const y0 = heightAt(PORTAL_FOREST.x, PORTAL_FOREST.z);
-    const nearY = pos.y > y0 - 0.4 && pos.y < y0 + 4.2;
-    if (along < 1.2 && nearY && pos.x < forestDoorX() + 0.35 && pos.x > PORTAL_FOREST.x - 0.85) {
-      pos.x = museumDoorX() - 1.7;
-      pos.y = MUSEUM.y + EYE;
-      pos.z = MUSEUM.z;
-      portalSide = "museum";
-      portalCool = 0.85;
-    }
+    const nearY = pos.y > y0 - 0.6 && pos.y < y0 + 5.2;
+    const hit = Nav.crossedSlab(
+      prevPos.x, prevPos.z, pos.x, pos.z,
+      PORTAL_FOREST.x - 0.4, forestDoorX() + 0.85,
+      PORTAL_FOREST.z - 1.55, PORTAL_FOREST.z + 1.55
+    );
+    if (nearY && hit) enterMuseum();
     return;
   }
-  const along = Math.abs(pos.z - MUSEUM.z);
-  const nearY = pos.y > MUSEUM.y + 0.4 && pos.y < MUSEUM.y + 5.2;
-  if (along < 1.15 && nearY && pos.x > museumDoorX() && pos.x < museumDoorX() + 1.8) {
-    const fx = forestDoorX() + 1.55;
-    const fz = PORTAL_FOREST.z;
-    pos.x = fx;
-    pos.y = heightAt(fx, fz) + EYE;
-    pos.z = fz;
-    portalSide = "forest";
-    portalCool = 0.85;
-  }
+  const nearY = pos.y > MUSEUM.y - 0.2 && pos.y < MUSEUM.y + 6.2;
+  const hit = Nav.crossedSlab(
+    prevPos.x, prevPos.z, pos.x, pos.z,
+    museumDoorX() - 0.4, museumDoorX() + 2.2,
+    MUSEUM.z - 1.4, MUSEUM.z + 1.4
+  );
+  if (nearY && hit) exitMuseum();
 }
 
 function buildPortal() {
@@ -810,7 +829,16 @@ function bindInput() {
     if (hud(e.target)) return;
     e.preventDefault();
     wakeHand(el);
-    const step = Nav.dollyStep(e.deltaY, e.deltaMode);
+    const now = performance.now();
+    if (now - wheelReset > 90) {
+      wheelBudget = 4.8;
+      wheelReset = now;
+    }
+    const step = Nav.wheelCap(Nav.dollyStep(e.deltaY, e.deltaMode), wheelBudget);
+    wheelBudget = Math.max(0, wheelBudget - Math.abs(step));
+    prevPos.x = pos.x;
+    prevPos.y = pos.y;
+    prevPos.z = pos.z;
     const flat = Nav.flatForward(yaw);
     pos.x += flat.x * step;
     pos.z += flat.z * step;
@@ -833,7 +861,7 @@ function bindInput() {
     downY = lastY = e.clientY;
     el.setPointerCapture(e.pointerId);
   });
-  el.addEventListener("pointermove", (e) => {
+  function onLookMove(e) {
     if (lookLocked) return;
     if (!dragging) return;
     const next = Nav.applyLook(yaw, pitch, e.clientX - lastX, e.clientY - lastY);
@@ -841,7 +869,9 @@ function bindInput() {
     pitch = next.pitch;
     lastX = e.clientX;
     lastY = e.clientY;
-  });
+  }
+  el.addEventListener("pointermove", onLookMove);
+  window.addEventListener("pointermove", onLookMove);
   el.addEventListener("pointerup", (e) => {
     if (lookLocked) return;
     const dx = e.clientX - downX;
@@ -861,6 +891,7 @@ function bindInput() {
   });
 
   window.addEventListener("keydown", (e) => {
+    wakeHand(el);
     const flags = Nav.setHeld(held, e.code, e.key, true);
     if (Nav.isMoveKey(e.code, e.key)) e.preventDefault();
     if (flags.escape) {
@@ -896,7 +927,12 @@ function bindInput() {
 function travel(dt) {
   if (held.turnLeft) yaw -= TURN * dt;
   if (held.turnRight) yaw += TURN * dt;
+  if (held.lookUp) pitch = Nav.clamp(pitch + TURN * dt, -Nav.PITCH_LIMIT, Nav.PITCH_LIMIT);
+  if (held.lookDown) pitch = Nav.clamp(pitch - TURN * dt, -Nav.PITCH_LIMIT, Nav.PITCH_LIMIT);
   const speed = held.fast ? MOVE_FAST : MOVE;
+  prevPos.x = pos.x;
+  prevPos.y = pos.y;
+  prevPos.z = pos.z;
   const offset = Nav.moveOffset(yaw, pitch, held, dt, speed);
   pos.x += offset.x;
   pos.y += offset.y;
@@ -1064,7 +1100,7 @@ async function populatePieces() {
   ]);
 
   if (guideTex) {
-    easelAt(-7.6, -11.2, framedPiece(guideTex, 3.15), {
+    easelAt(-10.4, -16.8, framedPiece(guideTex, 3.15), {
       title: "Giving Guide 2022–23",
       body: "Cover of the 2022–23 Tillamook County Giving Guide.",
       href: HOME_HREF,

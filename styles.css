@@ -36,7 +36,7 @@ header.top {
   position: absolute;
   top: 22px;
   left: 28px;
-  pointer-events: auto;
+  pointer-events: none;
   max-width: min(420px, calc(100vw - 56px));
 }
 

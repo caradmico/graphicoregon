@@ -67,4 +67,12 @@ assert.ok(Math.abs(skyKey.y - 10) < 1e-6, "Q/E is the sky axis");
 assert.ok(Math.abs(nav.rideGround(1.7, 2.3, 1.7) - 4.2) < 1e-9, "hill lifts the eye with a small clearance");
 assert.ok(nav.rideGround(20, 2.3, 1.7) === 20, "Q/E sky stay is not pulled down to the hill");
 
+const slab = nav.crossedSlab(-14, -14.4, -18, -14.4, -17.8, -16.4, -16, -13);
+assert.ok(slab, "a flick across the door slab still counts as enter");
+assert.ok(!nav.crossedSlab(0, 0, -4, 0, -17.8, -16.4, -16, -13), "far field travel does not enter");
+assert.ok(nav.wheelCap(8, 4.8) === 4.8, "a hard flick cannot yeet past the travel budget");
+assert.ok(nav.wheelCap(-1.6, 4.8) === -1.6, "a cherry notch is unchanged");
+const arrows = nav.keyFlags("ArrowUp", "ArrowUp");
+assert.ok(arrows.lookUp && !arrows.forward, "arrow-up looks up, it does not walk");
+
 console.log("field-nav: all assertions passed");

@@ -89,6 +89,8 @@
       right: false,
       up: false,
       down: false,
+      lookUp: false,
+      lookDown: false,
       turnLeft: false,
       turnRight: false,
       fast: false
@@ -99,12 +101,14 @@
     const c = code || "";
     const k = key == null ? "" : String(key).toLowerCase();
     return {
-      forward: c === "KeyW" || c === "ArrowUp" || k === "w" || k === "arrowup",
-      back: c === "KeyS" || c === "ArrowDown" || k === "s" || k === "arrowdown",
+      forward: c === "KeyW" || k === "w",
+      back: c === "KeyS" || k === "s",
       left: c === "KeyA" || k === "a",
       right: c === "KeyD" || k === "d",
       up: c === "KeyE" || c === "Space" || k === "e" || k === " ",
       down: c === "KeyQ" || k === "q",
+      lookUp: c === "ArrowUp" || k === "arrowup",
+      lookDown: c === "ArrowDown" || k === "arrowdown",
       turnLeft: c === "ArrowLeft" || k === "arrowleft",
       turnRight: c === "ArrowRight" || k === "arrowright",
       fast: c === "ShiftLeft" || c === "ShiftRight" || k === "shift",
@@ -122,6 +126,8 @@
     if (f.right) held.right = down;
     if (f.up) held.up = down;
     if (f.down) held.down = down;
+    if (f.lookUp) held.lookUp = down;
+    if (f.lookDown) held.lookDown = down;
     if (f.turnLeft) held.turnLeft = down;
     if (f.turnRight) held.turnRight = down;
     if (f.fast) held.fast = down;
@@ -130,7 +136,7 @@
 
   function isMoveKey(code, key) {
     const f = keyFlags(code, key);
-    return !!(f.forward || f.back || f.left || f.right || f.up || f.down || f.turnLeft || f.turnRight);
+    return !!(f.forward || f.back || f.left || f.right || f.up || f.down || f.lookUp || f.lookDown || f.turnLeft || f.turnRight);
   }
 
   function moveOffset(yaw, pitch, keys, dt, speed) {
@@ -163,6 +169,28 @@
     return { x: x * k, y: y * k, z: z * k };
   }
 
+  function crossedSlab(ax, az, bx, bz, x0, x1, z0, z1) {
+    const xmin = Math.min(x0, x1);
+    const xmax = Math.max(x0, x1);
+    const zmin = Math.min(z0, z1);
+    const zmax = Math.max(z0, z1);
+    const dx = bx - ax;
+    const dz = bz - az;
+    for (let i = 0; i <= 8; i++) {
+      const t = i / 8;
+      const x = ax + dx * t;
+      const z = az + dz * t;
+      if (x >= xmin && x <= xmax && z >= zmin && z <= zmax) return true;
+    }
+    return false;
+  }
+
+  function wheelCap(step, budget) {
+    if (budget <= 0) return 0;
+    if (Math.abs(step) <= budget) return step;
+    return (step < 0 ? -1 : 1) * budget;
+  }
+
   return {
     PITCH_LIMIT: PITCH_LIMIT,
     LOOK_SENS: LOOK_SENS,
@@ -180,6 +208,8 @@
     keyFlags: keyFlags,
     setHeld: setHeld,
     isMoveKey: isMoveKey,
-    moveOffset: moveOffset
+    moveOffset: moveOffset,
+    crossedSlab: crossedSlab,
+    wheelCap: wheelCap
   };
 });
