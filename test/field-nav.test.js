@@ -35,7 +35,20 @@ assert.ok(Math.abs(fwd.z + 10) < 1e-6, "W at yaw 0 travels −Z");
 assert.ok(Math.abs(fwd.y) < 1e-9, "level forward stays off the floor plane only when pitched");
 
 const climb = nav.moveOffset(0, 0.6, { forward: true }, 1, 10);
-assert.ok(climb.y > 0, "pitched-up forward leaves the XZ plane");
+assert.ok(Math.abs(climb.y) < 1e-9, "WASD stays on the field even when looking up");
+assert.ok(Math.abs(climb.z + 10) < 1e-6, "pitched look still walks −Z at yaw 0");
+
+const w = nav.keyFlags("KeyW", "w");
+assert.ok(w.forward, "KeyW is walk forward");
+const eKey = nav.keyFlags("KeyE", "e");
+assert.ok(eKey.up, "KeyE leaves the plane");
+const qKey = nav.keyFlags("KeyQ", "q");
+assert.ok(qKey.down, "KeyQ drops");
+const held = nav.emptyHeld();
+nav.setHeld(held, "KeyW", "w", true);
+assert.ok(held.forward, "held W stays down until keyup");
+nav.setHeld(held, "KeyW", "w", false);
+assert.ok(!held.forward, "keyup clears W");
 
 const rise = nav.moveOffset(0, 0, { up: true }, 1, 10);
 assert.ok(Math.abs(rise.y - 10) < 1e-6, "E/space climbs world +Y");

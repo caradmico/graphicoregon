@@ -36,7 +36,7 @@ let lastX = 0;
 let lastY = 0;
 let downX = 0;
 let downY = 0;
-const keys = {};
+const held = Nav.emptyHeld();
 const pos = { x: 0, y: EYE, z: 0 };
 const look = { x: 0, y: 0, z: -1 };
 const clickables = [];
@@ -416,18 +416,30 @@ function onClick(e) {
   }
 }
 
+function wakeHand(el) {
+  if (!el) return;
+  el.tabIndex = 0;
+  try {
+    el.focus({ preventScroll: true });
+  } catch (err) {
+    el.focus();
+  }
+}
+
 function bindInput() {
   const el = renderer.domElement;
   const hud = (t) => t && t.closest && t.closest("#hud a, #hud button, #panel");
+  el.tabIndex = 0;
+  wakeHand(el);
 
   function onWheel(e) {
     if (hud(e.target)) return;
     e.preventDefault();
+    wakeHand(el);
     const step = Nav.dollyStep(e.deltaY, e.deltaMode);
-    Nav.lookVector(yaw, pitch, look);
-    pos.x += look.x * step;
-    pos.y += look.y * step;
-    pos.z += look.z * step;
+    const flat = Nav.flatForward(yaw);
+    pos.x += flat.x * step;
+    pos.z += flat.z * step;
     if (Math.abs(e.deltaX) > 0.5) {
       const side = Nav.wheelUnit(e.deltaX, e.deltaMode) * Nav.DOLLY;
       const right = Nav.rightVector(yaw);
@@ -439,6 +451,7 @@ function bindInput() {
   window.addEventListener("wheel", onWheel, { passive: false });
 
   el.addEventListener("pointerdown", (e) => {
+    wakeHand(el);
     if (lookLocked) return;
     dragging = true;
     downX = lastX = e.clientX;
@@ -473,38 +486,34 @@ function bindInput() {
   });
 
   window.addEventListener("keydown", (e) => {
-    const k = e.key.toLowerCase();
-    keys[k] = true;
-    if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "q", "e"].includes(k)) {
-      e.preventDefault();
-    }
-    if (k === "escape") {
+    const flags = Nav.setHeld(held, e.code, e.key, true);
+    if (Nav.isMoveKey(e.code, e.key)) e.preventDefault();
+    if (flags.escape) {
       if (lookLocked) document.exitPointerLock();
       hidePanel();
     }
-    if (k === "l") {
+    if (flags.lock) {
       if (lookLocked) document.exitPointerLock();
       else el.requestPointerLock();
     }
-    if (k === "h") goHome();
-  });
+    if (flags.home) goHome();
+  }, true);
   window.addEventListener("keyup", (e) => {
-    keys[e.key.toLowerCase()] = false;
+    Nav.setHeld(held, e.code, e.key, false);
+  }, true);
+  window.addEventListener("blur", () => {
+    const clear = Nav.emptyHeld();
+    Object.keys(clear).forEach((k) => {
+      held[k] = false;
+    });
   });
 }
 
 function travel(dt) {
-  if (keys.arrowleft) yaw -= TURN * dt;
-  if (keys.arrowright) yaw += TURN * dt;
-  const speed = keys.shift ? MOVE_FAST : MOVE;
-  const offset = Nav.moveOffset(yaw, pitch, {
-    forward: keys.w || keys.arrowup,
-    back: keys.s || keys.arrowdown,
-    left: keys.a,
-    right: keys.d,
-    up: keys.e || keys[" "],
-    down: keys.q
-  }, dt, speed);
+  if (held.turnLeft) yaw -= TURN * dt;
+  if (held.turnRight) yaw += TURN * dt;
+  const speed = held.fast ? MOVE_FAST : MOVE;
+  const offset = Nav.moveOffset(yaw, pitch, held, dt, speed);
   pos.x += offset.x;
   pos.y += offset.y;
   pos.z += offset.z;

@@ -57,20 +57,83 @@
     return -wheelUnit(deltaY, deltaMode) * (scale == null ? DOLLY : scale);
   }
 
+  function flatForward(yaw, out) {
+    const x = Math.sin(yaw);
+    const y = 0;
+    const z = -Math.cos(yaw);
+    if (out) {
+      out.x = x;
+      out.y = y;
+      out.z = z;
+      return out;
+    }
+    return { x: x, y: y, z: z };
+  }
+
+  function emptyHeld() {
+    return {
+      forward: false,
+      back: false,
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      turnLeft: false,
+      turnRight: false,
+      fast: false
+    };
+  }
+
+  function keyFlags(code, key) {
+    const c = code || "";
+    const k = key == null ? "" : String(key).toLowerCase();
+    return {
+      forward: c === "KeyW" || c === "ArrowUp" || k === "w" || k === "arrowup",
+      back: c === "KeyS" || c === "ArrowDown" || k === "s" || k === "arrowdown",
+      left: c === "KeyA" || k === "a",
+      right: c === "KeyD" || k === "d",
+      up: c === "KeyE" || c === "Space" || k === "e" || k === " ",
+      down: c === "KeyQ" || k === "q",
+      turnLeft: c === "ArrowLeft" || k === "arrowleft",
+      turnRight: c === "ArrowRight" || k === "arrowright",
+      fast: c === "ShiftLeft" || c === "ShiftRight" || k === "shift",
+      home: c === "KeyH" || k === "h",
+      lock: c === "KeyL" || k === "l",
+      escape: c === "Escape" || k === "escape"
+    };
+  }
+
+  function setHeld(held, code, key, down) {
+    const f = keyFlags(code, key);
+    if (f.forward) held.forward = down;
+    if (f.back) held.back = down;
+    if (f.left) held.left = down;
+    if (f.right) held.right = down;
+    if (f.up) held.up = down;
+    if (f.down) held.down = down;
+    if (f.turnLeft) held.turnLeft = down;
+    if (f.turnRight) held.turnRight = down;
+    if (f.fast) held.fast = down;
+    return f;
+  }
+
+  function isMoveKey(code, key) {
+    const f = keyFlags(code, key);
+    return !!(f.forward || f.back || f.left || f.right || f.up || f.down || f.turnLeft || f.turnRight);
+  }
+
   function moveOffset(yaw, pitch, keys, dt, speed) {
-    const look = lookVector(yaw, pitch);
+    const look = flatForward(yaw);
     const right = rightVector(yaw);
     let x = 0;
     let y = 0;
     let z = 0;
     if (keys.forward) {
       x += look.x;
-      y += look.y;
       z += look.z;
     }
     if (keys.back) {
       x -= look.x;
-      y -= look.y;
       z -= look.z;
     }
     if (keys.left) {
@@ -96,9 +159,14 @@
     clamp: clamp,
     lookVector: lookVector,
     rightVector: rightVector,
+    flatForward: flatForward,
     applyLook: applyLook,
     wheelUnit: wheelUnit,
     dollyStep: dollyStep,
+    emptyHeld: emptyHeld,
+    keyFlags: keyFlags,
+    setHeld: setHeld,
+    isMoveKey: isMoveKey,
     moveOffset: moveOffset
   };
 });
