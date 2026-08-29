@@ -31,6 +31,19 @@ const MUSEUM = {
 };
 const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
+// Same woman, six lives. Dresses Orbit's lineup hook. Do not move the camera.
+const HER = [
+  { id: "journalist", file: "self-portrait-charcoal.jpg", x: 4.95 },
+  { id: "scientist", file: "self-portrait-graphite.jpg", x: 2.97 },
+  { id: "radio", file: "monochromatic-self-portrait.jpg", x: 0.99 },
+  { id: "artist", file: "self-portrait-acrylic.jpg", x: -0.99 },
+  { id: "teacher", file: "female-portrait-oil.jpg", x: -2.97 },
+  { id: "musician", file: "female-portrait-oil-3.jpg", x: -4.95 }
+];
+const HER_Z = 257.55;
+const FACE_W = 1.72;
+const FACE_H = 2.48;
+
 const WALKS = [
   { id: "art", title: "Art", pos: [-36, 2.4, -2], href: ART_HREF, body: "Oil, acrylic, charcoal, and prints." },
   { id: "research", title: "Research", pos: [34, 2.2, 2], href: RESEARCH_HREF, body: "Mapping and habitat studies." },
@@ -259,6 +272,8 @@ const PAPER = new THREE.MeshStandardMaterial({
   metalness: 0.02
 });
 let newsieHold = null;
+const herCards = [];
+let duskBackdrop = null;
 const hand = Roster.createHand();
 let fly = null;
 let fieldRoot = null;
@@ -406,20 +421,149 @@ function showLineup(on) {
   if (lineupRoot) lineupRoot.visible = !!on;
 }
 
+function faceFill(tex) {
+  const img = tex && tex.image;
+  if (!img || !img.width || !img.height) return tex;
+  const target = FACE_W / FACE_H;
+  const aspect = img.width / img.height;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  if (aspect < target) {
+    const vis = img.width / target;
+    tex.repeat.set(1, vis / img.height);
+    tex.offset.set(0, 1 - tex.repeat.y);
+  } else {
+    const vis = img.height * target;
+    tex.repeat.set(vis / img.width, 1);
+    tex.offset.set((1 - tex.repeat.x) * 0.5, 0);
+  }
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function artEmissive(tex, color, intensity) {
+  return new THREE.MeshLambertMaterial({
+    color: color == null ? 0xffffff : color,
+    map: tex || null,
+    emissive: 0xffffff,
+    emissiveMap: tex || null,
+    emissiveIntensity: intensity == null ? 0.34 : intensity,
+    side: THREE.DoubleSide
+  });
+}
+
+function letterboxDusk(tex) {
+  const img = tex && tex.image;
+  const w = 1600;
+  const h = 880;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, "#163834");
+  sky.addColorStop(0.38, "#2aa8a0");
+  sky.addColorStop(0.58, "#d4b05a");
+  sky.addColorStop(0.78, "#7a5230");
+  sky.addColorStop(1, "#3d2a1c");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+  if (img && img.width && img.height) {
+    const scale = Math.min(w / img.width, h / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
+    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  }
+  const out = new THREE.CanvasTexture(c);
+  out.colorSpace = THREE.SRGBColorSpace;
+  out.needsUpdate = true;
+  return out;
+}
+
+function plantOneOfHer(spec) {
+  const g = new THREE.Group();
+  const mat = artEmissive(null, 0xc4a07a, 0.12);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE_W, FACE_H), mat);
+  face.position.y = FACE_H * 0.5 + 0.28;
+  face.userData.id = spec.id;
+  face.userData.file = spec.file;
+  g.add(face);
+  if (spec.id === "journalist") {
+    const sheetTex = paintOfferedSheet();
+    const sheet = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.52, 0.7),
+      artEmissive(sheetTex, 0xffffff, 0.3)
+    );
+    sheet.position.set(0.72, 1.02, 0.22);
+    sheet.rotation.y = -0.38;
+    sheet.rotation.z = 0.05;
+    sheet.userData.paper = true;
+    g.add(sheet);
+  }
+  if (spec.id === "musician") {
+    const plank = shade(new THREE.Mesh(
+      new THREE.BoxGeometry(1.62, 0.05, 1.05),
+      new THREE.MeshStandardMaterial({ color: 0x1c1814, roughness: 0.92, metalness: 0.03 })
+    ), false, true);
+    plank.position.set(0, 0.03, 0.42);
+    plank.userData.emptyStage = true;
+    plank.userData.label = "empty stage";
+    g.add(plank);
+  }
+  g.position.set(spec.x, 0, HER_Z);
+  g.rotation.y = Math.PI;
+  g.userData.id = spec.id;
+  g.userData.self = spec.id;
+  g.userData.file = spec.file;
+  herCards.push({ spec: spec, group: g, face: face, mat: mat });
+  const root = lineupRoot || scene;
+  root.add(g);
+  return g;
+}
+
+function plantSixOfHer() {
+  HER.forEach(plantOneOfHer);
+}
+
+async function streamHerFaces() {
+  if (duskBackdrop && duskBackdrop.mat) {
+    const duskTex = await loadTexture("assets/art/ocean.jpg");
+    if (duskTex) {
+      const wide = letterboxDusk(duskTex);
+      duskBackdrop.mat.map = wide;
+      duskBackdrop.mat.needsUpdate = true;
+    }
+  }
+  for (let i = 0; i < herCards.length; i += 1) {
+    const card = herCards[i];
+    const tex = await loadTexture("assets/art/" + card.spec.file);
+    if (tex && card.mat) {
+      faceFill(tex);
+      card.mat.map = tex;
+      card.mat.emissiveMap = tex;
+      card.mat.color.set(0xffffff);
+      card.mat.emissiveIntensity = 0.36;
+      card.mat.needsUpdate = true;
+    }
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+}
+
 function buildLineupHook() {
   lineupRoot = new THREE.Group();
   lineupRoot.name = "lineup";
-  const dusk = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 22),
-    new THREE.MeshBasicMaterial({
-      map: skyMap(),
-      side: THREE.DoubleSide,
-      fog: false,
-      depthWrite: false
-    })
-  );
+  const mat = new THREE.MeshBasicMaterial({
+    map: skyMap(),
+    side: THREE.DoubleSide,
+    fog: false,
+    depthWrite: false
+  });
+  const dusk = new THREE.Mesh(new THREE.PlaneGeometry(40, 22), mat);
   dusk.position.set(0, 8, 264);
+  dusk.userData.dusk = true;
   lineupRoot.add(dusk);
+  duskBackdrop = { mesh: dusk, mat: mat };
+  plantSixOfHer();
   scene.add(lineupRoot);
 }
 
@@ -1652,6 +1796,7 @@ function main() {
   });
   tick();
   afterFirstPaint(() => {
+    streamHerFaces().catch((err) => console.warn(err));
     populatePieces().catch((err) => console.warn(err));
   });
 }
@@ -1694,6 +1839,8 @@ window.__field = {
   })),
   hungArt: () => hungArt.slice(),
   hungCount: () => hungArt.length,
+  herIds: () => HER.map((h) => h.id),
+  herFiles: () => HER.map((h) => h.file),
   portalSide: () => portalSide,
   paperOpen: () => {
     const el = document.getElementById("paper");
