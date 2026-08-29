@@ -33,16 +33,16 @@ const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
 // Same woman, six lives. Dresses Orbit's lineup hook. Do not move the camera.
 const HER = [
-  { id: "journalist", file: "self-portrait-charcoal.jpg", x: 4.95 },
-  { id: "scientist", file: "self-portrait-graphite.jpg", x: 2.97 },
-  { id: "radio", file: "monochromatic-self-portrait.jpg", x: 0.99 },
-  { id: "artist", file: "self-portrait-acrylic.jpg", x: -0.99 },
-  { id: "teacher", file: "female-portrait-oil.jpg", x: -2.97 },
-  { id: "musician", file: "female-portrait-oil-3.jpg", x: -4.95 }
+  { id: "journalist", file: "self-portrait-charcoal.jpg", x: 3.25 },
+  { id: "scientist", file: "self-portrait-graphite.jpg", x: 1.95 },
+  { id: "radio", file: "monochromatic-self-portrait.jpg", x: 0.65 },
+  { id: "artist", file: "self-portrait-acrylic.jpg", x: -0.65 },
+  { id: "teacher", file: "female-portrait-oil.jpg", x: -1.95 },
+  { id: "musician", file: "female-portrait-oil-3.jpg", x: -3.25 }
 ];
-const HER_Z = 257.55;
-const FACE_W = 1.72;
-const FACE_H = 2.48;
+const HER_Z = 256;
+const FACE_W = 1.22;
+const FACE_H = 1.78;
 
 const WALKS = [
   { id: "art", title: "Art", pos: [-36, 2.4, -2], href: ART_HREF, body: "Oil, acrylic, charcoal, and prints." },
@@ -441,14 +441,13 @@ function faceFill(tex) {
   return tex;
 }
 
-function artEmissive(tex, color, intensity) {
-  return new THREE.MeshLambertMaterial({
+function artCard(tex, color) {
+  return new THREE.MeshBasicMaterial({
     color: color == null ? 0xffffff : color,
     map: tex || null,
-    emissive: 0xffffff,
-    emissiveMap: tex || null,
-    emissiveIntensity: intensity == null ? 0.34 : intensity,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    toneMapped: false,
+    fog: false
   });
 }
 
@@ -482,17 +481,18 @@ function letterboxDusk(tex) {
 
 function plantOneOfHer(spec) {
   const g = new THREE.Group();
-  const mat = artEmissive(null, 0xc4a07a, 0.12);
+  const mat = artCard(null, 0xc4a07a);
   const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE_W, FACE_H), mat);
-  face.position.y = FACE_H * 0.5 + 0.28;
+  face.position.y = FACE_H * 0.5 + 0.22;
+  face.renderOrder = 1;
   face.userData.id = spec.id;
   face.userData.file = spec.file;
   g.add(face);
   if (spec.id === "journalist") {
     const sheetTex = paintOfferedSheet();
     const sheet = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.52, 0.7),
-      artEmissive(sheetTex, 0xffffff, 0.3)
+      new THREE.PlaneGeometry(0.42, 0.56),
+      artCard(sheetTex, 0xffffff)
     );
     sheet.position.set(0.72, 1.02, 0.22);
     sheet.rotation.y = -0.38;
@@ -540,9 +540,7 @@ async function streamHerFaces() {
     if (tex && card.mat) {
       faceFill(tex);
       card.mat.map = tex;
-      card.mat.emissiveMap = tex;
       card.mat.color.set(0xffffff);
-      card.mat.emissiveIntensity = 0.36;
       card.mat.needsUpdate = true;
     }
     await new Promise((resolve) => requestAnimationFrame(resolve));

@@ -38,7 +38,7 @@ Object.keys(faces).forEach((id) => {
 
 assert.ok(her.includes("self-portrait-charcoal.jpg"), "charcoal side part and brow stay the face");
 assert.ok(app.includes("function faceFill"), "the portrait fills the card");
-assert.ok(app.includes("function artEmissive"), "faces read with art emissive, not a PointLight");
+assert.ok(app.includes("function artCard"), "faces read as unlit portrait cards, not a PointLight");
 assert.ok(!/new THREE\.PointLight/.test(app), "no PointLights");
 assert.ok(!/function buildBoxSelf|boxPart\(/.test(app), "no box-dummy skeleton");
 assert.ok(!app.includes("standLineup"), "do not copy the closed lawn row");
