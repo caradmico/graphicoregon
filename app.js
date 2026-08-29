@@ -33,12 +33,12 @@ const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
 // Same woman, six lives. Dresses Orbit's lineup hook. Do not move the camera.
 const HER = [
-  { id: "journalist", file: "self-portrait-charcoal.jpg", x: -4.95 },
-  { id: "scientist", file: "self-portrait-graphite.jpg", x: -2.97 },
-  { id: "radio", file: "monochromatic-self-portrait.jpg", x: -0.99 },
-  { id: "artist", file: "self-portrait-acrylic.jpg", x: 0.99 },
-  { id: "teacher", file: "female-portrait-oil.jpg", x: 2.97 },
-  { id: "musician", file: "female-portrait-oil-3.jpg", x: 4.95 }
+  { id: "journalist", file: "self-portrait-charcoal.jpg", x: 4.95 },
+  { id: "scientist", file: "self-portrait-graphite.jpg", x: 2.97 },
+  { id: "radio", file: "monochromatic-self-portrait.jpg", x: 0.99 },
+  { id: "artist", file: "self-portrait-acrylic.jpg", x: -0.99 },
+  { id: "teacher", file: "female-portrait-oil.jpg", x: -2.97 },
+  { id: "musician", file: "female-portrait-oil-3.jpg", x: -4.95 }
 ];
 const HER_Z = 257.55;
 const FACE_W = 1.72;
