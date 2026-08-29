@@ -31,6 +31,10 @@ const home = hand.goHome();
 assert.strictEqual(hand.selected(), null, "Esc/home returns to the roster");
 assert.strictEqual(home.action, "roster");
 assert.ok(home.pose && home.pose.z > 0, "roster pose looks at the line-up");
+assert.deepStrictEqual(home.pose, Roster.LINEUP_POSE, "Esc returns to the lineup pose");
+assert.notDeepStrictEqual(Roster.LINEUP_POSE, Roster.ROSTER_POSE, "lineup is not leftover field pose");
+assert.ok(Roster.LINEUP_POSE.y >= 1.4 && Roster.LINEUP_POSE.y <= 1.7, "lineup camera is chest height");
+assert.ok(Math.abs(Roster.LINEUP_POSE.yaw - Math.PI) < 1e-9, "lineup faces the dusk plane, not the field ring");
 
 assert.strictEqual(hand.pick("artist").action, "museum", "artist enters the hall");
 hand.goHome();
@@ -70,6 +74,19 @@ assert.ok(app.includes("pickClass"), "a name tap dollies without a walk");
 assert.ok(app.includes("openMuseumVolume") || app.includes("enterMuseum"), "artist reuses the hall path");
 assert.ok(!/new THREE\.PointLight/.test(app), "no extra PointLights");
 assert.ok(!/identity-canvas/.test(app), "identity-canvas stays private");
+
+assert.ok(/applyPose\(Roster\.LINEUP_POSE\)/.test(app), "boot pose is lineup, not leftover field");
+assert.ok(!/applyPose\(Roster\.ROSTER_POSE\)/.test(app), "boot does not apply leftover field pose");
+assert.ok(app.includes("fieldRoot"), "leftover lawn is a hideable group");
+assert.ok(/fieldRoot\.visible = false/.test(app), "field starts hidden");
+assert.ok(/function returnToRoster[\s\S]*showField\(false\)/.test(app), "Esc hides leftover lawn");
+assert.ok(/function returnToRoster[\s\S]*showLineup\(true\)/.test(app), "Esc restores the lineup hook");
+assert.ok(/function returnToRoster[\s\S]*applyPose\(home\.pose\)/.test(app), "Esc applies the lineup pose");
+assert.ok(/function pickClass[\s\S]*showField\(true\)/.test(app), "a land pick may show the field");
+assert.ok(app.includes("buildLineupHook"), "one dusk plane is the first-paint hook");
+assert.ok(!app.includes("function buildBoxSelf"), "do not dress six dummy bodies");
+assert.ok(!app.includes("standLineup"), "do not copy the closed lawn row");
+assert.ok(/if \(onRosterHome\(\)\) return/.test(app), "WASD is not first-paint travel");
 
 ["app.js", "index.html", "styles.css", "roster.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");

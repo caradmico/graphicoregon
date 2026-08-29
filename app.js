@@ -261,6 +261,8 @@ const PAPER = new THREE.MeshStandardMaterial({
 let newsieHold = null;
 const hand = Roster.createHand();
 let fly = null;
+let fieldRoot = null;
+let lineupRoot = null;
 
 function capTexture(tex, max) {
   const img = tex && tex.image;
@@ -384,6 +386,43 @@ function afterFirstPaint(fn) {
   });
 }
 
+function onRosterHome() {
+  return !hand.selected();
+}
+
+function addField(obj) {
+  const root = fieldRoot || scene;
+  for (let i = 0; i < arguments.length; i++) {
+    if (arguments[i]) root.add(arguments[i]);
+  }
+  return obj;
+}
+
+function showField(on) {
+  if (fieldRoot) fieldRoot.visible = !!on;
+}
+
+function showLineup(on) {
+  if (lineupRoot) lineupRoot.visible = !!on;
+}
+
+function buildLineupHook() {
+  lineupRoot = new THREE.Group();
+  lineupRoot.name = "lineup";
+  const dusk = new THREE.Mesh(
+    new THREE.PlaneGeometry(40, 22),
+    new THREE.MeshBasicMaterial({
+      map: skyMap(),
+      side: THREE.DoubleSide,
+      fog: false,
+      depthWrite: false
+    })
+  );
+  dusk.position.set(0, 8, 264);
+  lineupRoot.add(dusk);
+  scene.add(lineupRoot);
+}
+
 function framedPiece(tex, height) {
   const img = tex.image;
   const aspect = img && img.width && img.height ? img.width / img.height : 1;
@@ -422,10 +461,10 @@ function easelAt(x, z, hung, data, label, labelScale) {
   stand.position.set(x, y, z);
   faceCenter(stand);
   addClick(hung.pic, data);
-  scene.add(stand);
+  addField(stand);
   const sign = makeSign(label, labelScale || 4.4);
   sign.position.set(x, y + hung.height + 1.15, z);
-  scene.add(sign);
+  addField(sign);
   return stand;
 }
 
@@ -591,7 +630,7 @@ function buildPortal() {
   ring.rotation.y = Math.PI / 2;
   g.add(postL, postR, postLB, postRB, sideN, sideS, back, roof, cap, step, jambN, jambS, lintel, inner, veil, ring);
   g.position.set(x, y, z);
-  scene.add(g);
+  addField(g);
 }
 
 function buildMuseum() {
@@ -830,7 +869,7 @@ function buildNewsie() {
     meta: "Writing"
   };
   addClickTree(g, data);
-  scene.add(g);
+  addField(g);
   newsieHold = { offer: offer, sheet: sheet, rest: offer.rotation.x };
 }
 
@@ -843,7 +882,7 @@ function fir(x, z, h) {
   crown.position.y = h * 0.58;
   g.add(trunk, crown);
   g.position.set(x, y, z);
-  scene.add(g);
+  addField(g);
 }
 
 function boulder(x, z, w, h, d) {
@@ -851,7 +890,7 @@ function boulder(x, z, w, h, d) {
   const rock = shade(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), ROCK), true, true);
   rock.position.set(x, y + h * 0.42, z);
   rock.rotation.y = hash2(x, z) * Math.PI;
-  scene.add(rock);
+  addField(rock);
 }
 
 function showPanel(data) {
@@ -936,6 +975,15 @@ function showPaper() {
 
 function fitVolume() {
   if (!camera || !scene) return;
+  if (onRosterHome()) {
+    scene.fog = null;
+    if (camera.far !== 80) {
+      camera.near = 0.1;
+      camera.far = 80;
+      camera.updateProjectionMatrix();
+    }
+    return;
+  }
   if (portalSide === "museum") {
     scene.fog = null;
     if (camera.far !== 48) {
@@ -961,10 +1009,13 @@ function applyCamera() {
 }
 
 function groundY() {
-  return portalSide === "museum" ? MUSEUM.y : heightAt(pos.x, pos.z);
+  if (portalSide === "museum") return MUSEUM.y;
+  if (onRosterHome()) return 0;
+  return heightAt(pos.x, pos.z);
 }
 
 function clampPos() {
+  if (onRosterHome()) return;
   pos.x = Nav.clamp(pos.x, -BOUNDS, BOUNDS);
   pos.z = Nav.clamp(pos.z, -BOUNDS, BOUNDS);
   pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
@@ -1005,7 +1056,7 @@ function stepFly(dt) {
 function poseForClass(id) {
   if (id === "artist") return museumEye();
   const m = Roster.mark(id);
-  if (!m) return Object.assign({}, Roster.ROSTER_POSE);
+  if (!m) return Object.assign({}, Roster.LINEUP_POSE);
   const eye = Nav.eyeToward({ x: m.x, z: m.z }, { x: 0, z: 0 }, id === "journalist" ? 3.6 : 3.4);
   return {
     x: eye.x,
@@ -1039,11 +1090,16 @@ function pickClass(id) {
   const next = hand.pick(id);
   if (!next) return null;
   setRosterChrome(false);
+  showLineup(false);
   if (next.action === "museum") {
+    showField(false);
     openMuseumVolume();
-  } else if (portalSide === "museum") {
-    portalSide = "forest";
-    showMuseum(false);
+  } else {
+    showField(true);
+    if (portalSide === "museum") {
+      portalSide = "forest";
+      showMuseum(false);
+    }
   }
   startFly(poseForClass(id));
   showClassSheet(id);
@@ -1056,6 +1112,8 @@ function returnToRoster() {
   portalSide = "forest";
   portalCool = 0;
   showMuseum(false);
+  showField(false);
+  showLineup(true);
   hidePanel();
   hidePaper();
   applyPose(home.pose);
@@ -1120,6 +1178,7 @@ function bindInput() {
       wheelBudget = 3.2;
       wheelReset = now;
     }
+    if (onRosterHome()) return;
     const step = Nav.wheelCap(Nav.dollyStep(e.deltaY, e.deltaMode), wheelBudget);
     wheelBudget = Math.max(0, wheelBudget - Math.abs(step));
     prevPos.x = pos.x;
@@ -1230,6 +1289,7 @@ function bindRoster() {
 
 function travel(dt) {
   if (fly) return;
+  if (onRosterHome()) return;
   if (held.turnLeft) yaw -= TURN * dt;
   if (held.turnRight) yaw += TURN * dt;
   if (held.lookUp) pitch = Nav.clamp(pitch + TURN * dt, -Nav.PITCH_LIMIT, Nav.PITCH_LIMIT);
@@ -1258,7 +1318,7 @@ function buildLand() {
   }
   attr.needsUpdate = true;
   geo.computeVertexNormals();
-  scene.add(shade(new THREE.Mesh(geo, EARTH), false, true));
+  addField(shade(new THREE.Mesh(geo, EARTH), false, true));
 
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(380, 40, 20),
@@ -1269,17 +1329,17 @@ function buildLand() {
       depthWrite: false
     })
   );
-  scene.add(sky);
+  addField(sky);
 
   const sea = shade(new THREE.Mesh(new THREE.PlaneGeometry(200, 300), WATER), false, true);
   sea.rotation.x = -Math.PI / 2;
   sea.position.set(-118, -0.45, -6);
-  scene.add(sea);
+  addField(sea);
 
   const ring = new THREE.Mesh(new THREE.TorusGeometry(7.4, 0.045, 10, 72), RING);
   ring.rotation.x = Math.PI / 2;
   ring.position.y = 0.04;
-  scene.add(ring);
+  addField(ring);
 
   boulder(-38, -4, 7.2, 4.6, 5.4);
   boulder(-44, 6, 5.4, 3.4, 4.8);
@@ -1306,7 +1366,7 @@ function addWalkSigns() {
       href: walk.href,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(sign);
+    addField(sign);
   });
 }
 
@@ -1316,7 +1376,7 @@ function buildResearchTable() {
   const y = heightAt(x, z);
   const slab = shade(new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.22, 4.2), ROCK), true, true);
   slab.position.set(x, y + 0.82, z);
-  scene.add(slab);
+  addField(slab);
   const legs = [
     [-2.3, -1.6],
     [2.3, -1.6],
@@ -1326,7 +1386,7 @@ function buildResearchTable() {
   legs.forEach((p) => {
     const leg = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.82, 0.28), ROCK), true, true);
     leg.position.set(x + p[0], y + 0.41, z + p[1]);
-    scene.add(leg);
+    addField(leg);
   });
   return { x: x, y: y + 0.94, z: z };
 }
@@ -1339,7 +1399,7 @@ function buildWritingLectern() {
   post.position.set(x, y + 0.58, z);
   const board = shade(new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 1.5), TIMBER), true, true);
   board.position.set(x, y + 1.16, z);
-  scene.add(post, board);
+  addField(post, board);
   return { x: x, y: y + 1.24, z: z };
 }
 
@@ -1388,11 +1448,11 @@ async function populateStarIS() {
     })
   );
   addClick(pts, data);
-  scene.add(pts);
+  addField(pts);
   const sign = makeSign("StarIS", 5.6);
   sign.position.set(origin.x, origin.y - 7.2, origin.z);
   addClick(sign, data);
-  scene.add(sign);
+  addField(sign);
 }
 
 async function populatePieces() {
@@ -1433,10 +1493,10 @@ async function populatePieces() {
       linkLabel: "Open Copper Horizon",
       openUrl: COPPER_HREF
     });
-    scene.add(stand);
+    addField(stand);
     const sign = makeSign("Copper Horizon", 4.8);
     sign.position.set(x, y + 3.7, z);
-    scene.add(sign);
+    addField(sign);
   }
 
   if (mapTex) {
@@ -1462,7 +1522,7 @@ async function populatePieces() {
       href: RESEARCH_HREF,
       linkLabel: "Open the IAU proposal"
     });
-    scene.add(map);
+    addField(map);
   } else {
     buildResearchTable();
   }
@@ -1479,7 +1539,7 @@ async function populatePieces() {
       href: HOME_HREF,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(hung.group);
+    addField(hung.group);
   } else {
     buildWritingLectern();
   }
@@ -1498,7 +1558,7 @@ async function populatePieces() {
       href: HOME_HREF,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(hung.group);
+    addField(hung.group);
   }
 
   await populateStarIS();
@@ -1564,14 +1624,21 @@ function main() {
   fill.position.set(24, 14, -12);
   scene.add(fill);
 
+  fieldRoot = new THREE.Group();
+  fieldRoot.name = "field";
+  fieldRoot.visible = false;
+  scene.add(fieldRoot);
   buildLand();
   buildPortal();
   buildMuseum();
   buildNewsie();
   addWalkSigns();
+  buildLineupHook();
   bindInput();
   bindRoster();
-  applyPose(Roster.ROSTER_POSE);
+  showField(false);
+  showLineup(true);
+  applyPose(Roster.LINEUP_POSE);
   prevPos.x = pos.x;
   prevPos.y = pos.y;
   prevPos.z = pos.z;
@@ -1612,7 +1679,9 @@ window.__field = {
   returnToRoster: returnToRoster,
   selectedClass: () => hand.selected(),
   rosterIds: () => Roster.IDS.slice(),
-  spawn: Object.assign({}, Roster.ROSTER_POSE),
+  spawn: Object.assign({}, Roster.LINEUP_POSE),
+  fieldVisible: () => !!(fieldRoot && fieldRoot.visible),
+  lineupVisible: () => !!(lineupRoot && lineupRoot.visible),
   billboardCount: () => billboards.length,
   billboardLabels: () => billboards.map((o) => o.userData.label).filter(Boolean),
   billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label),
