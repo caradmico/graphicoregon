@@ -20,6 +20,8 @@ assert.ok(app.includes("function dressLineup"), "self-portraits dress the cards"
 const dress = app.slice(app.indexOf("function dressLineup"), app.indexOf("function hideLoader"));
 assert.ok(/Promise\.all\(imgs\.map/.test(dress), "wait on every preload img");
 assert.ok(/img\.decode\(\)/.test(dress), "decode the hidden lineup images before maps");
+assert.ok(/crossOrigin = "anonymous"/.test(app), "decoded faces stay CORS-clean for WebGL");
+assert.ok(/CanvasTexture/.test(dress) || /function textureFromDecoded/.test(app), "maps come from already-decoded images");
 assert.ok(!/loadTexture/.test(dress), "do not TextureLoader the lineup");
 assert.ok(!/dressLineup/.test(app.slice(app.lastIndexOf("afterFirstPaint"))), "do not dress after a live first paint");
 assert.ok(/await dressLineup\(\)/.test(app), "maps apply before the first visible frame");
@@ -81,6 +83,7 @@ assert.ok(/hideLoader\(\)/.test(app) && /display = "none"/.test(app), "JS keeps 
 assert.ok(/id="loader"[^>]*\bhidden\b/.test(html), "markup hides the loader before JS");
 assert.ok(/#loader[\s\S]*#loader\[hidden\][\s\S]*display:\s*none\s*!important/.test(css), "loader is not first paint");
 assert.ok(/id="lineup-preload"/.test(html), "hidden preload images sit in markup");
+assert.ok(/id="lineup-preload"[\s\S]*crossorigin="anonymous"/.test(html), "preload faces load CORS-clean for WebGL");
 assert.ok(/src="look\.js"/.test(html), "index loads the renamed look script");
 assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
 assert.ok(!/\?v=/.test(html), "no cache-buster query on assets");

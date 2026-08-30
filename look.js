@@ -642,6 +642,7 @@ function lineupPreloadImages() {
 
 function imgForFile(imgs, file) {
   for (let i = 0; i < imgs.length; i += 1) {
+    if (!imgs[i]) continue;
     const src = imgs[i].getAttribute("src") || imgs[i].src || "";
     if (src.indexOf(file) !== -1) return imgs[i];
   }
@@ -650,18 +651,43 @@ function imgForFile(imgs, file) {
 
 function textureFromDecoded(img) {
   if (!img || !img.naturalWidth) return null;
-  const tex = new THREE.Texture(img);
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth;
+  c.height = img.naturalHeight;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  try {
+    ctx.getImageData(0, 0, 1, 1);
+  } catch (err) {
+    return null;
+  }
+  const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.needsUpdate = true;
   capTexture(tex, 1024);
   return tex;
 }
 
+async function corsDecoded(img) {
+  img.crossOrigin = "anonymous";
+  const src = img.getAttribute("src") || img.src;
+  if (!src) return null;
+  img.src = src;
+  await img.decode();
+  if (textureFromDecoded(img)) return img;
+  const fresh = new Image();
+  fresh.crossOrigin = "anonymous";
+  fresh.src = src;
+  await fresh.decode();
+  return fresh;
+}
+
 async function dressLineup() {
   const imgs = lineupPreloadImages();
   await Promise.all(imgs.map((img) => img.decode()));
-  const dusk = textureFromDecoded(imgForFile(imgs, "assets/art/ocean.jpg"));
-  const faces = herCards.map((card) => textureFromDecoded(imgForFile(imgs, "assets/art/" + card.spec.file)));
+  const usable = await Promise.all(imgs.map((img) => corsDecoded(img)));
+  const dusk = textureFromDecoded(imgForFile(usable, "assets/art/ocean.jpg"));
+  const faces = herCards.map((card) => textureFromDecoded(imgForFile(usable, "assets/art/" + card.spec.file)));
   if (!dusk || faces.some((tex) => !tex)) return false;
   applyDuskMap(dusk);
   for (let i = 0; i < herCards.length; i += 1) {
