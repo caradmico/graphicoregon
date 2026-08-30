@@ -1215,8 +1215,12 @@ function poseForClass(id) {
 function setRosterChrome(onRoster) {
   const roster = document.getElementById("roster");
   const back = document.getElementById("back");
-  if (roster) roster.hidden = !onRoster;
+  const header = document.querySelector("header.top");
+  const help = document.getElementById("help");
+  if (roster) roster.hidden = true;
   if (back) back.hidden = onRoster;
+  if (header) header.hidden = !!onRoster;
+  if (help) help.hidden = !!onRoster;
 }
 
 function showClassSheet(id) {
@@ -1788,6 +1792,7 @@ function main() {
   bindRoster();
   showField(false);
   showLineup(true);
+  setRosterChrome(true);
   applyPose(Roster.LINEUP_POSE);
   prevPos.x = pos.x;
   prevPos.y = pos.y;

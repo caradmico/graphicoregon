@@ -61,6 +61,8 @@ assert.ok(!/jarvis|commander|experiment|v0/i.test(html), "canvas copy stays quie
 });
 assert.ok(!/Museum|Jarvis|Commander/.test(her), "the six are not labeled as a hall");
 assert.ok(html.includes('id="roster"') && html.includes('id="back"'), "Orbit's taps stay");
+assert.ok(/if \(roster\) roster\.hidden = true/.test(app), "the HTML name list stays off first paint");
+assert.ok(/setRosterChrome\(true\)/.test(app), "boot hides the name-stack chrome");
 assert.ok(/PIXEL_RATIO = 1\.25/.test(app), "pixel ratio stays at or under 1.25");
 
 console.log("six-of-her: portraits on Orbit's dusk hook — all assertions passed");
