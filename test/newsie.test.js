@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..");
-const app = fs.readFileSync(path.join(root, "look.js"), "utf8");
+const app = fs.readFileSync(path.join(root, "faces.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "chrome.css"), "utf8");
 const newsie = app.slice(app.indexOf("function buildNewsie"), app.indexOf("function fir"));
@@ -35,7 +35,7 @@ assert.ok(!/byline|By [A-Z]/i.test(html), "no invented bylines");
 assert.ok(css.includes("#paper-close"), "fold chrome stays");
 assert.ok(css.includes("handed") || css.includes("rotate(-0.9deg)"), "the overlay sits like a handed sheet");
 
-["look.js", "index.html", "chrome.css"].forEach((file) => {
+["faces.js", "index.html", "chrome.css"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
 });
