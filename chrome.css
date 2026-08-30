@@ -207,15 +207,18 @@ header.top p.tag {
   opacity: 0.55;
 }
 
-#loader,
-#loader[hidden],
-#loader.hide {
+#loader {
   position: fixed;
   inset: 0;
   background: var(--ink);
   z-index: 8;
+  display: grid;
+  place-items: center;
+}
+
+#loader.hide,
+#loader[hidden] {
   display: none !important;
-  opacity: 0;
   pointer-events: none;
 }
 

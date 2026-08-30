@@ -18,7 +18,8 @@ assert.ok(app.includes("assets/art/ocean.jpg"), "dusk is her ocean painting, not
 assert.ok(app.includes("function paintHerPlaceholder"), "canvas faces stand in before remote portraits");
 assert.ok(app.includes("function dressLineup"), "self-portraits still dress the cards");
 assert.ok(/Promise\.all/.test(app.slice(app.indexOf("function dressLineup"), app.indexOf("function hideLoader"))), "lineup maps load in parallel");
-assert.ok(/afterFirstPaint\([\s\S]*dressLineup/.test(app), "self-portraits swap after first paint");
+assert.ok(/await dressLineup\(\)/.test(app), "maps apply before the stranger sees a frame");
+assert.ok(!/afterFirstPaint\([\s\S]{0,80}dressLineup/.test(app), "do not dress from afterFirstPaint");
 assert.ok(!/streamHerFaces/.test(app), "no sequential face stream");
 
 Roster.IDS.forEach((id) => {
@@ -73,8 +74,8 @@ assert.ok(/PIXEL_RATIO = 1\.25/.test(app), "pixel ratio stays at or under 1.25")
 const hook = app.slice(app.indexOf("function buildLineupHook"), app.indexOf("function framedPiece"));
 assert.ok(/depthWrite:\s*true/.test(hook), "dusk writes depth so the six stay in front");
 assert.ok(!/depthWrite:\s*false/.test(hook), "dusk is not a late overlay");
-assert.ok(/hideLoader\(\)/.test(app) && /display = "none"/.test(app), "JS keeps the loader off first paint");
-assert.ok(/id="loader"[^>]*\bhidden\b/.test(html), "markup hides the loader before JS");
-assert.ok(/#loader[\s\S]*#loader\[hidden\][\s\S]*display:\s*none\s*!important/.test(css), "loader is not first paint");
+assert.ok(/await dressLineup\(\)[\s\S]*hideLoader\(\)/.test(app), "loader drops only after her maps");
+assert.ok(!/<div id="loader" hidden>/.test(html), "loader stays up until the row is dressed");
+assert.ok(/#loader\.hide[\s\S]*display:\s*none\s*!important/.test(css), "loader hide is display none");
 
 console.log("six-of-her: portraits on Orbit's dusk hook — all assertions passed");
