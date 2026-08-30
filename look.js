@@ -1892,7 +1892,7 @@ async function main() {
     history.replaceState(null, "", location.pathname + location.hash);
   }
   hideLoader();
-  showStage();
+  hideStage();
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1946,8 +1946,10 @@ async function main() {
   prevPos.z = pos.z;
   applyCamera();
   hideLoader();
-  showStage();
+  const dressed = await dressLineup();
+  if (!dressed) return;
   renderer.render(scene, camera);
+  showStage();
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
@@ -1956,7 +1958,6 @@ async function main() {
   });
   tick();
   afterFirstPaint(() => {
-    dressLineup().catch((err) => console.warn(err));
     populatePieces().catch((err) => console.warn(err));
   });
 }
