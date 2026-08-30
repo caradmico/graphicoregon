@@ -479,9 +479,92 @@ function letterboxDusk(tex) {
   return out;
 }
 
+function paintHerPlaceholder(spec) {
+  const w = 320;
+  const h = 468;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  const looks = {
+    journalist: { ground: "#c8c2b6", skin: "#d4c2aa", shade: "#9a8870", hair: "#1c1814", cloth: "#eee6d4", ink: "#2a2420" },
+    scientist: { ground: "#b8bcc0", skin: "#c8c0b4", shade: "#8a8e92", hair: "#22262a", cloth: "#3a3e42", ink: "#3a3e42" },
+    radio: { ground: "#163834", skin: "#7ab8b0", shade: "#2a6a64", hair: "#0a1614", cloth: "#122422", ink: "#0c1c1a" },
+    artist: { ground: "#2a4038", skin: "#e0b890", shade: "#b07850", hair: "#2a1810", cloth: "#2aa8a0", ink: "#1a1712" },
+    teacher: { ground: "#5a3a24", skin: "#c4a07a", shade: "#8a6848", hair: "#1c1410", cloth: "#4a3020", ink: "#2a1810" },
+    musician: { ground: "#2a2018", skin: "#b89070", shade: "#7a5230", hair: "#14100c", cloth: "#1c1814", ink: "#14100c" }
+  };
+  const p = looks[spec.id] || looks.journalist;
+  ctx.fillStyle = p.ground;
+  ctx.fillRect(0, 0, w, h);
+  let i;
+  for (i = 0; i < 720; i += 1) {
+    const x = hash2(i * 1.7, spec.id.length) * w;
+    const y = hash2(spec.id.length + 3, i * 2.1) * h;
+    ctx.fillStyle = "rgba(26, 23, 18, 0.06)";
+    ctx.fillRect(x, y, 2, 2);
+  }
+  ctx.fillStyle = p.cloth;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, h * 1.06, w * 0.62, h * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = p.shade;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, h * 0.8, w * 0.13, h * 0.16, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = p.hair;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, h * 0.4, w * 0.42, h * 0.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = p.skin;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, h * 0.44, w * 0.28, h * 0.32, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = p.hair;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.34, h * 0.26, w * 0.22, h * 0.16, -0.42, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(w * 0.68, h * 0.25, w * 0.18, h * 0.15, 0.36, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = p.ink;
+  ctx.beginPath();
+  ctx.ellipse(w * 0.4, h * 0.45, 7, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.61, h * 0.45, 7, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = p.ink;
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(w * 0.32, h * 0.4);
+  ctx.quadraticCurveTo(w * 0.39, h * 0.36, w * 0.46, h * 0.4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(w * 0.54, h * 0.4);
+  ctx.quadraticCurveTo(w * 0.61, h * 0.36, w * 0.7, h * 0.41);
+  ctx.stroke();
+  ctx.strokeStyle = p.shade;
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.5, h * 0.47);
+  ctx.lineTo(w * 0.48, h * 0.55);
+  ctx.quadraticCurveTo(w * 0.5, h * 0.57, w * 0.55, h * 0.55);
+  ctx.stroke();
+  ctx.strokeStyle = p.ink;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.43, h * 0.63);
+  ctx.quadraticCurveTo(w * 0.5, h * 0.66, w * 0.58, h * 0.63);
+  ctx.stroke();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 function plantOneOfHer(spec) {
   const g = new THREE.Group();
-  const mat = artCard(null, 0xc4a07a);
+  const mat = artCard(paintHerPlaceholder(spec), 0xffffff);
   const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE_W, FACE_H), mat);
   face.position.y = FACE_H * 0.5 + 0.22;
   face.renderOrder = 1;
@@ -1769,6 +1852,7 @@ function main() {
   if (location.search) {
     history.replaceState(null, "", location.pathname + location.hash);
   }
+  hideLoader();
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1821,24 +1905,18 @@ function main() {
   prevPos.y = pos.y;
   prevPos.z = pos.z;
   applyCamera();
+  hideLoader();
+  renderer.render(scene, camera);
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
     renderer.setSize(innerWidth, innerHeight);
   });
-  dressLineup().then(() => {
-    applyCamera();
-    renderer.render(scene, camera);
-    hideLoader();
-    tick();
-    afterFirstPaint(() => {
-      populatePieces().catch((err) => console.warn(err));
-    });
-  }).catch((err) => {
-    console.warn(err);
-    hideLoader();
-    tick();
+  tick();
+  afterFirstPaint(() => {
+    dressLineup().catch((err) => console.warn(err));
+    populatePieces().catch((err) => console.warn(err));
   });
 }
 
