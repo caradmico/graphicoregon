@@ -15,14 +15,13 @@ assert.ok(app.includes("function plantSixOfHer"), "the lineup is six of her");
 assert.ok(app.includes("function buildLineupHook"), "look dresses Orbit's dusk hook");
 assert.ok(app.includes("plantSixOfHer()"), "the six stand on Orbit's lineup");
 assert.ok(app.includes("assets/art/ocean.jpg"), "dusk is her ocean painting, not a new plate");
-assert.ok(app.includes("function paintHerPlaceholder"), "placeholders may plant while the canvas is hidden");
-assert.ok(app.includes("function dressLineup"), "self-portraits dress the cards");
+assert.ok(app.includes("function paintHerPlaceholder"), "canvas faces stand in before remote portraits");
+assert.ok(app.includes("function dressLineup"), "self-portraits still dress the cards");
 const dress = app.slice(app.indexOf("function dressLineup"), app.indexOf("function hideLoader"));
 assert.ok(/Promise\.all\(imgs\.map/.test(dress), "wait on every preload img");
 assert.ok(/img\.decode\(\)/.test(dress), "decode the hidden lineup images before maps");
 assert.ok(!/loadTexture/.test(dress), "do not TextureLoader the lineup");
-assert.ok(!/dressLineup/.test(app.slice(app.lastIndexOf("afterFirstPaint"))), "do not dress after a live first paint");
-assert.ok(/await dressLineup\(\)/.test(app), "maps apply before the first visible frame");
+assert.ok(/afterFirstPaint\([\s\S]*dressLineup/.test(app), "self-portraits swap after first paint");
 assert.ok(!/streamHerFaces/.test(app), "no sequential face stream");
 
 Roster.IDS.forEach((id) => {
@@ -58,7 +57,7 @@ assert.ok(plant.includes("empty stage"), "Musician keeps an empty stage");
 assert.ok(!/spotify|track 1|album|soundcloud/i.test(plant), "no fake tracks");
 assert.ok(plant.includes("lineupRoot"), "cards parent to Orbit's lineup, not the leftover field");
 assert.ok(/addClick\(face/.test(plant), "each face card is a tap target");
-assert.ok(plant.includes("paintHerPlaceholder"), "placeholders may plant off-screen before maps");
+assert.ok(plant.includes("paintHerPlaceholder"), "each card is a painted face on the first frame");
 
 assert.ok(nav.includes("function lerpPose"), "field-nav.js stays Orbit's");
 assert.ok(!/const HER/.test(nav), "look did not rewrite the hand");
@@ -84,8 +83,7 @@ assert.ok(/id="lineup-preload"/.test(html), "hidden preload images sit in markup
 assert.ok(/src="look\.js"/.test(html), "index loads the renamed look script");
 assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
 assert.ok(!/\?v=/.test(html), "no cache-buster query on assets");
-assert.ok(/visibility:\s*hidden/.test(css) && /canvas#stage\.ready/.test(css), "canvas stays hidden until maps");
-assert.ok(/function hideStage/.test(app) && /function showStage/.test(app), "JS holds the canvas until the six are dressed");
-assert.ok(/await dressLineup\(\)[\s\S]*renderer\.render[\s\S]*showStage/.test(app), "first visible WebGL frame is after all maps");
+assert.ok(/canvas#stage[\s\S]*visibility:\s*visible/.test(css), "the canvas is first paint, not a hidden wait");
+assert.ok(/function showStage/.test(app) && /showStage\(\)/.test(app), "JS shows the stage on first paint");
 
 console.log("six-of-her: portraits on Orbit's dusk hook — all assertions passed");

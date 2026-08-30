@@ -17,16 +17,13 @@ html, body {
   font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
 }
 
-canvas#stage {
+canvas#stage,
+canvas#stage.ready {
   display: block;
   width: 100%;
   height: 100%;
   touch-action: none;
   outline: none;
-  visibility: hidden;
-}
-
-canvas#stage.ready {
   visibility: visible;
 }
 
