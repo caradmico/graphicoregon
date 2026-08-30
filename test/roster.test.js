@@ -67,15 +67,17 @@ assert.ok(html.includes('id="roster"'), "phone-first name list exists");
 assert.ok(/id="roster"[^>]*\bhidden\b/.test(html), "markup hides the name list before JS");
 assert.ok(html.includes('src="field.js"'), "index loads the renamed field script");
 assert.ok(!/src="app\.js"/.test(html), "do not keep the cached app.js src");
-assert.ok(html.includes('href="hud.css"'), "index loads the renamed hud sheet");
+assert.ok(html.includes('href="chrome.css"'), "index loads the renamed chrome sheet");
 assert.ok(html.includes('id="back"'), "visible Back control exists");
 assert.ok(/tap a face/i.test(help), "help says tap a face");
 assert.ok(!/WASD/i.test(help), "help does not advertise WASD as the way in");
 assert.ok(!/WASD/i.test(html.match(/id="help"[\s\S]*?<\/div>/)[0]), "help copy has no WASD");
 
-const css = fs.readFileSync(path.join(root, "hud.css"), "utf8");
+const css = fs.readFileSync(path.join(root, "chrome.css"), "utf8");
 assert.ok(/#roster,\s*#roster\[hidden\]\s*\{[\s\S]*display:\s*none\s*!important/.test(css), "CSS kills the name list even if hidden is fought");
-assert.ok(!/@media[\s\S]*#roster\s*\{[\s\S]*flex-direction:\s*row/.test(css), "mobile query does not restore the sidebar");
+const mobile = css.slice(css.indexOf("@media (max-width: 760px)"));
+assert.ok(/#roster,\s*#roster\[hidden\]\s*\{[\s\S]*display:\s*none\s*!important/.test(mobile), "the 760px query repeats the hide");
+assert.ok(!/left:\s*12px/.test(mobile) && !/flex-direction:\s*row/.test(mobile), "mobile query does not restore a name column");
 
 assert.ok(app.includes("returnToRoster"), "Esc/Back can restore the roster");
 assert.ok(/flags\.escape[\s\S]*hand\.selected\(\)[\s\S]*returnToRoster/.test(app), "Esc returns when a class is picked");
@@ -104,7 +106,7 @@ assert.ok(/userData\.id[\s\S]*Roster\.isId[\s\S]*pickClass/.test(app), "tapping 
 assert.ok(/setRosterChrome\(true\)/.test(app), "boot keeps the name list off");
 assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 
-["field.js", "index.html", "hud.css", "roster.js"].forEach((file) => {
+["field.js", "index.html", "chrome.css", "roster.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
   assert.ok(!/health.?bar|street fighter|vs\./i.test(src), file + " has no fighter chrome");

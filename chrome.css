@@ -366,6 +366,10 @@ header.top p.tag {
 }
 
 @media (max-width: 760px) {
+  #roster,
+  #roster[hidden] {
+    display: none !important;
+  }
   #help { display: none; }
   #panel { max-height: 32vh; }
   #paper .spread { grid-template-columns: 1fr; }
