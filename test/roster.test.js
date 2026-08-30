@@ -104,6 +104,8 @@ assert.ok(/addClick\(face/.test(plant), "a face card is a clickable pick");
 assert.ok(/PlaneGeometry\(FACE_W \* 1\.55/.test(plant), "an invisible larger hit mesh covers the card");
 assert.ok(/userData\.id[\s\S]*Roster\.isId[\s\S]*pickClass/.test(app), "tapping a face dollies that class");
 assert.ok(/setRosterChrome\(true\)/.test(app), "boot keeps the name list off");
+assert.ok(html.includes('rel="preload"'), "lineup images preload");
+assert.ok(!/\?v=/.test(html), "boot still strips query; no cache-buster on assets");
 assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 
 ["field.js", "index.html", "chrome.css", "roster.js"].forEach((file) => {

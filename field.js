@@ -537,26 +537,37 @@ function plantSixOfHer() {
   HER.forEach(plantOneOfHer);
 }
 
-async function streamHerFaces() {
-  if (duskBackdrop && duskBackdrop.mat) {
-    const duskTex = await loadTexture("assets/art/ocean.jpg");
-    if (duskTex) {
-      const wide = letterboxDusk(duskTex);
-      duskBackdrop.mat.map = wide;
-      duskBackdrop.mat.needsUpdate = true;
-    }
-  }
+function applyFaceMap(card, tex) {
+  if (!tex || !card || !card.mat) return;
+  faceFill(tex);
+  card.mat.map = tex;
+  card.mat.color.set(0xffffff);
+  card.mat.needsUpdate = true;
+}
+
+function applyDuskMap(tex) {
+  if (!tex || !duskBackdrop || !duskBackdrop.mat) return;
+  const wide = letterboxDusk(tex);
+  duskBackdrop.mat.map = wide;
+  duskBackdrop.mat.needsUpdate = true;
+}
+
+async function dressLineup() {
+  const duskJob = loadTexture("assets/art/ocean.jpg");
+  const faceJobs = herCards.map((card) => loadTexture("assets/art/" + card.spec.file));
+  const packed = await Promise.all([duskJob].concat(faceJobs));
+  applyDuskMap(packed[0]);
   for (let i = 0; i < herCards.length; i += 1) {
-    const card = herCards[i];
-    const tex = await loadTexture("assets/art/" + card.spec.file);
-    if (tex && card.mat) {
-      faceFill(tex);
-      card.mat.map = tex;
-      card.mat.color.set(0xffffff);
-      card.mat.needsUpdate = true;
-    }
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    applyFaceMap(herCards[i], packed[i + 1]);
   }
+}
+
+function hideLoader() {
+  const el = document.getElementById("loader");
+  if (!el) return;
+  el.classList.add("hide");
+  el.hidden = true;
+  el.style.display = "none";
 }
 
 function buildLineupHook() {
@@ -566,10 +577,13 @@ function buildLineupHook() {
     map: skyMap(),
     side: THREE.DoubleSide,
     fog: false,
-    depthWrite: false
+    transparent: false,
+    depthTest: true,
+    depthWrite: true
   });
   const dusk = new THREE.Mesh(new THREE.PlaneGeometry(40, 22), mat);
   dusk.position.set(0, 8, 264);
+  dusk.renderOrder = -1;
   dusk.userData.dusk = true;
   lineupRoot.add(dusk);
   duskBackdrop = { mesh: dusk, mat: mat };
@@ -1807,17 +1821,24 @@ function main() {
   prevPos.y = pos.y;
   prevPos.z = pos.z;
   applyCamera();
-  document.getElementById("loader").classList.add("hide");
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
     renderer.setSize(innerWidth, innerHeight);
   });
-  tick();
-  afterFirstPaint(() => {
-    streamHerFaces().catch((err) => console.warn(err));
-    populatePieces().catch((err) => console.warn(err));
+  dressLineup().then(() => {
+    applyCamera();
+    renderer.render(scene, camera);
+    hideLoader();
+    tick();
+    afterFirstPaint(() => {
+      populatePieces().catch((err) => console.warn(err));
+    });
+  }).catch((err) => {
+    console.warn(err);
+    hideLoader();
+    tick();
   });
 }
 

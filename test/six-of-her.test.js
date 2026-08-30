@@ -15,8 +15,9 @@ assert.ok(app.includes("function plantSixOfHer"), "the lineup is six of her");
 assert.ok(app.includes("function buildLineupHook"), "look dresses Orbit's dusk hook");
 assert.ok(app.includes("plantSixOfHer()"), "the six stand on Orbit's lineup");
 assert.ok(app.includes("assets/art/ocean.jpg"), "dusk is her ocean painting, not a new plate");
-assert.ok(app.includes("function streamHerFaces"), "faces stream after first frame");
-assert.ok(/afterFirstPaint\([\s\S]*streamHerFaces/.test(app), "portraits wait for first paint");
+assert.ok(app.includes("function dressLineup"), "the six and dusk dress before first paint");
+assert.ok(/Promise\.all/.test(app.slice(app.indexOf("function dressLineup"), app.indexOf("function hideLoader"))), "lineup maps load in parallel");
+assert.ok(!/streamHerFaces/.test(app), "no sequential face stream");
 
 Roster.IDS.forEach((id) => {
   assert.ok(new RegExp('id: "' + id + '"').test(her), "look plants " + id);
@@ -30,10 +31,12 @@ const faces = {
   teacher: "female-portrait-oil.jpg",
   musician: "female-portrait-oil-3.jpg"
 };
+assert.ok(html.includes('rel="preload"') && html.includes("assets/art/ocean.jpg"), "ocean is preloaded");
 Object.keys(faces).forEach((id) => {
   const file = faces[id];
   assert.ok(her.includes(file), id + " uses " + file);
   assert.ok(fs.existsSync(path.join(root, "assets/art", file)), file + " is already on disk");
+  assert.ok(html.includes("assets/art/" + file), "preload " + file);
 });
 
 assert.ok(her.includes("self-portrait-charcoal.jpg"), "charcoal side part and brow stay the face");
@@ -64,5 +67,11 @@ assert.ok(html.includes('id="roster"') && html.includes('id="back"'), "Orbit's t
 assert.ok(/if \(roster\) roster\.hidden = true/.test(app), "the HTML name list stays off first paint");
 assert.ok(/setRosterChrome\(true\)/.test(app), "boot hides the name-stack chrome");
 assert.ok(/PIXEL_RATIO = 1\.25/.test(app), "pixel ratio stays at or under 1.25");
+const hook = app.slice(app.indexOf("function buildLineupHook"), app.indexOf("function framedPiece"));
+assert.ok(/depthWrite:\s*true/.test(hook), "dusk writes depth so the six stay in front");
+assert.ok(!/depthWrite:\s*false/.test(hook), "dusk is not a late overlay");
+assert.ok(/dressLineup\(\)\.then/.test(app), "first WebGL frame waits for her maps");
+assert.ok(/hideLoader\(\)/.test(app) && /display = "none"/.test(app), "loader is removed only after the row is dressed");
+assert.ok(/#loader\.hide[\s\S]*display:\s*none/.test(css), "loader hide is display none, not a fade");
 
 console.log("six-of-her: portraits on Orbit's dusk hook — all assertions passed");
