@@ -479,115 +479,133 @@ function letterboxDusk(tex) {
   return out;
 }
 
-function paintHerPlaceholder(spec) {
-  const w = 320;
-  const h = 468;
-  const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
-  const ctx = c.getContext("2d");
-  const looks = {
-    journalist: { ground: "#c8c2b6", skin: "#d4c2aa", shade: "#9a8870", hair: "#1c1814", cloth: "#eee6d4", ink: "#2a2420" },
-    scientist: { ground: "#b8bcc0", skin: "#c8c0b4", shade: "#8a8e92", hair: "#22262a", cloth: "#3a3e42", ink: "#3a3e42" },
-    radio: { ground: "#163834", skin: "#7ab8b0", shade: "#2a6a64", hair: "#0a1614", cloth: "#122422", ink: "#0c1c1a" },
-    artist: { ground: "#2a4038", skin: "#e0b890", shade: "#b07850", hair: "#2a1810", cloth: "#2aa8a0", ink: "#1a1712" },
-    teacher: { ground: "#5a3a24", skin: "#c4a07a", shade: "#8a6848", hair: "#1c1410", cloth: "#4a3020", ink: "#2a1810" },
-    musician: { ground: "#2a2018", skin: "#b89070", shade: "#7a5230", hair: "#14100c", cloth: "#1c1814", ink: "#14100c" }
+function latheProfile(pts, segs, start, span) {
+  const profile = pts.map((p) => new THREE.Vector2(p[0], p[1]));
+  const geo = new THREE.LatheGeometry(
+    profile,
+    segs == null ? 28 : segs,
+    start == null ? 0 : start,
+    span == null ? Math.PI * 2 : span
+  );
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function clothOfHer(id) {
+  const ink = {
+    journalist: 0x1a3a42,
+    scientist: 0x3d4a38,
+    radio: 0x2a2e38,
+    artist: 0x8a6a4a,
+    teacher: 0x5a3a28,
+    musician: 0x1c1814
   };
-  const p = looks[spec.id] || looks.journalist;
-  ctx.fillStyle = p.ground;
-  ctx.fillRect(0, 0, w, h);
-  let i;
-  for (i = 0; i < 720; i += 1) {
-    const x = hash2(i * 1.7, spec.id.length) * w;
-    const y = hash2(spec.id.length + 3, i * 2.1) * h;
-    ctx.fillStyle = "rgba(26, 23, 18, 0.06)";
-    ctx.fillRect(x, y, 2, 2);
-  }
-  ctx.fillStyle = p.cloth;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.5, h * 1.06, w * 0.62, h * 0.3, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = p.shade;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.5, h * 0.8, w * 0.13, h * 0.16, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = p.hair;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.5, h * 0.4, w * 0.42, h * 0.4, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = p.skin;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.5, h * 0.44, w * 0.28, h * 0.32, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = p.hair;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.34, h * 0.26, w * 0.22, h * 0.16, -0.42, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(w * 0.68, h * 0.25, w * 0.18, h * 0.15, 0.36, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = p.ink;
-  ctx.beginPath();
-  ctx.ellipse(w * 0.4, h * 0.45, 7, 5, 0, 0, Math.PI * 2);
-  ctx.ellipse(w * 0.61, h * 0.45, 7, 5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = p.ink;
-  ctx.lineWidth = 5;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(w * 0.32, h * 0.4);
-  ctx.quadraticCurveTo(w * 0.39, h * 0.36, w * 0.46, h * 0.4);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(w * 0.54, h * 0.4);
-  ctx.quadraticCurveTo(w * 0.61, h * 0.36, w * 0.7, h * 0.41);
-  ctx.stroke();
-  ctx.strokeStyle = p.shade;
-  ctx.lineWidth = 2.4;
-  ctx.beginPath();
-  ctx.moveTo(w * 0.5, h * 0.47);
-  ctx.lineTo(w * 0.48, h * 0.55);
-  ctx.quadraticCurveTo(w * 0.5, h * 0.57, w * 0.55, h * 0.55);
-  ctx.stroke();
-  ctx.strokeStyle = p.ink;
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.moveTo(w * 0.43, h * 0.63);
-  ctx.quadraticCurveTo(w * 0.5, h * 0.66, w * 0.58, h * 0.63);
-  ctx.stroke();
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.needsUpdate = true;
-  return tex;
+  return new THREE.MeshStandardMaterial({
+    color: ink[id] || 0x3a2a18,
+    roughness: 0.86,
+    metalness: 0.04
+  });
+}
+
+function newsieCap() {
+  const g = new THREE.Group();
+  const felt = new THREE.MeshStandardMaterial({ color: 0x3a2a18, roughness: 0.84, metalness: 0.04 });
+  const crown = shade(new THREE.Mesh(
+    latheProfile([[0.02, 0.07], [0.078, 0.062], [0.088, 0.02], [0.07, 0]], 22),
+    felt
+  ), true, true);
+  const brim = shade(new THREE.Mesh(
+    latheProfile([[0.068, 0.012], [0.118, 0.01], [0.12, 0.002], [0.068, 0]], 22),
+    felt
+  ), true, true);
+  brim.position.z = 0.028;
+  g.add(crown, brim);
+  g.userData.newsie = true;
+  return g;
 }
 
 function plantOneOfHer(spec) {
   const g = new THREE.Group();
-  const mat = artCard(paintHerPlaceholder(spec), 0xffffff);
-  const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE_W, FACE_H), mat);
-  face.position.y = FACE_H * 0.5 + 0.22;
+  const cloth = clothOfHer(spec.id);
+  const skin = new THREE.MeshStandardMaterial({ color: 0xc4a07a, roughness: 0.78, metalness: 0.02 });
+  const hair = new THREE.MeshStandardMaterial({ color: 0x2a1c14, roughness: 0.88, metalness: 0.02 });
+  const head = shade(new THREE.Mesh(latheProfile([
+    [0.002, 0.17], [0.055, 0.162], [0.092, 0.138], [0.112, 0.09], [0.12, 0.03],
+    [0.116, -0.02], [0.102, -0.07], [0.072, -0.112], [0.038, -0.138], [0.002, -0.15]
+  ], 36), skin), true, true);
+  head.position.set(0, 1.55, 0.02);
+  const hairMesh = shade(new THREE.Mesh(latheProfile([
+    [0.04, 0.188], [0.1, 0.176], [0.132, 0.14], [0.138, 0.06],
+    [0.128, -0.02], [0.11, -0.08], [0.08, -0.12], [0.04, -0.1]
+  ], 28, Math.PI * 0.38, Math.PI * 1.24), hair), true, true);
+  hairMesh.position.set(0, 1.55, 0);
+  const neck = shade(new THREE.Mesh(latheProfile([
+    [0.038, 0.04], [0.042, 0], [0.05, -0.05], [0.062, -0.08]
+  ], 20), skin), true, true);
+  neck.position.set(0, 1.42, 0.01);
+  const torso = shade(new THREE.Mesh(latheProfile([
+    [0.08, 0.42], [0.14, 0.4], [0.168, 0.34], [0.155, 0.22], [0.128, 0.1],
+    [0.138, -0.02], [0.162, -0.12], [0.15, -0.2], [0.08, -0.24]
+  ], 32), cloth), true, true);
+  torso.position.set(0, 1.12, 0);
+  function limb(len, r0, r1) {
+    const pts = [];
+    for (let i = 0; i <= 12; i += 1) {
+      const t = i / 12;
+      pts.push([r0 + (r1 - r0) * t + Math.sin(t * Math.PI) * 0.01, -t * len]);
+    }
+    return latheProfile(pts, 16);
+  }
+  const armL = shade(new THREE.Mesh(limb(0.58, 0.038, 0.022), skin), true, true);
+  armL.position.set(-0.2, 1.36, 0.02);
+  armL.rotation.z = 0.18;
+  const armR = shade(new THREE.Mesh(limb(0.58, 0.038, 0.022), skin), true, true);
+  armR.position.set(0.2, 1.36, 0.04);
+  armR.rotation.z = -0.22;
+  armR.rotation.x = spec.id === "journalist" ? -0.55 : 0.06;
+  const legL = shade(new THREE.Mesh(limb(0.78, 0.055, 0.028), cloth), true, true);
+  legL.position.set(-0.07, 0.88, 0.01);
+  const legR = shade(new THREE.Mesh(limb(0.78, 0.055, 0.028), cloth), true, true);
+  legR.position.set(0.07, 0.88, -0.01);
+  const footGeo = latheProfile([[0.01, 0.04], [0.042, 0.03], [0.05, 0], [0.038, -0.02], [0.01, -0.025]], 14);
+  const shoe = new THREE.MeshStandardMaterial({ color: 0x1a1712, roughness: 0.9, metalness: 0.04 });
+  const footL = shade(new THREE.Mesh(footGeo, shoe), true, true);
+  footL.position.set(-0.08, 0.06, 0.04);
+  footL.rotation.x = Math.PI / 2;
+  const footR = shade(new THREE.Mesh(footGeo.clone(), shoe), true, true);
+  footR.position.set(0.08, 0.06, 0.04);
+  footR.rotation.x = Math.PI / 2;
+  g.add(head, hairMesh, neck, torso, armL, armR, legL, legR, footL, footR);
+
+  const mat = artCard(null, 0xffffff);
+  mat.visible = false;
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.26), mat);
+  face.position.set(0, 1.56, 0.128);
   face.renderOrder = 1;
   face.userData.id = spec.id;
   face.userData.file = spec.file;
+  face.userData.face = true;
   addClick(face, { id: spec.id });
   g.add(face);
   const hit = new THREE.Mesh(
     new THREE.PlaneGeometry(FACE_W * 1.55, FACE_H * 1.4),
     new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
   );
-  hit.position.copy(face.position);
-  hit.position.z += 0.06;
+  hit.position.set(0, 1.2, 0.2);
   hit.userData.id = spec.id;
   addClick(hit, { id: spec.id });
   g.add(hit);
   if (spec.id === "journalist") {
+    const cap = newsieCap();
+    cap.position.set(0, 1.68, 0.01);
+    addClick(cap, { id: spec.id });
+    g.add(cap);
     const sheetTex = paintOfferedSheet();
     const sheet = new THREE.Mesh(
       new THREE.PlaneGeometry(0.42, 0.56),
       artCard(sheetTex, 0xffffff)
     );
-    sheet.position.set(0.72, 1.02, 0.22);
+    sheet.position.set(0.28, 1.12, 0.22);
     sheet.rotation.y = -0.38;
     sheet.rotation.z = 0.05;
     sheet.userData.paper = true;
@@ -596,10 +614,10 @@ function plantOneOfHer(spec) {
   }
   if (spec.id === "musician") {
     const plank = shade(new THREE.Mesh(
-      new THREE.BoxGeometry(1.62, 0.05, 1.05),
+      latheProfile([[0.12, 0.02], [0.82, 0.016], [0.84, 0], [0.12, -0.008]], 28),
       new THREE.MeshStandardMaterial({ color: 0x1c1814, roughness: 0.92, metalness: 0.03 })
     ), false, true);
-    plank.position.set(0, 0.03, 0.42);
+    plank.position.set(0, 0.02, 0.22);
     plank.userData.emptyStage = true;
     plank.userData.label = "empty stage";
     addClick(plank, { id: spec.id });
@@ -610,6 +628,7 @@ function plantOneOfHer(spec) {
   g.userData.id = spec.id;
   g.userData.self = spec.id;
   g.userData.file = spec.file;
+  g.userData.kind = "figure";
   herCards.push({ spec: spec, group: g, face: face, mat: mat });
   const root = lineupRoot || scene;
   root.add(g);
@@ -625,6 +644,7 @@ function applyFaceMap(card, tex) {
   faceFill(tex);
   card.mat.map = tex;
   card.mat.color.set(0xffffff);
+  card.mat.visible = true;
   card.mat.needsUpdate = true;
 }
 

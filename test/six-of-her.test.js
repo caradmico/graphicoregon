@@ -15,7 +15,8 @@ assert.ok(app.includes("function plantSixOfHer"), "the lineup is six of her");
 assert.ok(app.includes("function buildLineupHook"), "look dresses Orbit's dusk hook");
 assert.ok(app.includes("plantSixOfHer()"), "the six stand on Orbit's lineup");
 assert.ok(app.includes("assets/art/ocean.jpg"), "dusk is her ocean painting, not a new plate");
-assert.ok(app.includes("function paintHerPlaceholder"), "placeholders may plant while the canvas is hidden");
+assert.ok(!app.includes("function paintHerPlaceholder"), "tan placeholders are gone");
+assert.ok(app.includes("function latheProfile"), "the six are sculpted people, not hung cards");
 assert.ok(app.includes("function dressLineup"), "self-portraits dress the cards");
 const dress = app.slice(app.indexOf("function dressLineup"), app.indexOf("function hideLoader"));
 assert.ok(/Promise\.all\(imgs\.map/.test(dress), "wait on every preload img");
@@ -48,19 +49,21 @@ Object.keys(faces).forEach((id) => {
 });
 
 assert.ok(her.includes("self-portrait-charcoal.jpg"), "charcoal side part and brow stay the face");
-assert.ok(app.includes("function faceFill"), "the portrait fills the card");
-assert.ok(app.includes("function artCard"), "faces read as unlit portrait cards, not a PointLight");
+assert.ok(app.includes("function faceFill"), "the portrait fills the face");
+assert.ok(app.includes("function artCard"), "faces read unlit, not a PointLight");
 assert.ok(!/new THREE\.PointLight/.test(app), "no PointLights");
 assert.ok(!/function buildBoxSelf|boxPart\(/.test(app), "no box-dummy skeleton");
 assert.ok(!app.includes("standLineup"), "do not copy the closed lawn row");
 
 const plant = app.slice(app.indexOf("function plantOneOfHer"), app.indexOf("function plantSixOfHer"));
+assert.ok(plant.includes("LatheGeometry") || app.includes("function latheProfile"), "avatars are sculpted, not a box stack");
 assert.ok(plant.includes("paintOfferedSheet"), "Journalist holds the printed paper");
+assert.ok(plant.includes("newsieCap"), "Journalist uses the newsie look");
 assert.ok(plant.includes("empty stage"), "Musician keeps an empty stage");
 assert.ok(!/spotify|track 1|album|soundcloud/i.test(plant), "no fake tracks");
-assert.ok(plant.includes("lineupRoot"), "cards parent to Orbit's lineup, not the leftover field");
-assert.ok(/addClick\(face/.test(plant), "each face card is a tap target");
-assert.ok(plant.includes("paintHerPlaceholder"), "placeholders may plant off-screen before maps");
+assert.ok(plant.includes("lineupRoot"), "figures parent to Orbit's lineup, not the leftover field");
+assert.ok(/addClick\(face/.test(plant), "each face is a tap target");
+assert.ok(!plant.includes("paintHerPlaceholder"), "no tan stand-in on the face");
 
 assert.ok(nav.includes("function lerpPose"), "field-nav.js stays Orbit's");
 assert.ok(!/const HER/.test(nav), "look did not rewrite the hand");
