@@ -48,6 +48,7 @@ assert.ok(plant.includes("paintOfferedSheet"), "Journalist holds the printed pap
 assert.ok(plant.includes("empty stage"), "Musician keeps an empty stage");
 assert.ok(!/spotify|track 1|album|soundcloud/i.test(plant), "no fake tracks");
 assert.ok(plant.includes("lineupRoot"), "cards parent to Orbit's lineup, not the leftover field");
+assert.ok(/addClick\(face/.test(plant), "each face card is a tap target");
 
 assert.ok(nav.includes("function lerpPose"), "field-nav.js stays Orbit's");
 assert.ok(!/const HER/.test(nav), "look did not rewrite the hand");

@@ -65,8 +65,15 @@ Roster.IDS.forEach((id) => {
 });
 assert.ok(html.includes('id="roster"'), "phone-first name list exists");
 assert.ok(html.includes('id="back"'), "visible Back control exists");
+assert.ok(/tap a face/i.test(help), "help says tap a face");
 assert.ok(!/WASD/i.test(help), "help does not advertise WASD as the way in");
 assert.ok(!/WASD/i.test(html.match(/id="help"[\s\S]*?<\/div>/)[0]), "help copy has no WASD");
+
+const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+const rosterCss = css.slice(css.indexOf("#roster {"), css.indexOf("#roster[hidden]"));
+assert.ok(/clip:\s*rect\(0/.test(rosterCss), "first paint hides the HTML name list");
+assert.ok(/overflow:\s*hidden/.test(rosterCss), "the sidebar is visually clipped");
+assert.ok(/pointer-events:\s*none/.test(rosterCss), "the name list is not the tap target");
 
 assert.ok(app.includes("returnToRoster"), "Esc/Back can restore the roster");
 assert.ok(/flags\.escape[\s\S]*hand\.selected\(\)[\s\S]*returnToRoster/.test(app), "Esc returns when a class is picked");
@@ -87,6 +94,11 @@ assert.ok(app.includes("buildLineupHook"), "one dusk plane is the first-paint ho
 assert.ok(!app.includes("function buildBoxSelf"), "do not dress six dummy bodies");
 assert.ok(!app.includes("standLineup"), "do not copy the closed lawn row");
 assert.ok(/if \(onRosterHome\(\)\) return/.test(app), "WASD is not first-paint travel");
+
+const plant = app.slice(app.indexOf("function plantOneOfHer"), app.indexOf("function plantSixOfHer"));
+assert.ok(/addClick\(face/.test(plant), "a face card is a clickable pick");
+assert.ok(/userData\.id[\s\S]*Roster\.isId[\s\S]*pickClass/.test(app), "tapping a face dollies that class");
+assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 
 ["app.js", "index.html", "styles.css", "roster.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");

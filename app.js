@@ -487,6 +487,7 @@ function plantOneOfHer(spec) {
   face.renderOrder = 1;
   face.userData.id = spec.id;
   face.userData.file = spec.file;
+  addClick(face, { id: spec.id });
   g.add(face);
   if (spec.id === "journalist") {
     const sheetTex = paintOfferedSheet();
@@ -498,6 +499,7 @@ function plantOneOfHer(spec) {
     sheet.rotation.y = -0.38;
     sheet.rotation.z = 0.05;
     sheet.userData.paper = true;
+    addClick(sheet, { id: spec.id });
     g.add(sheet);
   }
   if (spec.id === "musician") {
@@ -508,6 +510,7 @@ function plantOneOfHer(spec) {
     plank.position.set(0, 0.03, 0.42);
     plank.userData.emptyStage = true;
     plank.userData.label = "empty stage";
+    addClick(plank, { id: spec.id });
     g.add(plank);
   }
   g.position.set(spec.x, 0, HER_Z);
@@ -1285,6 +1288,11 @@ function onClick(e) {
     hidePanel();
     return;
   }
+  const classId = obj.userData.id || obj.userData.self;
+  if (classId && Roster.isId(classId)) {
+    pickClass(classId);
+    return;
+  }
   if (obj.userData.paper) {
     showPaper();
     return;
@@ -1393,7 +1401,7 @@ function bindInput() {
     }
     if (flags.lock) {
       if (lookLocked) document.exitPointerLock();
-      else el.requestPointerLock();
+      else if (!onRosterHome()) el.requestPointerLock();
     }
     if (flags.home) goHome();
   }, true);
