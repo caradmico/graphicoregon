@@ -119,6 +119,50 @@
     });
   }
 
+  function facePlate(tex) {
+    if (!tex) return null;
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.2, 0.26),
+      new THREE.MeshBasicMaterial({
+        map: tex,
+        color: 0xffffff,
+        toneMapped: false,
+        fog: false
+      })
+    );
+    mesh.position.set(0, 1.56, 0.128);
+    mesh.renderOrder = 2;
+    mesh.userData.face = true;
+    return mesh;
+  }
+
+  function newsieCap() {
+    const g = new THREE.Group();
+    const crown = shade(new THREE.Mesh(
+      lathe([[0.02, 0.07], [0.078, 0.062], [0.088, 0.02], [0.07, 0]], 22),
+      clothMat(0x3a2a18)
+    ), true, true);
+    const brim = shade(new THREE.Mesh(
+      lathe([[0.068, 0.012], [0.118, 0.01], [0.12, 0.002], [0.068, 0]], 22),
+      clothMat(0x3a2a18)
+    ), true, true);
+    brim.position.z = 0.028;
+    g.add(crown, brim);
+    g.userData.newsie = true;
+    return g;
+  }
+
+  function emptyStage() {
+    const plank = shade(new THREE.Mesh(
+      lathe([[0.12, 0.02], [0.82, 0.016], [0.84, 0], [0.12, -0.008]], 28),
+      clothMat(0x1c1814)
+    ), false, true);
+    plank.position.set(0, 0.02, 0.22);
+    plank.userData.emptyStage = true;
+    plank.userData.label = "empty stage";
+    return plank;
+  }
+
   function headGeo() {
     return mapHeadUVs(lathe([
       [0.002, 0.17],
@@ -301,6 +345,7 @@
     const head = shade(new THREE.Mesh(headGeo(), face), true, true);
     head.position.set(0, 1.55, 0.02);
     head.rotation.y = 0;
+    const plate = facePlate(tex);
     const hairMesh = shade(new THREE.Mesh(hairGeo(), hair), true, true);
     hairMesh.position.set(0, 1.55, 0);
     const neck = shade(new THREE.Mesh(neckGeo(), skin), true, true);
@@ -330,11 +375,21 @@
     footR.rotation.x = Math.PI / 2;
 
     g.add(head, hairMesh, neck, torso, armL, armR, legL, legR, footL, footR);
+    if (plate) g.add(plate);
+
+    if (spec.id === "journalist") {
+      const cap = newsieCap();
+      cap.position.set(0, 1.68, 0.01);
+      g.add(cap);
+    }
+    if (spec.id === "musician") g.add(emptyStage());
 
     const prop = propFor(spec.id);
     if (prop) {
-      if (spec.id === "journalist") prop.position.set(0.28, 1.12, 0.22);
-      else if (spec.id === "scientist") prop.position.set(0.26, 1.08, 0.16);
+      if (spec.id === "journalist") {
+        prop.position.set(0.28, 1.12, 0.22);
+        prop.userData.paper = true;
+      } else if (spec.id === "scientist") prop.position.set(0.26, 1.08, 0.16);
       else if (spec.id === "radio") prop.position.set(0.24, 1.1, 0.18);
       else if (spec.id === "artist") {
         prop.position.set(0.26, 1.14, 0.16);

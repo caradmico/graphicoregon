@@ -53,6 +53,11 @@ assert.ok(!/BoxGeometry|CylinderGeometry|SphereGeometry|CapsuleGeometry/.test(bo
 assert.ok(body.includes("headGeo") && body.includes("torsoGeo"), "a standing body, not a card");
 assert.ok(figSrc.includes("faceTexture") && figSrc.includes("mapHeadUVs"), "portraits fill the head");
 assert.ok(figSrc.includes("self-portrait-charcoal.jpg"), "journalist face is the charcoal");
+assert.ok(body.includes("facePlate"), "her portrait fills the face, not a wall card");
+assert.ok(body.includes("newsieCap") && figSrc.includes("paperProp"), "Journalist uses the newsie and paper look");
+assert.ok(figSrc.includes("empty stage") && body.includes("emptyStage"), "Musician keeps an empty stage");
+assert.ok(!/spotify|track 1|album|soundcloud/i.test(figSrc), "no fake tracks");
+assert.ok(!/identity-canvas/i.test(figSrc + app + html), "identity-canvas stays private");
 assert.ok(!/Lego|lego/.test(figSrc), "not Lego");
 
 console.log("lineup: no roster, tap→pickClass, pose is not leftover field — all assertions passed");
