@@ -1848,10 +1848,11 @@ function tick() {
   renderer.render(scene, camera);
 }
 
-async function main() {
+function main() {
   if (location.search) {
     history.replaceState(null, "", location.pathname + location.hash);
   }
+  hideLoader();
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1904,18 +1905,17 @@ async function main() {
   prevPos.y = pos.y;
   prevPos.z = pos.z;
   applyCamera();
+  hideLoader();
+  renderer.render(scene, camera);
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(devicePixelRatio, PIXEL_RATIO));
     renderer.setSize(innerWidth, innerHeight);
   });
-  await dressLineup();
-  applyCamera();
-  renderer.render(scene, camera);
-  hideLoader();
   tick();
   afterFirstPaint(() => {
+    dressLineup().catch((err) => console.warn(err));
     populatePieces().catch((err) => console.warn(err));
   });
 }
@@ -1983,8 +1983,4 @@ window.__field = {
   hidePaper: hidePaper
 };
 
-main().catch((err) => {
-  console.warn(err);
-  hideLoader();
-  if (renderer && scene && camera) tick();
-});
+main();
