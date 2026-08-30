@@ -23,6 +23,11 @@ canvas#stage {
   height: 100%;
   touch-action: none;
   outline: none;
+  visibility: hidden;
+}
+
+canvas#stage.ready {
+  visibility: visible;
 }
 
 #hud {

@@ -635,14 +635,39 @@ function applyDuskMap(tex) {
   duskBackdrop.mat.needsUpdate = true;
 }
 
-async function dressLineup() {
-  const duskJob = loadTexture("assets/art/ocean.jpg");
-  const faceJobs = herCards.map((card) => loadTexture("assets/art/" + card.spec.file));
-  const packed = await Promise.all([duskJob].concat(faceJobs));
-  applyDuskMap(packed[0]);
-  for (let i = 0; i < herCards.length; i += 1) {
-    applyFaceMap(herCards[i], packed[i + 1]);
+function lineupPreloadImages() {
+  const box = document.getElementById("lineup-preload");
+  return box ? Array.from(box.querySelectorAll("img")) : [];
+}
+
+function imgForFile(imgs, file) {
+  for (let i = 0; i < imgs.length; i += 1) {
+    const src = imgs[i].getAttribute("src") || imgs[i].src || "";
+    if (src.indexOf(file) !== -1) return imgs[i];
   }
+  return null;
+}
+
+function textureFromDecoded(img) {
+  if (!img || !img.naturalWidth) return null;
+  const tex = new THREE.Texture(img);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  capTexture(tex, 1024);
+  return tex;
+}
+
+async function dressLineup() {
+  const imgs = lineupPreloadImages();
+  await Promise.all(imgs.map((img) => img.decode()));
+  const dusk = textureFromDecoded(imgForFile(imgs, "assets/art/ocean.jpg"));
+  const faces = herCards.map((card) => textureFromDecoded(imgForFile(imgs, "assets/art/" + card.spec.file)));
+  if (!dusk || faces.some((tex) => !tex)) return false;
+  applyDuskMap(dusk);
+  for (let i = 0; i < herCards.length; i += 1) {
+    applyFaceMap(herCards[i], faces[i]);
+  }
+  return true;
 }
 
 function hideLoader() {
@@ -651,6 +676,20 @@ function hideLoader() {
   el.classList.add("hide");
   el.hidden = true;
   el.style.display = "none";
+}
+
+function hideStage() {
+  const el = document.getElementById("stage");
+  if (!el) return;
+  el.classList.remove("ready");
+  el.style.visibility = "hidden";
+}
+
+function showStage() {
+  const el = document.getElementById("stage");
+  if (!el) return;
+  el.classList.add("ready");
+  el.style.visibility = "visible";
 }
 
 function buildLineupHook() {
@@ -1848,11 +1887,12 @@ function tick() {
   renderer.render(scene, camera);
 }
 
-function main() {
+async function main() {
   if (location.search) {
     history.replaceState(null, "", location.pathname + location.hash);
   }
   hideLoader();
+  hideStage();
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1906,7 +1946,10 @@ function main() {
   prevPos.z = pos.z;
   applyCamera();
   hideLoader();
+  const dressed = await dressLineup();
+  if (!dressed) return;
   renderer.render(scene, camera);
+  showStage();
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
@@ -1915,7 +1958,6 @@ function main() {
   });
   tick();
   afterFirstPaint(() => {
-    dressLineup().catch((err) => console.warn(err));
     populatePieces().catch((err) => console.warn(err));
   });
 }
@@ -1983,4 +2025,4 @@ window.__field = {
   hidePaper: hidePaper
 };
 
-main();
+main().catch((err) => console.warn(err));

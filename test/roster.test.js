@@ -4,7 +4,7 @@ const path = require("path");
 const Roster = require("../roster.js");
 
 const root = path.join(__dirname, "..");
-const app = fs.readFileSync(path.join(root, "field.js"), "utf8");
+const app = fs.readFileSync(path.join(root, "look.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const help = (html.match(/id="help"[^>]*>([^<]+)/) || [])[1] || "";
 
@@ -65,7 +65,8 @@ Roster.IDS.forEach((id) => {
 });
 assert.ok(html.includes('id="roster"'), "phone-first name list exists");
 assert.ok(/id="roster"[^>]*\bhidden\b/.test(html), "markup hides the name list before JS");
-assert.ok(html.includes('src="field.js"'), "index loads the renamed field script");
+assert.ok(html.includes('src="look.js"'), "index loads the renamed look script");
+assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
 assert.ok(!/src="app\.js"/.test(html), "do not keep the cached app.js src");
 assert.ok(html.includes('href="chrome.css"'), "index loads the renamed chrome sheet");
 assert.ok(html.includes('id="back"'), "visible Back control exists");
@@ -108,7 +109,7 @@ assert.ok(html.includes('rel="preload"'), "lineup images preload");
 assert.ok(!/\?v=/.test(html), "boot still strips query; no cache-buster on assets");
 assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 
-["field.js", "index.html", "chrome.css", "roster.js"].forEach((file) => {
+["look.js", "index.html", "chrome.css", "roster.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
   assert.ok(!/health.?bar|street fighter|vs\./i.test(src), file + " has no fighter chrome");

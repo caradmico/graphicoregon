@@ -29,7 +29,7 @@ assert.strictEqual(inv.titleFromFile("still-life-charcoal-3.jpg"), "still life c
 assert.strictEqual(inv.titleFromFile("neahkahnie.jpg"), "neahkahnie");
 assert.ok(!inv.HANG.includes("Still life") && !inv.HANG.includes("Portraits") && !inv.HANG.includes("Coast"));
 
-["field.js", "index.html", "chrome.css", "art-inventory.js"].forEach((file) => {
+["look.js", "index.html", "chrome.css", "art-inventory.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
 });
