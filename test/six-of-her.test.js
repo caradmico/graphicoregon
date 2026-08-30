@@ -4,7 +4,7 @@ const path = require("path");
 const Roster = require("../roster.js");
 
 const root = path.join(__dirname, "..");
-const app = fs.readFileSync(path.join(root, "faces.js"), "utf8");
+const app = fs.readFileSync(path.join(root, "figures.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "chrome.css"), "utf8");
 const nav = fs.readFileSync(path.join(root, "field-nav.js"), "utf8");
@@ -70,7 +70,7 @@ assert.ok(!/const HER/.test(nav), "look did not rewrite the hand");
 assert.ok(!/identity-canvas/i.test(app + html), "identity-canvas stays private");
 assert.ok(!/health bar|Street Fighter|\bVS\b|HP bar|Diablo/i.test(app + html + css), "no fighting-game chrome");
 assert.ok(!/jarvis|commander|experiment|v0/i.test(html), "canvas copy stays quiet");
-["faces.js", "index.html", "chrome.css"].forEach((file) => {
+["figures.js", "index.html", "chrome.css"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
 });
@@ -87,7 +87,8 @@ assert.ok(/id="loader"[^>]*\bhidden\b/.test(html), "markup hides the loader befo
 assert.ok(/#loader[\s\S]*#loader\[hidden\][\s\S]*display:\s*none\s*!important/.test(css), "loader is not first paint");
 assert.ok(/id="lineup-preload"/.test(html), "hidden preload images sit in markup");
 assert.ok(/id="lineup-preload"[\s\S]*crossorigin="anonymous"/.test(html), "preload faces load CORS-clean for WebGL");
-assert.ok(/src="faces\.js"/.test(html), "index loads the renamed faces script");
+assert.ok(/src="figures\.js"/.test(html), "index loads the renamed figures script");
+assert.ok(!/src="faces\.js"/.test(html), "do not keep the cached faces.js src");
 assert.ok(!/src="look\.js"/.test(html), "do not keep the cached look.js src");
 assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
 assert.ok(!/\?v=/.test(html), "no cache-buster query on assets");
