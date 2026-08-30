@@ -31,6 +31,12 @@ const home = hand.goHome();
 assert.strictEqual(hand.selected(), null, "Esc/home returns to the roster");
 assert.strictEqual(home.action, "roster");
 assert.ok(home.pose && home.pose.z > 0, "roster pose looks at the line-up");
+assert.ok(Roster.LINEUP_POSE, "lineup pose exists");
+assert.ok(
+  Roster.LINEUP_POSE.y !== Roster.ROSTER_POSE.y || Roster.LINEUP_POSE.z !== Roster.ROSTER_POSE.z,
+  "lineup pose is not leftover field spawn"
+);
+assert.strictEqual(home.pose.z, Roster.LINEUP_POSE.z, "Esc home is the 3D lineup");
 
 assert.strictEqual(hand.pick("artist").action, "museum", "artist enters the hall");
 hand.goHome();

@@ -23,6 +23,11 @@ canvas#stage {
   height: 100%;
   touch-action: none;
   outline: none;
+  visibility: hidden;
+}
+
+canvas#stage.ready {
+  visibility: visible;
 }
 
 #hud {
@@ -56,19 +61,15 @@ header.top p.tag {
   text-transform: uppercase;
 }
 
-#roster {
-  position: absolute;
-  left: 22px;
-  top: 108px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: auto;
-  width: min(220px, calc(100vw - 44px));
-  z-index: 5;
+#roster,
+#roster[hidden] {
+  display: none !important;
 }
 
-#roster[hidden] { display: none; }
+header.top[hidden],
+#help[hidden] {
+  display: none !important;
+}
 
 #roster button {
   min-height: 48px;

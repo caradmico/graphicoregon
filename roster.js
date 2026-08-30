@@ -34,6 +34,8 @@
   const COPPER_HREF = "https://sassmeharder.com/product/30931683?utm_source=pinterest&utm_medium=organic&utm_campaign=copper-horizon&utm_content=2026-08-21";
 
   const ROSTER_POSE = { x: 0, y: 1.7, z: 7.2, yaw: 0, pitch: -0.08 };
+  // Chest-height home facing the six standing figures. Not leftover field spawn.
+  const LINEUP_POSE = { x: 0, y: 1.28, z: 9.4, yaw: 0, pitch: 0.08 };
 
   // Marks GO can dress. Hand dollies to these; do not invent rooms.
   const MARKS = {
@@ -196,7 +198,7 @@
       return {
         id: null,
         action: "roster",
-        pose: Object.assign({}, ROSTER_POSE),
+        pose: Object.assign({}, LINEUP_POSE),
         roster: true,
         requiresWasd: false
       };
@@ -220,6 +222,7 @@
     SUB_LABEL: SUB_LABEL,
     FLY_SEC: FLY_SEC,
     ROSTER_POSE: ROSTER_POSE,
+    LINEUP_POSE: LINEUP_POSE,
     MARKS: MARKS,
     isId: isId,
     defaultSubclass: defaultSubclass,
