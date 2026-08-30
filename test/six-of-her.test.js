@@ -4,9 +4,9 @@ const path = require("path");
 const Roster = require("../roster.js");
 
 const root = path.join(__dirname, "..");
-const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const app = fs.readFileSync(path.join(root, "field.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+const css = fs.readFileSync(path.join(root, "hud.css"), "utf8");
 const nav = fs.readFileSync(path.join(root, "field-nav.js"), "utf8");
 
 const her = app.slice(app.indexOf("const HER"), app.indexOf("const WALKS"));
@@ -55,7 +55,7 @@ assert.ok(!/const HER/.test(nav), "look did not rewrite the hand");
 assert.ok(!/identity-canvas/i.test(app + html), "identity-canvas stays private");
 assert.ok(!/health bar|Street Fighter|\bVS\b|HP bar|Diablo/i.test(app + html + css), "no fighting-game chrome");
 assert.ok(!/jarvis|commander|experiment|v0/i.test(html), "canvas copy stays quiet");
-["app.js", "index.html", "styles.css"].forEach((file) => {
+["field.js", "index.html", "hud.css"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
 });

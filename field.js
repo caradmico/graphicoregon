@@ -489,6 +489,15 @@ function plantOneOfHer(spec) {
   face.userData.file = spec.file;
   addClick(face, { id: spec.id });
   g.add(face);
+  const hit = new THREE.Mesh(
+    new THREE.PlaneGeometry(FACE_W * 1.55, FACE_H * 1.4),
+    new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
+  );
+  hit.position.copy(face.position);
+  hit.position.z += 0.06;
+  hit.userData.id = spec.id;
+  addClick(hit, { id: spec.id });
+  g.add(hit);
   if (spec.id === "journalist") {
     const sheetTex = paintOfferedSheet();
     const sheet = new THREE.Mesh(

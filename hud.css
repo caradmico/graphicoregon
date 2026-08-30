@@ -56,20 +56,10 @@ header.top p.tag {
   text-transform: uppercase;
 }
 
-#roster {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-  pointer-events: none;
+#roster,
+#roster[hidden] {
+  display: none !important;
 }
-
-#roster[hidden] { display: none; }
 
 #roster button {
   min-height: 48px;
@@ -379,19 +369,6 @@ header.top p.tag {
   #help { display: none; }
   #panel { max-height: 32vh; }
   #paper .spread { grid-template-columns: 1fr; }
-  #roster {
-    left: 0;
-    right: auto;
-    top: 0;
-    bottom: auto;
-    width: 1px;
-    flex-direction: column;
-  }
-  #roster button {
-    flex: none;
-    min-height: 0;
-    text-align: left;
-  }
   #back {
     top: 16px;
     right: 12px;

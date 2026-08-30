@@ -4,7 +4,7 @@ const path = require("path");
 const Roster = require("../roster.js");
 
 const root = path.join(__dirname, "..");
-const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const app = fs.readFileSync(path.join(root, "field.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const help = (html.match(/id="help"[^>]*>([^<]+)/) || [])[1] || "";
 
@@ -64,16 +64,18 @@ Roster.IDS.forEach((id) => {
   assert.ok(html.includes('data-class="' + id + '"'), "roster button for " + id);
 });
 assert.ok(html.includes('id="roster"'), "phone-first name list exists");
+assert.ok(/id="roster"[^>]*\bhidden\b/.test(html), "markup hides the name list before JS");
+assert.ok(html.includes('src="field.js"'), "index loads the renamed field script");
+assert.ok(!/src="app\.js"/.test(html), "do not keep the cached app.js src");
+assert.ok(html.includes('href="hud.css"'), "index loads the renamed hud sheet");
 assert.ok(html.includes('id="back"'), "visible Back control exists");
 assert.ok(/tap a face/i.test(help), "help says tap a face");
 assert.ok(!/WASD/i.test(help), "help does not advertise WASD as the way in");
 assert.ok(!/WASD/i.test(html.match(/id="help"[\s\S]*?<\/div>/)[0]), "help copy has no WASD");
 
-const css = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-const rosterCss = css.slice(css.indexOf("#roster {"), css.indexOf("#roster[hidden]"));
-assert.ok(/clip:\s*rect\(0/.test(rosterCss), "first paint hides the HTML name list");
-assert.ok(/overflow:\s*hidden/.test(rosterCss), "the sidebar is visually clipped");
-assert.ok(/pointer-events:\s*none/.test(rosterCss), "the name list is not the tap target");
+const css = fs.readFileSync(path.join(root, "hud.css"), "utf8");
+assert.ok(/#roster,\s*#roster\[hidden\]\s*\{[\s\S]*display:\s*none\s*!important/.test(css), "CSS kills the name list even if hidden is fought");
+assert.ok(!/@media[\s\S]*#roster\s*\{[\s\S]*flex-direction:\s*row/.test(css), "mobile query does not restore the sidebar");
 
 assert.ok(app.includes("returnToRoster"), "Esc/Back can restore the roster");
 assert.ok(/flags\.escape[\s\S]*hand\.selected\(\)[\s\S]*returnToRoster/.test(app), "Esc returns when a class is picked");
@@ -97,10 +99,12 @@ assert.ok(/if \(onRosterHome\(\)\) return/.test(app), "WASD is not first-paint t
 
 const plant = app.slice(app.indexOf("function plantOneOfHer"), app.indexOf("function plantSixOfHer"));
 assert.ok(/addClick\(face/.test(plant), "a face card is a clickable pick");
+assert.ok(/PlaneGeometry\(FACE_W \* 1\.55/.test(plant), "an invisible larger hit mesh covers the card");
 assert.ok(/userData\.id[\s\S]*Roster\.isId[\s\S]*pickClass/.test(app), "tapping a face dollies that class");
+assert.ok(/setRosterChrome\(true\)/.test(app), "boot keeps the name list off");
 assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 
-["app.js", "index.html", "styles.css", "roster.js"].forEach((file) => {
+["field.js", "index.html", "hud.css", "roster.js"].forEach((file) => {
   const src = fs.readFileSync(path.join(root, file), "utf8");
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
   assert.ok(!/health.?bar|street fighter|vs\./i.test(src), file + " has no fighter chrome");
