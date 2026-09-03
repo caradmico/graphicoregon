@@ -7,10 +7,26 @@
   <meta name="description" content="Graphic Oregon — research, website design, media, and fine art.">
   <meta name="theme-color" content="#1a1712">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chrome.css">
+  <link rel="preload" as="image" href="assets/art/ocean.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/self-portrait-charcoal.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/self-portrait-graphite.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/monochromatic-self-portrait.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/self-portrait-acrylic.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/female-portrait-oil.jpg" crossorigin="anonymous">
+  <link rel="preload" as="image" href="assets/art/female-portrait-oil-3.jpg" crossorigin="anonymous">
 </head>
 <body>
-  <div id="loader">
+  <div id="lineup-preload" hidden>
+    <img src="assets/art/ocean.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/self-portrait-charcoal.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/self-portrait-graphite.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/monochromatic-self-portrait.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/self-portrait-acrylic.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/female-portrait-oil.jpg" alt="" crossorigin="anonymous">
+    <img src="assets/art/female-portrait-oil-3.jpg" alt="" crossorigin="anonymous">
+  </div>
+  <div id="loader" hidden>
     <div class="inner">
       <h1>Graphic Oregon</h1>
       <p>Research · Mapping · Design · Writing · Fine Art</p>
@@ -18,12 +34,12 @@
   </div>
   <canvas id="stage" tabindex="0"></canvas>
   <div id="hud">
-    <header class="top">
+    <header class="top" hidden>
       <h1>Graphic Oregon</h1>
       <p class="tag">Research, website design, media, and fine art</p>
     </header>
     <button type="button" id="back" hidden>Back</button>
-    <nav id="roster" aria-label="Classes">
+    <nav id="roster" hidden aria-label="Classes">
       <button type="button" data-class="journalist">Journalist</button>
       <button type="button" data-class="scientist">Scientist</button>
       <button type="button" data-class="radio">Radio</button>
@@ -41,7 +57,7 @@
       <div id="panel-subs" hidden></div>
       <div id="panel-links"></div>
     </aside>
-    <div id="help">Tap a name · Back or Esc returns</div>
+    <div id="help" hidden>Tap a face · Back or Esc returns</div>
   </div>
   <div id="paper" hidden>
     <div class="sheet">
@@ -80,6 +96,6 @@
   <script src="field-nav.js"></script>
   <script src="art-inventory.js"></script>
   <script src="roster.js"></script>
-  <script src="app.js"></script>
+  <script src="figures.js"></script>
 </body>
 </html>

@@ -31,6 +31,19 @@ const MUSEUM = {
 };
 const PORTAL_FOREST = { x: -17.8, z: -14.4 };
 
+// Same woman, six lives. Dresses Orbit's lineup hook. Do not move the camera.
+const HER = [
+  { id: "journalist", file: "self-portrait-charcoal.jpg", x: 3.25 },
+  { id: "scientist", file: "self-portrait-graphite.jpg", x: 1.95 },
+  { id: "radio", file: "monochromatic-self-portrait.jpg", x: 0.65 },
+  { id: "artist", file: "self-portrait-acrylic.jpg", x: -0.65 },
+  { id: "teacher", file: "female-portrait-oil.jpg", x: -1.95 },
+  { id: "musician", file: "female-portrait-oil-3.jpg", x: -3.25 }
+];
+const HER_Z = 256;
+const FACE_W = 1.22;
+const FACE_H = 1.78;
+
 const WALKS = [
   { id: "art", title: "Art", pos: [-36, 2.4, -2], href: ART_HREF, body: "Oil, acrylic, charcoal, and prints." },
   { id: "research", title: "Research", pos: [34, 2.2, 2], href: RESEARCH_HREF, body: "Mapping and habitat studies." },
@@ -259,8 +272,12 @@ const PAPER = new THREE.MeshStandardMaterial({
   metalness: 0.02
 });
 let newsieHold = null;
+const herCards = [];
+let duskBackdrop = null;
 const hand = Roster.createHand();
 let fly = null;
+let fieldRoot = null;
+let lineupRoot = null;
 
 function capTexture(tex, max) {
   const img = tex && tex.image;
@@ -384,6 +401,364 @@ function afterFirstPaint(fn) {
   });
 }
 
+function onRosterHome() {
+  return !hand.selected();
+}
+
+function addField(obj) {
+  const root = fieldRoot || scene;
+  for (let i = 0; i < arguments.length; i++) {
+    if (arguments[i]) root.add(arguments[i]);
+  }
+  return obj;
+}
+
+function showField(on) {
+  if (fieldRoot) fieldRoot.visible = !!on;
+}
+
+function showLineup(on) {
+  if (lineupRoot) lineupRoot.visible = !!on;
+}
+
+function faceFill(tex) {
+  const img = tex && tex.image;
+  if (!img || !img.width || !img.height) return tex;
+  const target = FACE_W / FACE_H;
+  const aspect = img.width / img.height;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  if (aspect < target) {
+    const vis = img.width / target;
+    tex.repeat.set(1, vis / img.height);
+    tex.offset.set(0, 1 - tex.repeat.y);
+  } else {
+    const vis = img.height * target;
+    tex.repeat.set(vis / img.width, 1);
+    tex.offset.set((1 - tex.repeat.x) * 0.5, 0);
+  }
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function artCard(tex, color) {
+  return new THREE.MeshBasicMaterial({
+    color: color == null ? 0xffffff : color,
+    map: tex || null,
+    side: THREE.DoubleSide,
+    toneMapped: false,
+    fog: false
+  });
+}
+
+function letterboxDusk(tex) {
+  const img = tex && tex.image;
+  const w = 1600;
+  const h = 880;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d");
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, "#163834");
+  sky.addColorStop(0.38, "#2aa8a0");
+  sky.addColorStop(0.58, "#d4b05a");
+  sky.addColorStop(0.78, "#7a5230");
+  sky.addColorStop(1, "#3d2a1c");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+  if (img && img.width && img.height) {
+    const scale = Math.min(w / img.width, h / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
+    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  }
+  const out = new THREE.CanvasTexture(c);
+  out.colorSpace = THREE.SRGBColorSpace;
+  out.needsUpdate = true;
+  return out;
+}
+
+function latheProfile(pts, segs, start, span) {
+  const profile = pts.map((p) => new THREE.Vector2(p[0], p[1]));
+  const geo = new THREE.LatheGeometry(
+    profile,
+    segs == null ? 28 : segs,
+    start == null ? 0 : start,
+    span == null ? Math.PI * 2 : span
+  );
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function clothOfHer(id) {
+  const ink = {
+    journalist: 0x1a3a42,
+    scientist: 0x3d4a38,
+    radio: 0x2a2e38,
+    artist: 0x8a6a4a,
+    teacher: 0x5a3a28,
+    musician: 0x1c1814
+  };
+  return new THREE.MeshStandardMaterial({
+    color: ink[id] || 0x3a2a18,
+    roughness: 0.86,
+    metalness: 0.04
+  });
+}
+
+function newsieCap() {
+  const g = new THREE.Group();
+  const felt = new THREE.MeshStandardMaterial({ color: 0x3a2a18, roughness: 0.84, metalness: 0.04 });
+  const crown = shade(new THREE.Mesh(
+    latheProfile([[0.02, 0.07], [0.078, 0.062], [0.088, 0.02], [0.07, 0]], 22),
+    felt
+  ), true, true);
+  const brim = shade(new THREE.Mesh(
+    latheProfile([[0.068, 0.012], [0.118, 0.01], [0.12, 0.002], [0.068, 0]], 22),
+    felt
+  ), true, true);
+  brim.position.z = 0.028;
+  g.add(crown, brim);
+  g.userData.newsie = true;
+  return g;
+}
+
+function plantOneOfHer(spec) {
+  const g = new THREE.Group();
+  const cloth = clothOfHer(spec.id);
+  const skin = new THREE.MeshStandardMaterial({ color: 0xc4a07a, roughness: 0.78, metalness: 0.02 });
+  const hair = new THREE.MeshStandardMaterial({ color: 0x2a1c14, roughness: 0.88, metalness: 0.02 });
+  const head = shade(new THREE.Mesh(latheProfile([
+    [0.002, 0.17], [0.055, 0.162], [0.092, 0.138], [0.112, 0.09], [0.12, 0.03],
+    [0.116, -0.02], [0.102, -0.07], [0.072, -0.112], [0.038, -0.138], [0.002, -0.15]
+  ], 36), skin), true, true);
+  head.position.set(0, 1.55, 0.02);
+  const hairMesh = shade(new THREE.Mesh(latheProfile([
+    [0.04, 0.188], [0.1, 0.176], [0.132, 0.14], [0.138, 0.06],
+    [0.128, -0.02], [0.11, -0.08], [0.08, -0.12], [0.04, -0.1]
+  ], 28, Math.PI * 0.38, Math.PI * 1.24), hair), true, true);
+  hairMesh.position.set(0, 1.55, 0);
+  const neck = shade(new THREE.Mesh(latheProfile([
+    [0.038, 0.04], [0.042, 0], [0.05, -0.05], [0.062, -0.08]
+  ], 20), skin), true, true);
+  neck.position.set(0, 1.42, 0.01);
+  const torso = shade(new THREE.Mesh(latheProfile([
+    [0.08, 0.42], [0.14, 0.4], [0.168, 0.34], [0.155, 0.22], [0.128, 0.1],
+    [0.138, -0.02], [0.162, -0.12], [0.15, -0.2], [0.08, -0.24]
+  ], 32), cloth), true, true);
+  torso.position.set(0, 1.12, 0);
+  function limb(len, r0, r1) {
+    const pts = [];
+    for (let i = 0; i <= 12; i += 1) {
+      const t = i / 12;
+      pts.push([r0 + (r1 - r0) * t + Math.sin(t * Math.PI) * 0.01, -t * len]);
+    }
+    return latheProfile(pts, 16);
+  }
+  const armL = shade(new THREE.Mesh(limb(0.58, 0.038, 0.022), skin), true, true);
+  armL.position.set(-0.2, 1.36, 0.02);
+  armL.rotation.z = 0.18;
+  const armR = shade(new THREE.Mesh(limb(0.58, 0.038, 0.022), skin), true, true);
+  armR.position.set(0.2, 1.36, 0.04);
+  armR.rotation.z = -0.22;
+  armR.rotation.x = spec.id === "journalist" ? -0.55 : 0.06;
+  const legL = shade(new THREE.Mesh(limb(0.78, 0.055, 0.028), cloth), true, true);
+  legL.position.set(-0.07, 0.88, 0.01);
+  const legR = shade(new THREE.Mesh(limb(0.78, 0.055, 0.028), cloth), true, true);
+  legR.position.set(0.07, 0.88, -0.01);
+  const footGeo = latheProfile([[0.01, 0.04], [0.042, 0.03], [0.05, 0], [0.038, -0.02], [0.01, -0.025]], 14);
+  const shoe = new THREE.MeshStandardMaterial({ color: 0x1a1712, roughness: 0.9, metalness: 0.04 });
+  const footL = shade(new THREE.Mesh(footGeo, shoe), true, true);
+  footL.position.set(-0.08, 0.06, 0.04);
+  footL.rotation.x = Math.PI / 2;
+  const footR = shade(new THREE.Mesh(footGeo.clone(), shoe), true, true);
+  footR.position.set(0.08, 0.06, 0.04);
+  footR.rotation.x = Math.PI / 2;
+  g.add(head, hairMesh, neck, torso, armL, armR, legL, legR, footL, footR);
+
+  const mat = artCard(null, 0xffffff);
+  mat.visible = false;
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.26), mat);
+  face.position.set(0, 1.56, 0.128);
+  face.renderOrder = 1;
+  face.userData.id = spec.id;
+  face.userData.file = spec.file;
+  face.userData.face = true;
+  addClick(face, { id: spec.id });
+  g.add(face);
+  const hit = new THREE.Mesh(
+    new THREE.PlaneGeometry(FACE_W * 1.55, FACE_H * 1.4),
+    new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
+  );
+  hit.position.set(0, 1.2, 0.2);
+  hit.userData.id = spec.id;
+  addClick(hit, { id: spec.id });
+  g.add(hit);
+  if (spec.id === "journalist") {
+    const cap = newsieCap();
+    cap.position.set(0, 1.68, 0.01);
+    addClick(cap, { id: spec.id });
+    g.add(cap);
+    const sheetTex = paintOfferedSheet();
+    const sheet = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.42, 0.56),
+      artCard(sheetTex, 0xffffff)
+    );
+    sheet.position.set(0.28, 1.12, 0.22);
+    sheet.rotation.y = -0.38;
+    sheet.rotation.z = 0.05;
+    sheet.userData.paper = true;
+    addClick(sheet, { id: spec.id });
+    g.add(sheet);
+  }
+  if (spec.id === "musician") {
+    const plank = shade(new THREE.Mesh(
+      latheProfile([[0.12, 0.02], [0.82, 0.016], [0.84, 0], [0.12, -0.008]], 28),
+      new THREE.MeshStandardMaterial({ color: 0x1c1814, roughness: 0.92, metalness: 0.03 })
+    ), false, true);
+    plank.position.set(0, 0.02, 0.22);
+    plank.userData.emptyStage = true;
+    plank.userData.label = "empty stage";
+    addClick(plank, { id: spec.id });
+    g.add(plank);
+  }
+  g.position.set(spec.x, 0, HER_Z);
+  g.rotation.y = Math.PI;
+  g.userData.id = spec.id;
+  g.userData.self = spec.id;
+  g.userData.file = spec.file;
+  g.userData.kind = "figure";
+  herCards.push({ spec: spec, group: g, face: face, mat: mat });
+  const root = lineupRoot || scene;
+  root.add(g);
+  return g;
+}
+
+function plantSixOfHer() {
+  HER.forEach(plantOneOfHer);
+}
+
+function applyFaceMap(card, tex) {
+  if (!tex || !card || !card.mat) return;
+  faceFill(tex);
+  card.mat.map = tex;
+  card.mat.color.set(0xffffff);
+  card.mat.visible = true;
+  card.mat.needsUpdate = true;
+}
+
+function applyDuskMap(tex) {
+  if (!tex || !duskBackdrop || !duskBackdrop.mat) return;
+  const wide = letterboxDusk(tex);
+  duskBackdrop.mat.map = wide;
+  duskBackdrop.mat.needsUpdate = true;
+}
+
+function lineupPreloadImages() {
+  const box = document.getElementById("lineup-preload");
+  return box ? Array.from(box.querySelectorAll("img")) : [];
+}
+
+function imgForFile(imgs, file) {
+  for (let i = 0; i < imgs.length; i += 1) {
+    if (!imgs[i]) continue;
+    const src = imgs[i].getAttribute("src") || imgs[i].src || "";
+    if (src.indexOf(file) !== -1) return imgs[i];
+  }
+  return null;
+}
+
+function textureFromDecoded(img) {
+  if (!img || !img.naturalWidth) return null;
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth;
+  c.height = img.naturalHeight;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  try {
+    ctx.getImageData(0, 0, 1, 1);
+  } catch (err) {
+    return null;
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  capTexture(tex, 1024);
+  return tex;
+}
+
+async function corsDecoded(img) {
+  img.crossOrigin = "anonymous";
+  const src = img.getAttribute("src") || img.src;
+  if (!src) return null;
+  img.src = src;
+  await img.decode();
+  if (textureFromDecoded(img)) return img;
+  const fresh = new Image();
+  fresh.crossOrigin = "anonymous";
+  fresh.src = src;
+  await fresh.decode();
+  return fresh;
+}
+
+async function dressLineup() {
+  const imgs = lineupPreloadImages();
+  await Promise.all(imgs.map((img) => img.decode()));
+  const usable = await Promise.all(imgs.map((img) => corsDecoded(img)));
+  const dusk = textureFromDecoded(imgForFile(usable, "assets/art/ocean.jpg"));
+  const faces = herCards.map((card) => textureFromDecoded(imgForFile(usable, "assets/art/" + card.spec.file)));
+  if (!dusk || faces.some((tex) => !tex)) return false;
+  applyDuskMap(dusk);
+  for (let i = 0; i < herCards.length; i += 1) {
+    applyFaceMap(herCards[i], faces[i]);
+  }
+  return true;
+}
+
+function hideLoader() {
+  const el = document.getElementById("loader");
+  if (!el) return;
+  el.classList.add("hide");
+  el.hidden = true;
+  el.style.display = "none";
+}
+
+function hideStage() {
+  const el = document.getElementById("stage");
+  if (!el) return;
+  el.classList.remove("ready");
+  el.style.visibility = "hidden";
+}
+
+function showStage() {
+  const el = document.getElementById("stage");
+  if (!el) return;
+  el.classList.add("ready");
+  el.style.visibility = "visible";
+}
+
+function buildLineupHook() {
+  lineupRoot = new THREE.Group();
+  lineupRoot.name = "lineup";
+  const mat = new THREE.MeshBasicMaterial({
+    map: skyMap(),
+    side: THREE.DoubleSide,
+    fog: false,
+    transparent: false,
+    depthTest: true,
+    depthWrite: true
+  });
+  const dusk = new THREE.Mesh(new THREE.PlaneGeometry(40, 22), mat);
+  dusk.position.set(0, 8, 264);
+  dusk.renderOrder = -1;
+  dusk.userData.dusk = true;
+  lineupRoot.add(dusk);
+  duskBackdrop = { mesh: dusk, mat: mat };
+  plantSixOfHer();
+  scene.add(lineupRoot);
+}
+
 function framedPiece(tex, height) {
   const img = tex.image;
   const aspect = img && img.width && img.height ? img.width / img.height : 1;
@@ -422,10 +797,10 @@ function easelAt(x, z, hung, data, label, labelScale) {
   stand.position.set(x, y, z);
   faceCenter(stand);
   addClick(hung.pic, data);
-  scene.add(stand);
+  addField(stand);
   const sign = makeSign(label, labelScale || 4.4);
   sign.position.set(x, y + hung.height + 1.15, z);
-  scene.add(sign);
+  addField(sign);
   return stand;
 }
 
@@ -591,7 +966,7 @@ function buildPortal() {
   ring.rotation.y = Math.PI / 2;
   g.add(postL, postR, postLB, postRB, sideN, sideS, back, roof, cap, step, jambN, jambS, lintel, inner, veil, ring);
   g.position.set(x, y, z);
-  scene.add(g);
+  addField(g);
 }
 
 function buildMuseum() {
@@ -830,7 +1205,7 @@ function buildNewsie() {
     meta: "Writing"
   };
   addClickTree(g, data);
-  scene.add(g);
+  addField(g);
   newsieHold = { offer: offer, sheet: sheet, rest: offer.rotation.x };
 }
 
@@ -843,7 +1218,7 @@ function fir(x, z, h) {
   crown.position.y = h * 0.58;
   g.add(trunk, crown);
   g.position.set(x, y, z);
-  scene.add(g);
+  addField(g);
 }
 
 function boulder(x, z, w, h, d) {
@@ -851,7 +1226,7 @@ function boulder(x, z, w, h, d) {
   const rock = shade(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), ROCK), true, true);
   rock.position.set(x, y + h * 0.42, z);
   rock.rotation.y = hash2(x, z) * Math.PI;
-  scene.add(rock);
+  addField(rock);
 }
 
 function showPanel(data) {
@@ -936,6 +1311,15 @@ function showPaper() {
 
 function fitVolume() {
   if (!camera || !scene) return;
+  if (onRosterHome()) {
+    scene.fog = null;
+    if (camera.far !== 80) {
+      camera.near = 0.1;
+      camera.far = 80;
+      camera.updateProjectionMatrix();
+    }
+    return;
+  }
   if (portalSide === "museum") {
     scene.fog = null;
     if (camera.far !== 48) {
@@ -961,10 +1345,13 @@ function applyCamera() {
 }
 
 function groundY() {
-  return portalSide === "museum" ? MUSEUM.y : heightAt(pos.x, pos.z);
+  if (portalSide === "museum") return MUSEUM.y;
+  if (onRosterHome()) return 0;
+  return heightAt(pos.x, pos.z);
 }
 
 function clampPos() {
+  if (onRosterHome()) return;
   pos.x = Nav.clamp(pos.x, -BOUNDS, BOUNDS);
   pos.z = Nav.clamp(pos.z, -BOUNDS, BOUNDS);
   pos.y = Nav.clamp(pos.y, -BOUNDS * 0.55, BOUNDS * 0.55);
@@ -1005,7 +1392,7 @@ function stepFly(dt) {
 function poseForClass(id) {
   if (id === "artist") return museumEye();
   const m = Roster.mark(id);
-  if (!m) return Object.assign({}, Roster.ROSTER_POSE);
+  if (!m) return Object.assign({}, Roster.LINEUP_POSE);
   const eye = Nav.eyeToward({ x: m.x, z: m.z }, { x: 0, z: 0 }, id === "journalist" ? 3.6 : 3.4);
   return {
     x: eye.x,
@@ -1019,8 +1406,12 @@ function poseForClass(id) {
 function setRosterChrome(onRoster) {
   const roster = document.getElementById("roster");
   const back = document.getElementById("back");
-  if (roster) roster.hidden = !onRoster;
+  const header = document.querySelector("header.top");
+  const help = document.getElementById("help");
+  if (roster) roster.hidden = true;
   if (back) back.hidden = onRoster;
+  if (header) header.hidden = !!onRoster;
+  if (help) help.hidden = !!onRoster;
 }
 
 function showClassSheet(id) {
@@ -1039,11 +1430,16 @@ function pickClass(id) {
   const next = hand.pick(id);
   if (!next) return null;
   setRosterChrome(false);
+  showLineup(false);
   if (next.action === "museum") {
+    showField(false);
     openMuseumVolume();
-  } else if (portalSide === "museum") {
-    portalSide = "forest";
-    showMuseum(false);
+  } else {
+    showField(true);
+    if (portalSide === "museum") {
+      portalSide = "forest";
+      showMuseum(false);
+    }
   }
   startFly(poseForClass(id));
   showClassSheet(id);
@@ -1056,6 +1452,8 @@ function returnToRoster() {
   portalSide = "forest";
   portalCool = 0;
   showMuseum(false);
+  showField(false);
+  showLineup(true);
   hidePanel();
   hidePaper();
   applyPose(home.pose);
@@ -1083,6 +1481,11 @@ function onClick(e) {
   const obj = pickAt(e);
   if (!obj) {
     hidePanel();
+    return;
+  }
+  const classId = obj.userData.id || obj.userData.self;
+  if (classId && Roster.isId(classId)) {
+    pickClass(classId);
     return;
   }
   if (obj.userData.paper) {
@@ -1120,6 +1523,7 @@ function bindInput() {
       wheelBudget = 3.2;
       wheelReset = now;
     }
+    if (onRosterHome()) return;
     const step = Nav.wheelCap(Nav.dollyStep(e.deltaY, e.deltaMode), wheelBudget);
     wheelBudget = Math.max(0, wheelBudget - Math.abs(step));
     prevPos.x = pos.x;
@@ -1192,7 +1596,7 @@ function bindInput() {
     }
     if (flags.lock) {
       if (lookLocked) document.exitPointerLock();
-      else el.requestPointerLock();
+      else if (!onRosterHome()) el.requestPointerLock();
     }
     if (flags.home) goHome();
   }, true);
@@ -1230,6 +1634,7 @@ function bindRoster() {
 
 function travel(dt) {
   if (fly) return;
+  if (onRosterHome()) return;
   if (held.turnLeft) yaw -= TURN * dt;
   if (held.turnRight) yaw += TURN * dt;
   if (held.lookUp) pitch = Nav.clamp(pitch + TURN * dt, -Nav.PITCH_LIMIT, Nav.PITCH_LIMIT);
@@ -1258,7 +1663,7 @@ function buildLand() {
   }
   attr.needsUpdate = true;
   geo.computeVertexNormals();
-  scene.add(shade(new THREE.Mesh(geo, EARTH), false, true));
+  addField(shade(new THREE.Mesh(geo, EARTH), false, true));
 
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(380, 40, 20),
@@ -1269,17 +1674,17 @@ function buildLand() {
       depthWrite: false
     })
   );
-  scene.add(sky);
+  addField(sky);
 
   const sea = shade(new THREE.Mesh(new THREE.PlaneGeometry(200, 300), WATER), false, true);
   sea.rotation.x = -Math.PI / 2;
   sea.position.set(-118, -0.45, -6);
-  scene.add(sea);
+  addField(sea);
 
   const ring = new THREE.Mesh(new THREE.TorusGeometry(7.4, 0.045, 10, 72), RING);
   ring.rotation.x = Math.PI / 2;
   ring.position.y = 0.04;
-  scene.add(ring);
+  addField(ring);
 
   boulder(-38, -4, 7.2, 4.6, 5.4);
   boulder(-44, 6, 5.4, 3.4, 4.8);
@@ -1306,7 +1711,7 @@ function addWalkSigns() {
       href: walk.href,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(sign);
+    addField(sign);
   });
 }
 
@@ -1316,7 +1721,7 @@ function buildResearchTable() {
   const y = heightAt(x, z);
   const slab = shade(new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.22, 4.2), ROCK), true, true);
   slab.position.set(x, y + 0.82, z);
-  scene.add(slab);
+  addField(slab);
   const legs = [
     [-2.3, -1.6],
     [2.3, -1.6],
@@ -1326,7 +1731,7 @@ function buildResearchTable() {
   legs.forEach((p) => {
     const leg = shade(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.82, 0.28), ROCK), true, true);
     leg.position.set(x + p[0], y + 0.41, z + p[1]);
-    scene.add(leg);
+    addField(leg);
   });
   return { x: x, y: y + 0.94, z: z };
 }
@@ -1339,7 +1744,7 @@ function buildWritingLectern() {
   post.position.set(x, y + 0.58, z);
   const board = shade(new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 1.5), TIMBER), true, true);
   board.position.set(x, y + 1.16, z);
-  scene.add(post, board);
+  addField(post, board);
   return { x: x, y: y + 1.24, z: z };
 }
 
@@ -1388,11 +1793,11 @@ async function populateStarIS() {
     })
   );
   addClick(pts, data);
-  scene.add(pts);
+  addField(pts);
   const sign = makeSign("StarIS", 5.6);
   sign.position.set(origin.x, origin.y - 7.2, origin.z);
   addClick(sign, data);
-  scene.add(sign);
+  addField(sign);
 }
 
 async function populatePieces() {
@@ -1433,10 +1838,10 @@ async function populatePieces() {
       linkLabel: "Open Copper Horizon",
       openUrl: COPPER_HREF
     });
-    scene.add(stand);
+    addField(stand);
     const sign = makeSign("Copper Horizon", 4.8);
     sign.position.set(x, y + 3.7, z);
-    scene.add(sign);
+    addField(sign);
   }
 
   if (mapTex) {
@@ -1462,7 +1867,7 @@ async function populatePieces() {
       href: RESEARCH_HREF,
       linkLabel: "Open the IAU proposal"
     });
-    scene.add(map);
+    addField(map);
   } else {
     buildResearchTable();
   }
@@ -1479,7 +1884,7 @@ async function populatePieces() {
       href: HOME_HREF,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(hung.group);
+    addField(hung.group);
   } else {
     buildWritingLectern();
   }
@@ -1498,7 +1903,7 @@ async function populatePieces() {
       href: HOME_HREF,
       linkLabel: "Open graphicoregon.com"
     });
-    scene.add(hung.group);
+    addField(hung.group);
   }
 
   await populateStarIS();
@@ -1528,10 +1933,12 @@ function tick() {
   renderer.render(scene, camera);
 }
 
-function main() {
+async function main() {
   if (location.search) {
     history.replaceState(null, "", location.pathname + location.hash);
   }
+  hideLoader();
+  hideStage();
   scene = new THREE.Scene();
   scene.background = new THREE.Color(DUSK);
   fieldFog = new THREE.Fog(HAZE, 70, 240);
@@ -1564,19 +1971,31 @@ function main() {
   fill.position.set(24, 14, -12);
   scene.add(fill);
 
+  fieldRoot = new THREE.Group();
+  fieldRoot.name = "field";
+  fieldRoot.visible = false;
+  scene.add(fieldRoot);
   buildLand();
   buildPortal();
   buildMuseum();
   buildNewsie();
   addWalkSigns();
+  buildLineupHook();
   bindInput();
   bindRoster();
-  applyPose(Roster.ROSTER_POSE);
+  showField(false);
+  showLineup(true);
+  setRosterChrome(true);
+  applyPose(Roster.LINEUP_POSE);
   prevPos.x = pos.x;
   prevPos.y = pos.y;
   prevPos.z = pos.z;
   applyCamera();
-  document.getElementById("loader").classList.add("hide");
+  hideLoader();
+  const dressed = await dressLineup();
+  if (!dressed) return;
+  renderer.render(scene, camera);
+  showStage();
   window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
@@ -1612,7 +2031,9 @@ window.__field = {
   returnToRoster: returnToRoster,
   selectedClass: () => hand.selected(),
   rosterIds: () => Roster.IDS.slice(),
-  spawn: Object.assign({}, Roster.ROSTER_POSE),
+  spawn: Object.assign({}, Roster.LINEUP_POSE),
+  fieldVisible: () => !!(fieldRoot && fieldRoot.visible),
+  lineupVisible: () => !!(lineupRoot && lineupRoot.visible),
   billboardCount: () => billboards.length,
   billboardLabels: () => billboards.map((o) => o.userData.label).filter(Boolean),
   billboardPrints: () => billboards.filter((o) => o.userData.kind === "print").map((o) => o.userData.label),
@@ -1625,6 +2046,8 @@ window.__field = {
   })),
   hungArt: () => hungArt.slice(),
   hungCount: () => hungArt.length,
+  herIds: () => HER.map((h) => h.id),
+  herFiles: () => HER.map((h) => h.file),
   portalSide: () => portalSide,
   paperOpen: () => {
     const el = document.getElementById("paper");
@@ -1648,4 +2071,4 @@ window.__field = {
   hidePaper: hidePaper
 };
 
-main();
+main().catch((err) => console.warn(err));
