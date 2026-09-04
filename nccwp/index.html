@@ -17,9 +17,10 @@
       --paper: #efe6d4;
       --muted: #a89a78;
       --panel: rgba(26, 23, 18, 0.94);
-      --well: #6ec8c2;
-      --pod: #f3e7c8;
       --heat: #c4922a;
+      --well-dom: #2aa8a0;
+      --few-wells: #c4922a;
+      --pod-dom: #f3e7c8;
     }
     * { box-sizing: border-box; }
     html, body {
@@ -40,7 +41,7 @@
       z-index: 500;
       top: 16px;
       left: 16px;
-      width: min(320px, calc(100vw - 32px));
+      width: min(360px, calc(100vw - 32px));
       max-height: calc(100vh - 32px);
       overflow: auto;
       padding: 18px 20px 16px;
@@ -79,16 +80,68 @@
     }
     dd {
       margin: 0;
-      font-size: 0.98rem;
+      font-size: 0.95rem;
       line-height: 1.35;
     }
-    #basin-list {
+    .totals {
       margin: 0;
       padding: 0;
       list-style: none;
     }
-    #basin-list li {
+    .totals li { margin: 0 0 6px; }
+    .modes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 2px 0 8px;
+    }
+    .modes button {
+      appearance: none;
+      cursor: pointer;
+      padding: 5px 9px;
+      border: 1px solid rgba(212, 176, 90, 0.35);
+      background: transparent;
+      color: var(--gold-soft);
+      font: inherit;
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+    .modes button[aria-pressed="true"] {
+      background: rgba(42, 168, 160, 0.22);
+      border-color: var(--teal);
+      color: var(--paper);
+    }
+    .hotspots {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .hotspots li { margin: 0 0 4px; }
+    .hotspots button {
+      appearance: none;
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--gold-soft);
+      font: inherit;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .hotspots button:hover,
+    .hotspots button:focus-visible {
+      color: var(--paper);
+      text-decoration: underline;
+    }
+    .legend-note,
+    .criteria {
       margin: 0 0 8px;
+      color: var(--paper);
+      font-size: 0.88rem;
+      line-height: 1.35;
     }
     .hint {
       margin: 14px 0 0;
@@ -105,6 +158,16 @@
       vertical-align: baseline;
     }
     .swatch.heat { background: var(--heat); }
+    .swatch.pods { background: var(--teal); }
+    .swatch.homes { background: #8b5a1e; }
+    .swatch.well-dom { background: var(--well-dom); }
+    .swatch.few-wells { background: var(--few-wells); }
+    .swatch.pod-dom { background: var(--pod-dom); box-shadow: inset 0 0 0 1px rgba(234, 215, 164, 0.8); }
+    .swatch.foley {
+      border-radius: 0;
+      background: transparent;
+      box-shadow: inset 0 0 0 2px var(--teal);
+    }
     .leaflet-control-attribution {
       background: rgba(26, 23, 18, 0.82) !important;
       color: var(--muted) !important;
@@ -132,6 +195,10 @@
       color: var(--paper);
       font-size: 0.92rem;
     }
+    .leaflet-popup-content .pop-proxy {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
     .leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
     .status {
       position: fixed;
@@ -152,7 +219,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        max-height: 42vh;
+        max-height: 48vh;
         border: 0;
         border-top: 1px solid rgba(212, 176, 90, 0.28);
       }
@@ -166,19 +233,32 @@
     <h1>Creek-size watersheds</h1>
     <p class="why">You’re on this page to see how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
     <dl>
-      <dt>On the map</dt>
-      <dd>Each Foley-size creek, filled by wells</dd>
-      <dt><span class="swatch heat"></span>Watersheds</dt>
+      <dt>Watershed totals</dt>
       <dd>
-        <ul id="basin-list"></ul>
+        <ul class="totals" id="totals-list"></ul>
+      </dd>
+      <dt>PROXY</dt>
+      <dd>Wells and surface PODs are registered well logs and stream points of diversion — not people. The map does not assign each home to well vs surface.</dd>
+      <dt>Look by</dt>
+      <dd>
+        <div class="modes" role="group" aria-label="Map count modes">
+          <button type="button" data-mode="wells" aria-pressed="true">Wells</button>
+          <button type="button" data-mode="surface_pods" aria-pressed="false">Surface PODs</button>
+          <button type="button" data-mode="homes_off_city" aria-pressed="false">Homes off city</button>
+          <button type="button" data-mode="vuln" aria-pressed="false">PROXY vulns</button>
+        </div>
+        <p class="legend-note" id="legend-note"></p>
+        <p class="criteria" id="criteria" hidden></p>
+        <ul class="hotspots" id="hotspot-list"></ul>
       </dd>
     </dl>
-    <p class="hint">Click a creek. Fill is wells — not a parcel pin. Popup is wells vs surface. <a href="COUNTS.md">Queried counts</a></p>
+    <p class="hint">Click a creek or a name. Popup is wells vs surface vs homes. No points, no addresses. <a href="COUNTS.md">Queried counts</a></p>
   </aside>
   <div id="status" class="status">Loading layers…</div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
     (function () {
+      const FOLEY = "171002020603";
       const status = document.getElementById("status");
       function showStatus(msg) {
         status.hidden = !msg;
@@ -198,14 +278,19 @@
       }).addTo(map);
 
       const fmtInt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+      const palettes = {
+        wells: { from: "#ead7a4", to: "#c4922a", stroke: "#2aa8a0" },
+        surface_pods: { from: "#d8efe9", to: "#1f7f78", stroke: "#2aa8a0" },
+        homes_off_city: { from: "#ead7a4", to: "#8b5a1e", stroke: "#d4b05a" }
+      };
 
-      function line(text) {
-        return text ? "<div class=\"pop-line\">" + text + "</div>" : "";
+      function line(text, cls) {
+        if (!text) return "";
+        return "<div class=\"" + (cls || "pop-line") + "\">" + text + "</div>";
       }
       function pop(title, lines) {
-        return "<strong>" + title + "</strong>" + lines.filter(Boolean).map(line).join("");
+        return "<strong>" + title + "</strong>" + lines.filter(Boolean).join("");
       }
-
       function hexToRgb(hex) {
         const h = hex.replace("#", "");
         return [
@@ -222,14 +307,36 @@
         });
         return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
       }
-      function heatStyle(n, maxN) {
+      function heatStyle(n, maxN, palette) {
         const t = Math.max(0, Math.min(1, Number(n || 0) / (maxN || 1)));
         return {
-          color: "#2aa8a0",
+          color: palette.stroke,
           weight: 1.2,
-          fillColor: lerpColor("#ead7a4", "#c4922a", t),
-          fillOpacity: 0.18 + 0.45 * t
+          fillColor: lerpColor(palette.from, palette.to, t),
+          fillOpacity: 0.16 + 0.48 * t
         };
+      }
+      function nums(p) {
+        return {
+          wells: Number((p || {}).wells || 0),
+          surface_pods: Number((p || {}).surface_pods || 0),
+          homes_off_city: Number((p || {}).homes_off_city || 0)
+        };
+      }
+      function flags(p) {
+        const n = nums(p);
+        return {
+          wellDominant: n.wells >= 50 && n.wells >= 3 * n.surface_pods,
+          podDominant: n.surface_pods >= 20 && n.wells <= 5,
+          fewWells: n.homes_off_city >= 200 && n.wells <= 30
+        };
+      }
+      function escapeHtml(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
       }
 
       Promise.all([
@@ -249,44 +356,219 @@
           throw new Error("Expected many creek-size polygons");
         }
         const foley = features.find(function (f) {
-          return (f.properties || {}).code === "171002020603";
+          return (f.properties || {}).code === FOLEY;
         });
         if (!foley) {
           throw new Error("Foley Creek 171002020603 missing");
         }
 
-        const maxWells = features.reduce(function (m, f) {
-          return Math.max(m, Number((f.properties || {}).wells || 0));
-        }, 0);
         const totals = (summary && summary.counts) || {};
-        const list = document.getElementById("basin-list");
+        const ref = (summary && summary.reference) || {};
+        const foleyN = nums(foley.properties);
+        const maxes = { wells: 0, surface_pods: 0, homes_off_city: 0 };
+        features.forEach(function (f) {
+          const n = nums(f.properties);
+          maxes.wells = Math.max(maxes.wells, n.wells);
+          maxes.surface_pods = Math.max(maxes.surface_pods, n.surface_pods);
+          maxes.homes_off_city = Math.max(maxes.homes_off_city, n.homes_off_city);
+        });
+
+        const totalsList = document.getElementById("totals-list");
         [
-          fmtInt.format(features.length) + " Foley-size creeks in Tillamook and Clatsop",
-          fmtInt.format(totals.wells || 0) + " wells · " + fmtInt.format(totals.surface_pods || 0) + " surface PODs",
-          "Foley Creek 171002020603 · 43.83 km²"
+          fmtInt.format(totals.creek_size || features.length) + " Foley-size creeks in Tillamook and Clatsop",
+          fmtInt.format(totals.homes_off_city || 0) + " homes off city — " +
+            fmtInt.format(totals.homes_clatsop_off_city || 0) + " Clatsop + " +
+            fmtInt.format(totals.homes_tillamook_off_city || 0) + " Tillamook",
+          fmtInt.format(totals.wells || 0) + " wells · " +
+            fmtInt.format(totals.surface_pods || 0) + " surface PODs · PROXY, not people",
+          (ref.name || "Foley Creek") + " " + (ref.code || FOLEY) + " · " +
+            (ref.areasqkm != null ? ref.areasqkm : 43.83) + " km² · " +
+            fmtInt.format(foleyN.wells) + " wells · " +
+            fmtInt.format(foleyN.surface_pods) + " surface PODs · " +
+            fmtInt.format(foleyN.homes_off_city) + " homes off city",
+          "Homes incomplete where a creek leaves Clatsop or Tillamook."
         ].forEach(function (text) {
           const li = document.createElement("li");
           li.textContent = text;
-          list.appendChild(li);
+          totalsList.appendChild(li);
         });
 
+        let mode = "wells";
+        const layersByCode = {};
+        const legendNote = document.getElementById("legend-note");
+        const criteria = document.getElementById("criteria");
+        const hotspotList = document.getElementById("hotspot-list");
+
+        function styleFeature(feature) {
+          const p = feature.properties || {};
+          const n = nums(p);
+          const f = flags(p);
+          const isFoley = p.code === FOLEY;
+          let style;
+          if (mode === "vuln") {
+            if (f.wellDominant) {
+              style = { color: "#2aa8a0", weight: 2, fillColor: "#2aa8a0", fillOpacity: 0.52 };
+            } else if (f.fewWells) {
+              style = { color: "#d4b05a", weight: 2, fillColor: "#c4922a", fillOpacity: 0.52 };
+            } else if (f.podDominant) {
+              style = { color: "#ead7a4", weight: 2, fillColor: "#f3e7c8", fillOpacity: 0.42 };
+            } else {
+              style = { color: "#5a5346", weight: 0.8, fillColor: "#3a3428", fillOpacity: 0.06 };
+            }
+          } else {
+            style = heatStyle(n[mode], maxes[mode], palettes[mode]);
+          }
+          if (isFoley) {
+            style.weight = Math.max(style.weight || 1, 2.6);
+            style.color = "#2aa8a0";
+          }
+          return style;
+        }
+
+        function popupHtml(p) {
+          const n = nums(p);
+          const f = flags(p);
+          const flagLines = [];
+          if (f.wellDominant) {
+            flagLines.push(line("Well-dominant PROXY — wells ≥ 50 and ≥ 3× surface PODs"));
+          }
+          if (f.fewWells) {
+            flagLines.push(line("High homes, few wells PROXY — homes ≥ 200 and wells ≤ 30"));
+          }
+          if (f.podDominant) {
+            flagLines.push(line("Surface-POD-dominant PROXY — PODs ≥ 20 and wells ≤ 5"));
+          }
+          return pop(escapeHtml(p.name || "Creek"), [
+            line(escapeHtml(p.code || "")),
+            line(fmtInt.format(n.wells) + " wells"),
+            line(fmtInt.format(n.surface_pods) + " surface PODs"),
+            line(fmtInt.format(n.homes_off_city) + " homes off city"),
+            line("Wells and PODs are PROXY — registered logs / diversions, not people.", "pop-proxy")
+          ].concat(flagLines));
+        }
+
+        function topUnits(key, limit) {
+          return features.slice().sort(function (a, b) {
+            return nums(b.properties)[key] - nums(a.properties)[key];
+          }).slice(0, limit);
+        }
+        function flaggedUnits(kind) {
+          return features.filter(function (f) {
+            return flags(f.properties)[kind];
+          }).sort(function (a, b) {
+            const na = nums(a.properties);
+            const nb = nums(b.properties);
+            if (kind === "wellDominant") return nb.wells - na.wells;
+            if (kind === "podDominant") return nb.surface_pods - na.surface_pods;
+            return nb.homes_off_city - na.homes_off_city;
+          });
+        }
+        function addHotspot(p, label) {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = label;
+          btn.addEventListener("click", function () {
+            const lyr = layersByCode[p.code];
+            if (!lyr) return;
+            map.fitBounds(lyr.getBounds(), { padding: [36, 36], maxZoom: 11 });
+            lyr.openPopup();
+          });
+          li.appendChild(btn);
+          hotspotList.appendChild(li);
+        }
+        function renderLegend() {
+          hotspotList.textContent = "";
+          if (mode === "vuln") {
+            legendNote.innerHTML =
+              "<span class=\"swatch well-dom\"></span>Well-dominant · " +
+              "<span class=\"swatch few-wells\"></span>High homes, few wells · " +
+              "<span class=\"swatch pod-dom\"></span>Surface-POD-dominant · " +
+              "<span class=\"swatch foley\"></span>Foley outlined. Count proxies — not engineering failure.";
+            criteria.hidden = false;
+            criteria.textContent =
+              "Well-dominant: wells ≥ 50 and wells ≥ 3× surface PODs. " +
+              "High homes, few wells: homes ≥ 200 and wells ≤ 30. " +
+              "Surface-POD-dominant: surface PODs ≥ 20 and wells ≤ 5.";
+            [
+              { kind: "wellDominant", title: "Well-dominant", fmt: function (n) {
+                return fmtInt.format(n.wells) + "w / " + fmtInt.format(n.surface_pods) + "p";
+              } },
+              { kind: "fewWells", title: "High homes, few wells", fmt: function (n) {
+                return fmtInt.format(n.homes_off_city) + "h / " + fmtInt.format(n.wells) + "w";
+              } },
+              { kind: "podDominant", title: "Surface-POD-dominant", fmt: function (n) {
+                return fmtInt.format(n.wells) + "w / " + fmtInt.format(n.surface_pods) + "p";
+              } }
+            ].forEach(function (group) {
+              const units = flaggedUnits(group.kind);
+              if (!units.length) return;
+              const head = document.createElement("li");
+              head.textContent = group.title;
+              head.style.marginTop = "8px";
+              head.style.color = "#2aa8a0";
+              head.style.fontSize = "0.7rem";
+              head.style.letterSpacing = "0.12em";
+              head.style.textTransform = "uppercase";
+              hotspotList.appendChild(head);
+              units.forEach(function (f) {
+                const p = f.properties || {};
+                addHotspot(p, (p.name || "Creek") + " · " + group.fmt(nums(p)));
+              });
+            });
+            return;
+          }
+          criteria.hidden = true;
+          criteria.textContent = "";
+          const labels = {
+            wells: { swatch: "heat", noun: "wells", fill: "Fill is registered wells." },
+            surface_pods: { swatch: "pods", noun: "surface PODs", fill: "Fill is surface stream PODs." },
+            homes_off_city: { swatch: "homes", noun: "homes off city", fill: "Fill is homes off city." }
+          };
+          const meta = labels[mode];
+          legendNote.innerHTML =
+            "<span class=\"swatch " + meta.swatch + "\"></span>" + meta.fill +
+            " Darker is more. <span class=\"swatch foley\"></span>Foley Creek outlined — size reference.";
+          const head = document.createElement("li");
+          head.textContent = "Hotspots · " + meta.noun;
+          head.style.color = "#2aa8a0";
+          head.style.fontSize = "0.7rem";
+          head.style.letterSpacing = "0.12em";
+          head.style.textTransform = "uppercase";
+          hotspotList.appendChild(head);
+          topUnits(mode, 5).forEach(function (f) {
+            const p = f.properties || {};
+            addHotspot(p, (p.name || "Creek") + " · " + fmtInt.format(nums(p)[mode]));
+          });
+        }
+        function applyMode(next) {
+          mode = next;
+          document.querySelectorAll(".modes button").forEach(function (btn) {
+            btn.setAttribute("aria-pressed", btn.getAttribute("data-mode") === mode ? "true" : "false");
+          });
+          layer.setStyle(styleFeature);
+          renderLegend();
+        }
+
         const layer = L.geoJSON(collection, {
-          style: function (feature) {
-            return heatStyle((feature.properties || {}).wells, maxWells);
-          },
+          style: styleFeature,
           onEachFeature: function (feature, lyr) {
             const p = feature.properties || {};
-            lyr.bindPopup(pop(p.name || "Creek", [
-              p.code || "",
-              fmtInt.format(p.wells || 0) + " wells",
-              fmtInt.format(p.surface_pods || 0) + " surface PODs",
-              fmtInt.format(p.homes_off_city || 0) + " homes off city"
-            ]), { maxWidth: 260, className: "nccwp-pop" });
+            if (p.code) layersByCode[p.code] = lyr;
+            lyr.bindPopup(function () {
+              return popupHtml(p);
+            }, { maxWidth: 280, className: "nccwp-pop" });
           }
         });
 
         layer.addTo(map);
         map.fitBounds(layer.getBounds(), { padding: [28, 28] });
+        document.querySelectorAll(".modes button").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            applyMode(btn.getAttribute("data-mode"));
+          });
+        });
+        renderLegend();
         showStatus("");
       }).catch(function (err) {
         showStatus(err.message || "Could not load map layers");
