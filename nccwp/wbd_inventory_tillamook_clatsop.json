@@ -15,7 +15,7 @@
   "purpose": "Inventory Foley-size watersheds for the NCCWP desk. No invented homes, wells, surface PODs, or dollars.",
   "method": "Oregon Framework county polygons for Clatsop and Tillamook. USGS Watershed Boundary Dataset creek-size units (12-digit codes; Foley Creek = 171002020603) queried by the two-county envelope and kept only when the polygon intersects a county polygon. Areas are WBD unit totals.",
   "sources": {
-    "huc12": "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6",
+    "creek_size": "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6",
     "counties": "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/6",
     "clatsop_taxlots": "https://delta.co.clatsop.or.us/server/rest/services/Taxlots/FeatureServer/1",
     "tillamook_taxlots": "https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Public_Query_WGS84/FeatureServer/2",
@@ -29,7 +29,7 @@
     "surface_pods": 4081,
     "homes_off_city": 22689
   },
-  "homes_note": "homes_off_city is Clatsop + Tillamook taxlots only. HUC-12s that run into Columbia, Washington, Yamhill, Lincoln, or Washington State are incomplete for homes.",
+  "homes_note": "homes_off_city is Clatsop + Tillamook taxlots only. Creek-size units that run into Columbia, Washington, Yamhill, Lincoln, or Washington State are incomplete for homes.",
   "units": [
     {
       "code": "170800030801",
