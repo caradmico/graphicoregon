@@ -1,2 +1,8 @@
 node_modules/
 package-lock.json
+__pycache__/
+
+# Public Nehalem map is HUC-8 aggregates only — do not ship residence/well/POD points
+nccwp-nehalem/data/homes.geojson
+nccwp-nehalem/data/wells.geojson
+nccwp-nehalem/data/pods.geojson

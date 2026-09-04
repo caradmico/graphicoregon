@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Query public GIS endpoints for Nehalem HUC-8 17100202 drinking-water layers.
 
-Writes data/*.geojson and data/summary.json. Numbers come from the endpoints;
-nothing is invented.
+Writes public data/nehalem_huc8.geojson, data/cities.geojson, and
+data/summary.json. Counts come from the endpoints; nothing is invented.
+
+The public map is a HUC-8 polygon heat (choropleth_metric = homes_off_city).
+Residence / well / POD points and owner / address fields are not written
+to the public data/ path.
 """
 from __future__ import annotations
 
@@ -33,6 +37,48 @@ TILLAMOOK = "https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Publi
 CITIES = "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/0/query"
 WELLS = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Wells_by_Theme_WGS84/FeatureServer/2/query"
 PODS = "https://gis.wrd.state.or.us/server/rest/services/dynamic/PODs_By_Source_WGS84/FeatureServer/3/query"
+
+# Keys that must never land in files GitHub Pages serves.
+BANNED_PUBLIC_PROP = (
+    "owner",
+    "owner_name",
+    "owner_address",
+    "owner_line",
+    "situs",
+    "situs_addr",
+    "situs_city",
+    "site_address",
+    "site_citystatezip",
+    "address",
+)
+
+
+def public_props(props: dict) -> dict:
+    """Drop owner / address fields before any write under data/."""
+    out = {}
+    for key, value in (props or {}).items():
+        low = str(key).lower()
+        if low in BANNED_PUBLIC_PROP:
+            continue
+        if "owner" in low or "situs" in low or "addr" in low:
+            continue
+        out[key] = value
+    return out
+
+
+def write_public_geojson(path: Path, collection: dict) -> None:
+    features = []
+    for feat in collection.get("features") or []:
+        features.append(
+            {
+                "type": "Feature",
+                "properties": public_props(feat.get("properties") or {}),
+                "geometry": feat.get("geometry"),
+            }
+        )
+    path.write_text(
+        json.dumps({"type": "FeatureCollection", "features": features}, separators=(",", ":"))
+    )
 
 
 def retry_sleep(attempt: int) -> None:
@@ -274,7 +320,7 @@ def main() -> None:
             {
                 **env,
                 "where": "1=1",
-                "outFields": "OBJECTID,TAXLOTKEY,PROPERTY_C,STAT_CLASS,SITUS_ADDR,SITUS_CITY,YEAR_BUILT,OWNER_LINE",
+                "outFields": "OBJECTID,TAXLOTKEY,PROPERTY_C,STAT_CLASS",
             },
             page=2000,
         )
@@ -293,7 +339,7 @@ def main() -> None:
             {
                 **env,
                 "where": "county_name='Tillamook'",
-                "outFields": "OBJECTID,county_name,maptaxlot,taxlot,site_address,site_citystatezip,taxlot_acre,owner_address",
+                "outFields": "OBJECTID,county_name,maptaxlot,taxlot,site_address,taxlot_acre",
             },
             page=2000,
         )
@@ -310,7 +356,7 @@ def main() -> None:
             {
                 **env,
                 "where": "1=1",
-                "outFields": "wl_id,type_of_log,wl_nbr,well_tag_nbr,owner_name,exempt_use,primary_use,wl_county_code",
+                "outFields": "wl_id,type_of_log,wl_nbr,well_tag_nbr,exempt_use,primary_use,wl_county_code",
             },
             page=2000,
         )
@@ -361,8 +407,6 @@ def main() -> None:
                     "kind": "home",
                     "county": "Clatsop",
                     "class": str(code) if code is not None else "",
-                    "situs": attrs.get("SITUS_ADDR") or "",
-                    "city": attrs.get("SITUS_CITY") or "",
                 },
                 "geometry": {"type": "Point", "coordinates": [x, y]},
             }
@@ -395,7 +439,6 @@ def main() -> None:
                     "kind": "home",
                     "county": "Tillamook",
                     "class": "",
-                    "situs": attrs.get("site_address") or "",
                     "acres": acres,
                 },
                 "geometry": {"type": "Point", "coordinates": [x, y]},
@@ -516,13 +559,20 @@ def main() -> None:
             "tillamook_residential": "no class field; site_address present and taxlot_acre is null or <= 80",
             "off_city": "centroid inside HUC-8 17100202 and outside Oregon Framework city limits",
         },
+        "public_map": {
+            "geometry": "huc8_polygon",
+            "choropleth_metric": "homes_off_city",
+            "choropleth_note": "Residential parcels inside the HUC-8 and outside city limits. Homes-off-city proxy for well-related intensity. Not a parcel-level well or surface assignment.",
+            "popup_metrics": ["homes_off_city", "wells", "surface_pods"],
+        },
     }
 
-    DATA.joinpath("nehalem_huc8.geojson").write_text(json.dumps(huc_fc, separators=(",", ":")))
-    DATA.joinpath("cities.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": city_in}, separators=(",", ":")))
-    DATA.joinpath("homes.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": homes}, separators=(",", ":")))
-    DATA.joinpath("wells.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": wells}, separators=(",", ":")))
-    DATA.joinpath("pods.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": pods}, separators=(",", ":")))
+    write_public_geojson(DATA / "nehalem_huc8.geojson", huc_fc)
+    write_public_geojson(DATA / "cities.geojson", {"type": "FeatureCollection", "features": city_in})
+    for leftover in ("homes.geojson", "wells.geojson", "pods.geojson"):
+        old = DATA / leftover
+        if old.exists():
+            old.unlink()
     DATA.joinpath("summary.json").write_text(json.dumps(summary, indent=2))
 
     print(json.dumps(summary["counts"], indent=2))

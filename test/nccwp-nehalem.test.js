@@ -3,14 +3,13 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..", "nccwp-nehalem");
+const dataDir = path.join(root, "data");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const geo = JSON.parse(fs.readFileSync(path.join(root, "data", "nehalem_huc8.geojson"), "utf8"));
-const summary = JSON.parse(fs.readFileSync(path.join(root, "data", "summary.json"), "utf8"));
-const homes = JSON.parse(fs.readFileSync(path.join(root, "data", "homes.geojson"), "utf8"));
-const wells = JSON.parse(fs.readFileSync(path.join(root, "data", "wells.geojson"), "utf8"));
-const pods = JSON.parse(fs.readFileSync(path.join(root, "data", "pods.geojson"), "utf8"));
-const cities = JSON.parse(fs.readFileSync(path.join(root, "data", "cities.geojson"), "utf8"));
+const geo = JSON.parse(fs.readFileSync(path.join(dataDir, "nehalem_huc8.geojson"), "utf8"));
+const summary = JSON.parse(fs.readFileSync(path.join(dataDir, "summary.json"), "utf8"));
+const cities = JSON.parse(fs.readFileSync(path.join(dataDir, "cities.geojson"), "utf8"));
 const countsMd = fs.readFileSync(path.join(root, "COUNTS.md"), "utf8");
+const queryPy = fs.readFileSync(path.join(root, "query_layers.py"), "utf8");
 
 assert.ok(html.includes("leaflet@1.9.4"), "Leaflet 1.9.4");
 assert.ok(html.includes("tile.openstreetmap.org"), "OSM tiles only");
@@ -23,15 +22,28 @@ assert.ok(
 );
 assert.ok(/On the map/.test(html), "say what is on the map");
 assert.ok(html.includes("bindPopup"), "click pop-ups on features");
-assert.ok(html.includes("HUC-8 ") && html.includes("Watershed boundary"), "short popup labels");
-assert.ok(html.includes("Homes off city"), "homes on the panel");
+assert.ok(html.includes("heatStyle") && html.includes("homes_off_city"), "HUC-8 choropleth from homes_off_city");
+assert.ok(html.includes("interactive: false"), "city limits are visual only");
+assert.ok(html.includes("residential parcels in this HUC-8 off city water"), "aggregate homes-off-city popup");
+assert.ok(html.includes("registered wells in this HUC-8"), "aggregate wells popup");
+assert.ok(html.includes("surface stream PODs in this HUC-8"), "aggregate POD popup");
 assert.ok(html.includes("data/summary.json"), "panel reads queried summary");
-assert.ok(html.includes("data/homes.geojson") && html.includes("data/wells.geojson") && html.includes("data/pods.geojson"));
+assert.ok(html.includes("data/nehalem_huc8.geojson") && html.includes("data/cities.geojson"));
+assert.ok(!html.includes("data/homes.geojson"), "do not load homes points");
+assert.ok(!html.includes("data/wells.geojson"), "do not load well points");
+assert.ok(!html.includes("data/pods.geojson"), "do not load POD points");
+assert.ok(!/pointToLayer/.test(html), "no point markers on the public map");
+assert.ok(!html.includes("pop(\"Home\""), "no per-home popup");
+assert.ok(!html.includes("p.situs") && !html.includes("SITUS_ADDR"), "no situs in popups");
+assert.ok(!/owner_name|OWNER_LINE|owner_address/i.test(html), "no owner fields on the public page");
 assert.ok(html.includes("homes_off_city") && html.includes("surface_pods"), "counts from summary.json");
+assert.ok(html.includes("stripPrivateProps"), "client strips owner/address if present");
 
 const banned = /numbers will not be invented|do not invent|hallucinat|pending Identity|taxlot Identity|will not be invented|no home counts until/i;
 assert.ok(!banned.test(html), "strip invent-disclaimer speak");
 assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public panel");
+assert.ok(!/8-HUC KEEP/.test(html + countsMd), "do not claim 8-HUC KEEP");
+assert.ok(!/\$\d/.test(html), "do not invent dollars on the public page");
 
 assert.strictEqual(geo.type, "FeatureCollection");
 assert.strictEqual(geo.features.length, 1, "one HUC-8");
@@ -61,22 +73,47 @@ assert.ok(Math.abs(lat - 45.86) < 0.05, "centroid lat near 45.86, got " + lat);
 assert.ok(Math.abs(lon + 123.49) < 0.05, "centroid lon near -123.49, got " + lon);
 
 assert.strictEqual(summary.huc8, "17100202");
-assert.strictEqual(summary.counts.homes_off_city, homes.features.length);
-assert.strictEqual(summary.counts.wells, wells.features.length);
-assert.strictEqual(summary.counts.surface_pods, pods.features.length);
-assert.strictEqual(summary.counts.cities, cities.features.length);
+assert.strictEqual(summary.public_map.choropleth_metric, "homes_off_city");
+assert.deepStrictEqual(summary.public_map.popup_metrics, ["homes_off_city", "wells", "surface_pods"]);
 assert.ok(summary.counts.homes_off_city > 1000, "real home query, not an empty layer");
 assert.ok(summary.counts.wells > 1000, "real well query");
 assert.ok(summary.counts.surface_pods > 1000, "real POD query");
-assert.strictEqual(summary.counts.homes_clatsop_off_city + summary.counts.homes_tillamook_off_city, summary.counts.homes_off_city);
+assert.strictEqual(summary.counts.homes_off_city, 3873);
+assert.strictEqual(summary.counts.wells, 1554);
+assert.strictEqual(summary.counts.surface_pods, 1143);
+assert.strictEqual(summary.counts.cities, cities.features.length);
+assert.strictEqual(
+  summary.counts.homes_clatsop_off_city + summary.counts.homes_tillamook_off_city,
+  summary.counts.homes_off_city
+);
 
-const wellIds = new Set(wells.features.map((f) => f.properties.wl_id));
-assert.strictEqual(wellIds.size, wells.features.length, "wells unique on wl_id");
-const podIds = new Set(pods.features.map((f) => f.properties.pod_use_id));
-assert.strictEqual(podIds.size, pods.features.length, "pods unique on pod_use_id");
+["homes.geojson", "wells.geojson", "pods.geojson"].forEach((name) => {
+  assert.ok(!fs.existsSync(path.join(dataDir, name)), name + " must not be on the public path");
+});
 
+const privateKey = /^(owner|owner_name|owner_address|owner_line|situs|situs_addr|site_address|address)$/i;
+function assertPublicProps(collection, label) {
+  for (const f of collection.features || []) {
+    for (const key of Object.keys(f.properties || {})) {
+      assert.ok(!privateKey.test(key), label + " must not ship " + key);
+      assert.ok(!/owner|situs|addr/i.test(key), label + " must not ship " + key);
+    }
+  }
+}
+assertPublicProps(geo, "huc8");
+assertPublicProps(cities, "cities");
+
+assert.ok(countsMd.includes("homes_off_city"), "COUNTS.md names the choropleth metric");
+assert.ok(/homes-off-city proxy/i.test(countsMd), "COUNTS.md labels the proxy honestly");
+assert.ok(/not a parcel-level assignment/i.test(countsMd), "COUNTS.md does not invent well assignment");
 assert.ok(countsMd.includes("3,873") || countsMd.includes("3873"), "COUNTS.md has queried homes");
 assert.ok(countsMd.includes("1,554") || countsMd.includes("1554"), "COUNTS.md has queried wells");
 assert.ok(countsMd.includes("1,143") || countsMd.includes("1143"), "COUNTS.md has queried PODs");
 assert.ok(countsMd.includes("delta.co.clatsop.or.us"), "COUNTS.md cites Clatsop endpoint");
 assert.ok(countsMd.includes("Wells_by_Theme_WGS84"), "COUNTS.md cites wells endpoint");
+
+assert.ok(queryPy.includes("write_public_geojson"), "pipeline writes stripped public geojson");
+assert.ok(queryPy.includes("BANNED_PUBLIC_PROP"), "pipeline bans owner/address on public writes");
+assert.ok(!/DATA\.joinpath\("homes\.geojson"\)/.test(queryPy), "pipeline does not write homes.geojson to data/");
+assert.ok(!/DATA\.joinpath\("wells\.geojson"\)/.test(queryPy), "pipeline does not write wells.geojson to data/");
+assert.ok(!/DATA\.joinpath\("pods\.geojson"\)/.test(queryPy), "pipeline does not write pods.geojson to data/");

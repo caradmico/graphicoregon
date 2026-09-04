@@ -4,9 +4,23 @@ You’re on the map to see how many people in this HUC-8 watershed have drinking
 
 These numbers were queried from public endpoints on 2026-09-04. They are not estimates.
 
-## Counts on the map
+## Public map metric
 
-| Layer | Count | How counted |
+The public page is a **single HUC-8 polygon heat**, not home / well / POD points.
+
+**Choropleth fill uses `homes_off_city` (3,873)** from `data/summary.json`: residential parcels inside HUC-8 17100202 and outside city limits. That is the queried count of homes not on city water. It is a **homes-off-city proxy** for well-related residential intensity — not a parcel-level assignment of each home to a well or a surface POD. This pipeline did not compute that join.
+
+The watershed popup shows those same queried aggregates, labeled as what they are:
+
+- **3,873** residential parcels in this HUC-8 off city water (`homes_off_city`)
+- **1,554** registered wells in this HUC-8 (`wells`, unique OWRD `wl_id`)
+- **1,143** surface stream PODs in this HUC-8 (`surface_pods`, unique OWRD `pod_use_id`)
+
+Owner names and addresses are not written to files the client loads. `homes.geojson` / `wells.geojson` / `pods.geojson` are not on the public path.
+
+## Counts behind the heat
+
+| Metric | Count | How counted |
 | --- | ---: | --- |
 | Homes off city water | **3,873** | Residential taxlot centroids inside the HUC-8 and outside city limits |
 | Wells | **1,554** | Unique OWRD `wl_id` inside the HUC-8 |
