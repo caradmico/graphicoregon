@@ -23,8 +23,13 @@ assert.ok(desk.includes("nccwp-necanicum/data/summary.json"), "stitches Necanicu
 assert.ok(desk.includes("heatStyle") && desk.includes("homes_off_city"), "choropleth by homes_off_city");
 assert.ok(desk.includes("HUC-8 ") && desk.includes("homes off city") && desk.includes("wells") && desk.includes("surface PODs"), "popup is code + aggregates");
 assert.ok(desk.includes("bindPopup"), "click pop-ups on polygons");
-assert.ok(desk.includes("nccwp-nehalem"), "desk links Nehalem");
-assert.ok(desk.includes("nccwp-necanicum"), "desk links Necanicum");
+assert.ok(desk.includes("nccwp-nehalem/data/") && desk.includes("nccwp-necanicum/data/"), "desk reuses queried folders");
+assert.ok(!/href=["']\.\.\/nccwp-nehalem\/["']/.test(desk), "desk is the product map, not a Nehalem page");
+assert.ok(!/href=["']\.\.\/nccwp-necanicum\/["']/.test(desk), "desk is the product map, not a Necanicum page");
+
+const nehalemHtml = fs.readFileSync(path.join(__dirname, "..", "nccwp-nehalem", "index.html"), "utf8");
+const necanicumHtml = fs.readFileSync(path.join(__dirname, "..", "nccwp-necanicum", "index.html"), "utf8");
+assert.ok(nehalemHtml.includes("../nccwp/") && necanicumHtml.includes("../nccwp/"), "old single-basin URLs redirect here");
 
 assert.ok(!desk.includes("data/homes.geojson"), "no public home points");
 assert.ok(!desk.includes("data/wells.geojson"), "no public well points");
