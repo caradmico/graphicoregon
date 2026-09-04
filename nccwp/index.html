@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NCCWP · HUC-8 basins</title>
-  <meta name="description" content="You’re on this page to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.">
+  <title>NCCWP · creek-size watersheds</title>
+  <meta name="description" content="You’re on this page to see how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices.">
   <meta name="theme-color" content="#1a1712">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/nccwp/">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -160,20 +160,20 @@
   </style>
 </head>
 <body>
-  <div id="map" role="application" aria-label="NCCWP HUC-8 drinking-water basins"></div>
+  <div id="map" role="application" aria-label="NCCWP creek-size drinking-water watersheds"></div>
   <aside class="panel">
     <p class="kicker">NCCWP desk</p>
-    <h1>HUC-8 basins</h1>
-    <p class="why">You’re on this page to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
+    <h1>Creek-size watersheds</h1>
+    <p class="why">You’re on this page to see how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
     <dl>
       <dt>On the map</dt>
-      <dd>Each HUC-8, filled by homes off city water</dd>
-      <dt><span class="swatch heat"></span>Basins</dt>
+      <dd>Each Foley-size creek, filled by wells</dd>
+      <dt><span class="swatch heat"></span>Watersheds</dt>
       <dd>
         <ul id="basin-list"></ul>
       </dd>
     </dl>
-    <p class="hint">Click a watershed. Fill is homes off city — not a parcel pin. <a href="../nccwp-nehalem/COUNTS.md">Nehalem counts</a> · <a href="../nccwp-necanicum/COUNTS.md">Necanicum counts</a></p>
+    <p class="hint">Click a creek. Fill is wells — not a parcel pin. Popup is wells vs surface. <a href="COUNTS.md">Queried counts</a></p>
   </aside>
   <div id="status" class="status">Loading layers…</div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -206,13 +206,6 @@
         return "<strong>" + title + "</strong>" + lines.filter(Boolean).map(line).join("");
       }
 
-      function loadJSON(path) {
-        return fetch(path).then(function (res) {
-          if (!res.ok) throw new Error(path + " missing (" + res.status + ")");
-          return res.json();
-        });
-      }
-
       function hexToRgb(hex) {
         const h = hex.replace("#", "");
         return [
@@ -229,84 +222,71 @@
         });
         return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
       }
-      // Choropleth fill uses homes_off_city. Homes-off-city proxy — not a parcel-level well assignment. Scale 0–5000.
-      function heatStyle(n) {
-        const t = Math.max(0, Math.min(1, Number(n || 0) / 5000));
+      function heatStyle(n, maxN) {
+        const t = Math.max(0, Math.min(1, Number(n || 0) / (maxN || 1)));
         return {
           color: "#2aa8a0",
-          weight: 2.5,
+          weight: 1.2,
           fillColor: lerpColor("#ead7a4", "#c4922a", t),
-          fillOpacity: 0.22 + 0.4 * t
+          fillOpacity: 0.18 + 0.45 * t
         };
       }
 
-      const sources = [
-        {
-          huc8: "17100202",
-          geo: "../nccwp-nehalem/data/nehalem_huc8.geojson",
-          summary: "../nccwp-nehalem/data/summary.json"
-        },
-        {
-          huc8: "17100201",
-          geo: "../nccwp-necanicum/data/necanicum_huc8.geojson",
-          summary: "../nccwp-necanicum/data/summary.json"
+      Promise.all([
+        fetch("data/creek_size.geojson").then(function (res) {
+          if (!res.ok) throw new Error("creek_size.geojson missing (" + res.status + ")");
+          return res.json();
+        }),
+        fetch("data/summary.json").then(function (res) {
+          if (!res.ok) throw new Error("summary.json missing (" + res.status + ")");
+          return res.json();
+        })
+      ]).then(function (pair) {
+        const collection = pair[0];
+        const summary = pair[1];
+        const features = collection.features || [];
+        if (features.length < 40) {
+          throw new Error("Expected many creek-size polygons");
         }
-      ];
-
-      Promise.all(sources.map(function (src) {
-        return Promise.all([loadJSON(src.geo), loadJSON(src.summary)]).then(function (pair) {
-          return { src: src, geo: pair[0], summary: pair[1] };
+        const foley = features.find(function (f) {
+          return (f.properties || {}).code === "171002020603";
         });
-      })).then(function (rows) {
-        const features = rows.map(function (row) {
-          const feat = row.geo.features && row.geo.features[0];
-          const props = (feat && feat.properties) || {};
-          if (props.huc8 !== row.src.huc8) {
-            throw new Error("Expected HUC-8 " + row.src.huc8 + ", got " + (props.huc8 || "none"));
-          }
-          const counts = row.summary.counts || {};
-          return {
-            type: "Feature",
-            properties: {
-              name: props.name || row.summary.name,
-              huc8: props.huc8,
-              homes_off_city: counts.homes_off_city || 0,
-              wells: counts.wells || 0,
-              surface_pods: counts.surface_pods || 0
-            },
-            geometry: feat.geometry
-          };
-        });
-        const collection = { type: "FeatureCollection", features: features };
-        if (collection.features.length < 2) {
-          throw new Error("Expected at least two HUC-8 polygons");
+        if (!foley) {
+          throw new Error("Foley Creek 171002020603 missing");
         }
 
+        const maxWells = features.reduce(function (m, f) {
+          return Math.max(m, Number((f.properties || {}).wells || 0));
+        }, 0);
+        const totals = (summary && summary.counts) || {};
         const list = document.getElementById("basin-list");
-        features.forEach(function (f) {
-          const p = f.properties;
+        [
+          fmtInt.format(features.length) + " Foley-size creeks in Tillamook and Clatsop",
+          fmtInt.format(totals.wells || 0) + " wells · " + fmtInt.format(totals.surface_pods || 0) + " surface PODs",
+          "Foley Creek 171002020603 · 43.83 km²"
+        ].forEach(function (text) {
           const li = document.createElement("li");
-          li.textContent = p.name + " " + p.huc8 + " · " + fmtInt.format(p.homes_off_city) + " off city";
+          li.textContent = text;
           list.appendChild(li);
         });
 
-        const hucLayer = L.geoJSON(collection, {
+        const layer = L.geoJSON(collection, {
           style: function (feature) {
-            return heatStyle((feature.properties || {}).homes_off_city);
+            return heatStyle((feature.properties || {}).wells, maxWells);
           },
           onEachFeature: function (feature, lyr) {
             const p = feature.properties || {};
-            lyr.bindPopup(pop(p.name || "HUC-8", [
-              p.huc8 ? "HUC-8 " + p.huc8 : "",
-              fmtInt.format(p.homes_off_city || 0) + " homes off city",
+            lyr.bindPopup(pop(p.name || "Creek", [
+              p.code || "",
               fmtInt.format(p.wells || 0) + " wells",
-              fmtInt.format(p.surface_pods || 0) + " surface PODs"
+              fmtInt.format(p.surface_pods || 0) + " surface PODs",
+              fmtInt.format(p.homes_off_city || 0) + " homes off city"
             ]), { maxWidth: 260, className: "nccwp-pop" });
           }
         });
 
-        hucLayer.addTo(map);
-        map.fitBounds(hucLayer.getBounds(), { padding: [28, 28] });
+        layer.addTo(map);
+        map.fitBounds(layer.getBounds(), { padding: [28, 28] });
         showStatus("");
       }).catch(function (err) {
         showStatus(err.message || "Could not load map layers");
