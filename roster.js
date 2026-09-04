@@ -60,7 +60,10 @@
         meta: "Scientist · Watershed",
         title: "Scientist",
         body: "Watershed maps already in the field: Netarts, Nehalem, Nestucca, Siuslaw, Tillamook, Necanicum, and Lane.",
-        links: [{ href: RESEARCH_HREF, label: "Open the research index" }],
+        links: [
+          { href: RESEARCH_HREF, label: "Open the research index" },
+          { href: "https://caradmico.github.io/graphicoregon/nccwp/", label: "NCCWP desk" }
+        ],
         figure: { src: "assets/maps/01-context.jpg", alt: "North Coast context map" }
       },
       orbit: {
