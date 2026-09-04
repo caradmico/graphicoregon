@@ -1,0 +1,109 @@
+{
+  "huc8": "17100201",
+  "name": "Necanicum",
+  "queried": "2026-09-04T12:28:40Z",
+  "area": {
+    "areasqkm": 820.02,
+    "areaacres": 202630.43
+  },
+  "counts": {
+    "homes_off_city": 4076,
+    "homes_clatsop_off_city": 3445,
+    "homes_tillamook_off_city": 631,
+    "wells": 470,
+    "surface_pods": 347,
+    "cities": 5
+  },
+  "raw_rows": {
+    "wells_in_huc": 470,
+    "surface_pods_in_huc": 347
+  },
+  "pipeline": {
+    "clatsop_in_huc": 14584,
+    "clatsop_residential": 12278,
+    "clatsop_off_city": 3445,
+    "clatsop_property_c_residential": {
+      "101": 7179,
+      "100": 1179,
+      "401": 1153,
+      "400": 344,
+      "102": 1506,
+      "010": 112,
+      "109": 49,
+      "009": 69,
+      "021": 18,
+      "040": 29,
+      "409": 28,
+      "781": 23,
+      "019": 239,
+      "701": 111,
+      "707": 34,
+      "121": 96,
+      "700": 10,
+      "090": 56,
+      "003": 9,
+      "015": 2,
+      "131": 2,
+      "120": 4,
+      "011": 26
+    },
+    "tillamook_in_huc": 2760,
+    "tillamook_heuristic_residential": 2148,
+    "tillamook_off_city": 631,
+    "wells_rows_in_huc": 470,
+    "wells_unique_wl_id": 470,
+    "pods_rows_in_huc": 347,
+    "pods_unique_pod_use_id": 347,
+    "city_names": [
+      "Warrenton",
+      "Manzanita",
+      "Seaside",
+      "Cannon Beach",
+      "Gearhart"
+    ],
+    "pod_uses": {
+      "MULTIPLE INSTREAM USES": 87,
+      "ANADROMOUS AND RESIDENT FISH HABITAT (INSTREAM)": 68,
+      "DOMESTIC": 50,
+      "AQUATIC LIFE (INSTREAM)": 29,
+      "IRRIGATION": 18,
+      "MUNICIPAL USES": 12,
+      "FISH CULTURE": 12,
+      "DOMESTIC INCLUDING LAWN AND GARDEN": 11,
+      "DOMESTIC EXPANDED": 8,
+      "NURSERY USES": 6,
+      "TEMPERATURE CONTROL": 5,
+      "LIVESTOCK": 4,
+      "CRANBERRY": 4,
+      "HUMAN CONSUMPTION": 4,
+      "WILDLIFE": 3,
+      "AGRICULTURE USES": 3,
+      "HARVESTING OF CRANBERRIES": 3,
+      "SUPPLEMENTAL IRRIGATION": 3,
+      "USE WITHIN A SCHOOL": 2,
+      "INDUSTRIAL/MANUFACTURING USES": 2,
+      "POWER DEVELOPMENT": 2,
+      "IRRIGATION OF CRANBERRIES": 2,
+      "MULTIPLE PURPOSE": 2,
+      "AESTHETICS": 2,
+      "SUPPLEMENTAL FLOOD HARVESTING": 2,
+      "FISH AND WILDLIFE": 1,
+      "IRRIGATION AND DOMESTIC": 1,
+      "FIRE PROTECTION": 1
+    }
+  },
+  "sources": {
+    "huc8": "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4",
+    "clatsop_taxlots": "https://delta.co.clatsop.or.us/server/rest/services/Taxlots/FeatureServer/1",
+    "tillamook_taxlots": "https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Public_Query_WGS84/FeatureServer/2",
+    "city_limits": "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/0",
+    "wells": "https://gis.wrd.state.or.us/server/rest/services/dynamic/Wells_by_Theme_WGS84/FeatureServer/2",
+    "surface_pods": "https://gis.wrd.state.or.us/server/rest/services/dynamic/PODs_By_Source_WGS84/FeatureServer/3"
+  },
+  "rules": {
+    "clatsop_residential": "PROPERTY_C is 0, 1, 7xx, or 400/401/409; exclude 5xx farm and 6xx forest",
+    "tillamook_residential": "no class field; site_address present and taxlot_acre is null or <= 80",
+    "off_city": "centroid inside HUC-8 17100201 and outside Oregon Framework city limits",
+    "public_map": "HUC-8 polygon heat only; no home, well, or POD points; no owner or address"
+  }
+}

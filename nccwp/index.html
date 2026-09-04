@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NCCWP desk</title>
+  <meta name="description" content="You’re on this page to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.">
+  <meta name="theme-color" content="#1a1712">
+  <link rel="canonical" href="https://caradmico.github.io/graphicoregon/nccwp/">
+  <style>
+    :root {
+      --ink: #1a1712;
+      --teal: #2aa8a0;
+      --gold-soft: #ead7a4;
+      --paper: #efe6d4;
+      --muted: #a89a78;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    }
+    main {
+      width: min(36rem, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+    .kicker {
+      margin: 0 0 6px;
+      color: var(--teal);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--gold-soft);
+    }
+    .why {
+      margin: 0 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+    ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      border: 1px solid rgba(212, 176, 90, 0.28);
+    }
+    a { color: var(--gold-soft); }
+    .huc {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .hint {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">NCCWP desk</p>
+    <h1>HUC-8 maps</h1>
+    <p class="why">You’re on this page to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
+    <ol>
+      <li>
+        <a href="../nccwp-nehalem/">Nehalem</a>
+        <span class="huc">HUC-8 17100202 · shipped</span>
+      </li>
+      <li>
+        <a href="../nccwp-necanicum/">Necanicum</a>
+        <span class="huc">HUC-8 17100201 · next after Nehalem</span>
+      </li>
+    </ol>
+    <p class="hint">WIP. Two of eight. Counts live on each map.</p>
+  </main>
+</body>
+</html>
