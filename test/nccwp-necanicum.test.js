@@ -11,29 +11,19 @@ const countsMd = fs.readFileSync(path.join(root, "COUNTS.md"), "utf8");
 const query = fs.readFileSync(path.join(root, "query_layers.py"), "utf8");
 const desk = fs.readFileSync(path.join(__dirname, "..", "nccwp", "index.html"), "utf8");
 
-assert.ok(html.includes("leaflet@1.9.4"), "Leaflet 1.9.4");
-assert.ok(html.includes("tile.openstreetmap.org"), "OSM tiles only");
-assert.ok(!/arcgisonline|basemaps\.arcgis|mapbox\.com/i.test(html), "no ArcGIS or Mapbox tiles");
-assert.ok(html.includes("45.96") && html.includes("-123.92"), "Necanicum center");
-
+assert.ok(/location\.replace\(["']\.\.\/nccwp\/["']\)/.test(html), "old Necanicum URL redirects to the desk map");
+assert.ok(html.includes('http-equiv="refresh"') && html.includes("../nccwp/"), "meta refresh to nccwp/");
+assert.ok(html.includes('href="../nccwp/"'), "no-JS link to the desk map");
 assert.ok(
   /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
   "lead with why"
 );
-assert.ok(/On the map/.test(html), "say what is on the map");
-assert.ok(html.includes("bindPopup"), "click pop-ups on the watershed");
-assert.ok(html.includes("Homes off city ") && html.includes("Wells ") && html.includes("Surface "), "polygon popup is aggregates");
-assert.ok(html.includes("data/summary.json"), "panel reads queried summary");
-assert.ok(html.includes("data/necanicum_huc8.geojson"), "map loads the HUC polygon");
-assert.ok(html.includes("homes_off_city") && html.includes("surface_pods"), "counts from summary.json");
-assert.ok(html.includes("../nccwp/"), "map links the NCCWP desk");
-assert.ok(html.includes("Click the watershed"), "no click-a-point prompt");
-
+assert.ok(!html.includes("leaflet@"), "redirect is not a second Leaflet map");
 assert.ok(!html.includes("data/homes.geojson"), "no public home points");
 assert.ok(!html.includes("data/wells.geojson"), "no public well points");
 assert.ok(!html.includes("data/pods.geojson"), "no public POD points");
 assert.ok(!/circleMarker|pointToLayer/.test(html), "no point markers");
-assert.ok(!/situs|site_address|owner_name|OWNER_LINE|owner_address/i.test(html), "no owner or address on the map");
+assert.ok(!/situs|site_address|owner_name|OWNER_LINE|owner_address/i.test(html), "no owner or address on the page");
 
 ["homes.geojson", "wells.geojson", "pods.geojson"].forEach((name) => {
   assert.ok(!fs.existsSync(path.join(root, "data", name)), name + " is not in the public data folder");
@@ -41,7 +31,7 @@ assert.ok(!/situs|site_address|owner_name|OWNER_LINE|owner_address/i.test(html),
 
 const banned = /numbers will not be invented|do not invent|hallucinat|pending Identity|taxlot Identity|will not be invented|no home counts until/i;
 assert.ok(!banned.test(html), "strip invent-disclaimer speak");
-assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public panel");
+assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public page");
 assert.ok(!/\$|KEEP/i.test(html), "no invented dollars or KEEP");
 
 assert.strictEqual(geo.type, "FeatureCollection");
@@ -108,8 +98,10 @@ assert.ok(
   /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(desk),
   "desk leads with why"
 );
-assert.ok(desk.includes("nccwp-necanicum"), "desk links Necanicum");
-assert.ok(desk.includes("nccwp-nehalem"), "desk links Nehalem");
+assert.ok(desk.includes("nccwp-necanicum/data/"), "desk reuses Necanicum queried data");
+assert.ok(desk.includes("nccwp-nehalem/data/"), "desk reuses Nehalem queried data");
+assert.ok(!/href=["']\.\.\/nccwp-nehalem\/["']/.test(desk), "desk does not send people to a second Nehalem map");
+assert.ok(!/href=["']\.\.\/nccwp-necanicum\/["']/.test(desk), "desk does not send people to a second Necanicum map");
 assert.ok(!banned.test(desk), "desk has no invent-speak");
 
-console.log("nccwp-necanicum: HUC-8 17100201 heat, aggregates only, no points — all assertions passed");
+console.log("nccwp-necanicum: data + privacy stand; public URL redirects to desk — all assertions passed");

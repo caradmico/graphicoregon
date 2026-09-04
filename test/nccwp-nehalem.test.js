@@ -11,37 +11,24 @@ const cities = JSON.parse(fs.readFileSync(path.join(dataDir, "cities.geojson"), 
 const countsMd = fs.readFileSync(path.join(root, "COUNTS.md"), "utf8");
 const queryPy = fs.readFileSync(path.join(root, "query_layers.py"), "utf8");
 
-assert.ok(html.includes("leaflet@1.9.4"), "Leaflet 1.9.4");
-assert.ok(html.includes("tile.openstreetmap.org"), "OSM tiles only");
-assert.ok(!/arcgisonline|basemaps\.arcgis|mapbox\.com/i.test(html), "no ArcGIS or Mapbox tiles");
-assert.ok(html.includes("45.86") && html.includes("-123.49"), "Nehalem center");
-
+assert.ok(/location\.replace\(["']\.\.\/nccwp\/["']\)/.test(html), "old Nehalem URL redirects to the desk map");
+assert.ok(html.includes('http-equiv="refresh"') && html.includes("../nccwp/"), "meta refresh to nccwp/");
+assert.ok(html.includes('href="../nccwp/"'), "no-JS link to the desk map");
 assert.ok(
   /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
   "lead with why"
 );
-assert.ok(/On the map/.test(html), "say what is on the map");
-assert.ok(html.includes("bindPopup"), "click pop-ups on features");
-assert.ok(html.includes("heatStyle") && html.includes("homes_off_city"), "HUC-8 choropleth from homes_off_city");
-assert.ok(html.includes("interactive: false"), "city limits are visual only");
-assert.ok(html.includes("residential parcels in this HUC-8 off city water"), "aggregate homes-off-city popup");
-assert.ok(html.includes("registered wells in this HUC-8"), "aggregate wells popup");
-assert.ok(html.includes("surface stream PODs in this HUC-8"), "aggregate POD popup");
-assert.ok(html.includes("data/summary.json"), "panel reads queried summary");
-assert.ok(html.includes("data/nehalem_huc8.geojson") && html.includes("data/cities.geojson"));
+assert.ok(!html.includes("leaflet@"), "redirect is not a second Leaflet map");
+assert.ok(!/circleMarker|pointToLayer/.test(html), "no point markers");
 assert.ok(!html.includes("data/homes.geojson"), "do not load homes points");
 assert.ok(!html.includes("data/wells.geojson"), "do not load well points");
 assert.ok(!html.includes("data/pods.geojson"), "do not load POD points");
-assert.ok(!/pointToLayer/.test(html), "no point markers on the public map");
-assert.ok(!html.includes("pop(\"Home\""), "no per-home popup");
 assert.ok(!html.includes("p.situs") && !html.includes("SITUS_ADDR"), "no situs in popups");
 assert.ok(!/owner_name|OWNER_LINE|owner_address/i.test(html), "no owner fields on the public page");
-assert.ok(html.includes("homes_off_city") && html.includes("surface_pods"), "counts from summary.json");
-assert.ok(html.includes("stripPrivateProps"), "client strips owner/address if present");
 
 const banned = /numbers will not be invented|do not invent|hallucinat|pending Identity|taxlot Identity|will not be invented|no home counts until/i;
 assert.ok(!banned.test(html), "strip invent-disclaimer speak");
-assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public panel");
+assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public page");
 assert.ok(!/8-HUC KEEP/.test(html + countsMd), "do not claim 8-HUC KEEP");
 assert.ok(!/\$\d/.test(html), "do not invent dollars on the public page");
 
@@ -117,3 +104,5 @@ assert.ok(queryPy.includes("BANNED_PUBLIC_PROP"), "pipeline bans owner/address o
 assert.ok(!/DATA\.joinpath\("homes\.geojson"\)/.test(queryPy), "pipeline does not write homes.geojson to data/");
 assert.ok(!/DATA\.joinpath\("wells\.geojson"\)/.test(queryPy), "pipeline does not write wells.geojson to data/");
 assert.ok(!/DATA\.joinpath\("pods\.geojson"\)/.test(queryPy), "pipeline does not write pods.geojson to data/");
+
+console.log("nccwp-nehalem: data + privacy stand; public URL redirects to desk — all assertions passed");
