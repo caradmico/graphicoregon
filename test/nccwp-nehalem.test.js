@@ -9,14 +9,23 @@ const geo = JSON.parse(fs.readFileSync(path.join(root, "data", "nehalem_huc8.geo
 assert.ok(html.includes("leaflet@1.9.4"), "Leaflet 1.9.4");
 assert.ok(html.includes("tile.openstreetmap.org"), "OSM tiles only");
 assert.ok(!/arcgisonline|basemaps\.arcgis|mapbox\.com/i.test(html), "no ArcGIS or Mapbox tiles");
-assert.ok(/NCCWP · public draft/.test(html), "public draft kicker");
-assert.ok(/PENDING|Pending/.test(html), "home counts stay pending");
-assert.ok(!/\b\d{2,}\s+homes\b/i.test(html), "do not invent home counts");
-assert.ok(html.includes("HUC-8 → residential outside forestry/ag/city water → OWRD/OWRIS → simple home counts"));
 assert.ok(html.includes("45.86") && html.includes("-123.49"), "Nehalem center");
 
+assert.ok(
+  /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
+  "lead with why"
+);
+assert.ok(/On the map/.test(html) && /Watershed boundary/.test(html), "say what is on the map");
+assert.ok(html.includes("bindPopup"), "click pop-ups on features");
+assert.ok(html.includes("HUC-8 ") && html.includes("Watershed boundary"), "short popup labels");
+
+const banned = /numbers will not be invented|do not invent|hallucinat|pending Identity|taxlot Identity|will not be invented|no home counts until/i;
+assert.ok(!banned.test(html), "strip invent-disclaimer speak");
+assert.ok(!/\b\d{2,}\s+homes\b/i.test(html), "no invented home counts");
+assert.ok(!/OWRD\/OWRIS/.test(html), "method essay stays out of the public panel");
+
 assert.strictEqual(geo.type, "FeatureCollection");
-assert.strictEqual(geo.features.length, 1, "one HUC-8 feature");
+assert.strictEqual(geo.features.length, 1, "one HUC-8 this PR — do not expand");
 const feat = geo.features[0];
 assert.strictEqual(feat.properties.huc8, "17100202");
 assert.strictEqual(feat.properties.name, "Nehalem");
