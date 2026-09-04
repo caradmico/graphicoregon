@@ -1,0 +1,91 @@
+{
+  "huc8": "17100202",
+  "name": "Nehalem",
+  "queried": "2026-09-04T12:09:02Z",
+  "area": {
+    "areasqkm": 2213.88,
+    "areaacres": 547061.34
+  },
+  "counts": {
+    "homes_off_city": 3873,
+    "homes_clatsop_off_city": 1808,
+    "homes_tillamook_off_city": 2065,
+    "wells": 1554,
+    "surface_pods": 1143,
+    "cities": 5
+  },
+  "raw_rows": {
+    "wells_in_huc": 1958,
+    "surface_pods_in_huc": 1242
+  },
+  "pipeline": {
+    "clatsop_in_huc": 3419,
+    "clatsop_residential": 1808,
+    "clatsop_off_city": 1808,
+    "clatsop_property_c_residential": {
+      "101": 483,
+      "100": 288,
+      "400": 168,
+      "401": 572,
+      "009": 83,
+      "109": 75,
+      "019": 62,
+      "409": 44,
+      "010": 11,
+      "003": 6,
+      "021": 12,
+      "040": 4
+    },
+    "tillamook_in_huc": 6213,
+    "tillamook_heuristic_residential": 3167,
+    "tillamook_off_city": 2065,
+    "city_names": [
+      "Manzanita",
+      "Rockaway Beach",
+      "Nehalem",
+      "Wheeler",
+      "Vernonia"
+    ],
+    "pod_uses": {
+      "ANADROMOUS AND RESIDENT FISH HABITAT (INSTREAM)": 244,
+      "MULTIPLE INSTREAM USES": 174,
+      "DOMESTIC": 151,
+      "IRRIGATION": 123,
+      "AQUATIC LIFE (INSTREAM)": 102,
+      "DOMESTIC EXPANDED": 80,
+      "QUASI-MUNICIPAL USES": 55,
+      "FISH CULTURE": 48,
+      "INDUSTRIAL/MANUFACTURING USES": 45,
+      "DOMESTIC INCLUDING LAWN AND GARDEN": 44,
+      "HUMAN CONSUMPTION": 29,
+      "MUNICIPAL USES": 28,
+      "LIVESTOCK": 28,
+      "MULTIPLE PURPOSE": 18,
+      "FIRE PROTECTION": 13,
+      "WILDLIFE": 12,
+      "RECREATION": 10,
+      "FOREST MANAGEMENT": 9,
+      "POND MAINTENANCE": 6,
+      "POWER DEVELOPMENT": 5,
+      "DOMESTIC AND LIVESTOCK": 5,
+      "IRRIGATION AND DOMESTIC": 4,
+      "COMMERCIAL USES": 4,
+      "DAIRY BARN USES": 3,
+      "AGRICULTURE USES": 1,
+      "CAMPSITE": 1
+    }
+  },
+  "sources": {
+    "huc8": "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4",
+    "clatsop_taxlots": "https://delta.co.clatsop.or.us/server/rest/services/Taxlots/FeatureServer/1",
+    "tillamook_taxlots": "https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Public_Query_WGS84/FeatureServer/2",
+    "city_limits": "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/0",
+    "wells": "https://gis.wrd.state.or.us/server/rest/services/dynamic/Wells_by_Theme_WGS84/FeatureServer/2",
+    "surface_pods": "https://gis.wrd.state.or.us/server/rest/services/dynamic/PODs_By_Source_WGS84/FeatureServer/3"
+  },
+  "rules": {
+    "clatsop_residential": "PROPERTY_C is 0, 1, 7xx, or 400/401/409; exclude 5xx farm and 6xx forest",
+    "tillamook_residential": "no class field; site_address present and taxlot_acre is null or <= 80",
+    "off_city": "centroid inside HUC-8 17100202 and outside Oregon Framework city limits"
+  }
+}
