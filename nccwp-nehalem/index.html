@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NCCWP · Nehalem HUC-8 · public draft</title>
-  <meta name="description" content="Public draft map of the Nehalem HUC-8 watershed for North Coast Communities for Watershed Protection. USGS WBD frame only; home counts pending.">
+  <title>NCCWP · Nehalem HUC-8</title>
+  <meta name="description" content="How many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices. Nehalem watershed boundary.">
   <meta name="theme-color" content="#1a1712">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/nccwp-nehalem/">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -37,10 +37,10 @@
       z-index: 500;
       top: 16px;
       left: 16px;
-      width: min(360px, calc(100vw - 32px));
+      width: min(320px, calc(100vw - 32px));
       max-height: calc(100vh - 32px);
       overflow: auto;
-      padding: 20px 22px 18px;
+      padding: 18px 20px 16px;
       background: var(--panel);
       color: var(--paper);
       border: 1px solid rgba(212, 176, 90, 0.28);
@@ -54,22 +54,21 @@
       text-transform: uppercase;
     }
     h1 {
-      margin: 0 0 4px;
+      margin: 0 0 10px;
       font-size: 1.55rem;
       font-weight: 600;
       letter-spacing: 0.04em;
       color: var(--gold-soft);
       line-height: 1.15;
     }
-    .org {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.35;
+    .why {
+      margin: 0 0 14px;
+      font-size: 0.98rem;
+      line-height: 1.4;
     }
     dl { margin: 0; }
     dt {
-      margin: 12px 0 3px;
+      margin: 10px 0 2px;
       color: var(--teal);
       font-size: 0.7rem;
       letter-spacing: 0.12em;
@@ -78,29 +77,44 @@
     dd {
       margin: 0;
       font-size: 0.98rem;
-      line-height: 1.4;
+      line-height: 1.35;
     }
-    .pending {
-      color: var(--gold);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 0.86rem;
-    }
-    .note, .method, .source {
+    .hint {
+      margin: 14px 0 0;
       color: var(--muted);
       font-size: 0.86rem;
-      line-height: 1.45;
     }
-    .method { color: var(--paper); }
-    a {
-      color: var(--gold-soft);
-    }
+    a { color: var(--gold-soft); }
     .leaflet-control-attribution {
       background: rgba(26, 23, 18, 0.82) !important;
       color: var(--muted) !important;
       font-family: inherit;
     }
     .leaflet-control-attribution a { color: var(--gold-soft) !important; }
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: var(--ink);
+      color: var(--paper);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px;
+      font-family: inherit;
+      line-height: 1.35;
+    }
+    .leaflet-popup-content strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--gold-soft);
+      font-size: 1.05rem;
+    }
+    .leaflet-popup-content .pop-line {
+      color: var(--paper);
+      font-size: 0.92rem;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+      color: var(--muted);
+    }
     .status {
       position: fixed;
       z-index: 400;
@@ -120,7 +134,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        max-height: 46vh;
+        max-height: 42vh;
         border: 0;
         border-top: 1px solid rgba(212, 176, 90, 0.28);
       }
@@ -130,24 +144,18 @@
 <body>
   <div id="map" role="application" aria-label="Nehalem HUC-8 watershed map"></div>
   <aside class="panel">
-    <p class="kicker">NCCWP · public draft</p>
+    <p class="kicker">NCCWP · draft</p>
     <h1>Nehalem</h1>
-    <p class="org">North Coast Communities for Watershed Protection</p>
+    <p class="why">You’re here to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
     <dl>
+      <dt>On the map</dt>
+      <dd>Watershed boundary</dd>
       <dt>HUC-8</dt>
       <dd id="huc-code">17100202</dd>
       <dt>Area</dt>
-      <dd id="huc-area">Loading USGS WBD…</dd>
-      <dt>Homes</dt>
-      <dd>
-        <span class="pending">Pending</span>
-        <p class="note">County taxlot Identity overlay has not been run. No home counts until that join exists — numbers will not be invented.</p>
-      </dd>
-      <dt>Method</dt>
-      <dd class="method">HUC-8 → residential outside forestry/ag/city water → OWRD/OWRIS → simple home counts</dd>
-      <dt>Source</dt>
-      <dd class="source">USGS Watershed Boundary Dataset, HUC-8 17100202. OSM tiles. <a href="https://caradmico.github.io/graphicoregon/">Graphic Oregon</a></dd>
+      <dd id="huc-area"></dd>
     </dl>
+    <p class="hint">Click the outline.</p>
   </aside>
   <div id="status" class="status" hidden></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -171,11 +179,22 @@
       }).addTo(map);
 
       const fmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-      const fmtInt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+
+      function popupHtml(props) {
+        const name = props.name || "Watershed";
+        const huc = props.huc8 ? "HUC-8 " + props.huc8 : "";
+        const area = typeof props.areasqkm === "number" ? fmt.format(props.areasqkm) + " km²" : "";
+        return (
+          "<strong>" + name + "</strong>" +
+          "<div class=\"pop-line\">Watershed boundary</div>" +
+          (huc ? "<div class=\"pop-line\">" + huc + "</div>" : "") +
+          (area ? "<div class=\"pop-line\">" + area + "</div>" : "")
+        );
+      }
 
       fetch("data/nehalem_huc8.geojson")
         .then(function (res) {
-          if (!res.ok) throw new Error("USGS WBD GeoJSON missing (" + res.status + ")");
+          if (!res.ok) throw new Error("Watershed boundary missing (" + res.status + ")");
           return res.json();
         })
         .then(function (data) {
@@ -184,18 +203,9 @@
           if (props.huc8 !== "17100202") {
             throw new Error("Expected HUC-8 17100202, got " + (props.huc8 || "none"));
           }
-          document.getElementById("huc-code").textContent =
-            props.huc8 + " · " + (props.name || "Nehalem") + ", " + (props.states || "OR");
-          const areaBits = [];
-          if (typeof props.areasqkm === "number") {
-            areaBits.push(fmt.format(props.areasqkm) + " km²");
-          }
-          if (typeof props.areaacres === "number") {
-            areaBits.push(fmtInt.format(props.areaacres) + " acres");
-          }
-          document.getElementById("huc-area").textContent = areaBits.length
-            ? areaBits.join(" · ") + " (USGS WBD)"
-            : "USGS area attributes unavailable";
+          document.getElementById("huc-code").textContent = props.huc8;
+          document.getElementById("huc-area").textContent =
+            typeof props.areasqkm === "number" ? fmt.format(props.areasqkm) + " km²" : "";
 
           const layer = L.geoJSON(data, {
             style: {
@@ -203,12 +213,19 @@
               weight: 2,
               fillColor: "#d4b05a",
               fillOpacity: 0.18
+            },
+            onEachFeature: function (feature, lyr) {
+              lyr.bindPopup(popupHtml(feature.properties || {}), {
+                maxWidth: 220,
+                className: "nccwp-pop"
+              });
+              lyr.on("mouseover", function () { lyr.setStyle({ weight: 3 }); });
+              lyr.on("mouseout", function () { lyr.setStyle({ weight: 2 }); });
             }
           }).addTo(map);
           map.fitBounds(layer.getBounds(), { padding: [28, 28] });
         })
         .catch(function (err) {
-          document.getElementById("huc-area").textContent = "USGS geometry failed to load";
           showStatus(err.message || "Could not load watershed boundary");
         });
     })();
