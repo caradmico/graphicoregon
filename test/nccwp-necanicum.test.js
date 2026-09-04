@@ -15,7 +15,7 @@ assert.ok(/location\.replace\(["']\.\.\/nccwp\/["']\)/.test(html), "old Necanicu
 assert.ok(html.includes('http-equiv="refresh"') && html.includes("../nccwp/"), "meta refresh to nccwp/");
 assert.ok(html.includes('href="../nccwp/"'), "no-JS link to the desk map");
 assert.ok(
-  /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
+  /how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
   "lead with why"
 );
 assert.ok(!html.includes("leaflet@"), "redirect is not a second Leaflet map");
@@ -95,13 +95,13 @@ assert.ok(!/data\/homes\.geojson/.test(query), "query does not write public home
 assert.ok(!/SITUS_ADDR|OWNER_LINE|owner_name|owner_address/.test(query), "query does not pull owner or situs into public fields");
 
 assert.ok(
-  /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(desk),
+  /how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(desk),
   "desk leads with why"
 );
-assert.ok(desk.includes("nccwp-necanicum/data/"), "desk reuses Necanicum queried data");
-assert.ok(desk.includes("nccwp-nehalem/data/"), "desk reuses Nehalem queried data");
+assert.ok(desk.includes("data/creek_size.geojson"), "desk loads Foley-size polygons");
 assert.ok(!/href=["']\.\.\/nccwp-nehalem\/["']/.test(desk), "desk does not send people to a second Nehalem map");
 assert.ok(!/href=["']\.\.\/nccwp-necanicum\/["']/.test(desk), "desk does not send people to a second Necanicum map");
 assert.ok(!banned.test(desk), "desk has no invent-speak");
+assert.ok(!/HUC-8|HUC-10|HUC-12/i.test(desk), "desk does not argue HUC jargon");
 
 console.log("nccwp-necanicum: data + privacy stand; public URL redirects to desk — all assertions passed");

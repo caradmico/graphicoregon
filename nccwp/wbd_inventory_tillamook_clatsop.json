@@ -1,0 +1,1388 @@
+{
+  "title": "Creek-size USGS WBD units intersecting Tillamook and Clatsop counties, Oregon",
+  "reference": {
+    "name": "Foley Creek",
+    "code": "171002020603",
+    "areasqkm": 43.83,
+    "areaacres": 10829.55,
+    "note": "Tillamook reference. Lower Nehalem parent 1710020206 has five creek-size children: Cook Creek, Lost Creek-Nehalem River, Foley Creek, Anderson Creek-Nehalem River, Nehalem Bay."
+  },
+  "queried": "2026-09-04T16:23:26Z",
+  "counties": [
+    "Clatsop",
+    "Tillamook"
+  ],
+  "purpose": "Inventory Foley-size watersheds for the NCCWP desk. No invented homes, wells, surface PODs, or dollars.",
+  "method": "Oregon Framework county polygons for Clatsop and Tillamook. USGS Watershed Boundary Dataset creek-size units (12-digit codes; Foley Creek = 171002020603) queried by the two-county envelope and kept only when the polygon intersects a county polygon. Areas are WBD unit totals.",
+  "sources": {
+    "creek_size": "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6",
+    "counties": "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/6",
+    "clatsop_taxlots": "https://delta.co.clatsop.or.us/server/rest/services/Taxlots/FeatureServer/1",
+    "tillamook_taxlots": "https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Public_Query_WGS84/FeatureServer/2",
+    "city_limits": "https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/0",
+    "wells": "https://gis.wrd.state.or.us/server/rest/services/dynamic/Wells_by_Theme_WGS84/FeatureServer/2",
+    "surface_pods": "https://gis.wrd.state.or.us/server/rest/services/dynamic/PODs_By_Source_WGS84/FeatureServer/3"
+  },
+  "counts": {
+    "creek_size": 96,
+    "wells": 5373,
+    "surface_pods": 4081,
+    "homes_off_city": 22689
+  },
+  "homes_note": "homes_off_city is Clatsop + Tillamook taxlots only. Creek-size units that run into Columbia, Washington, Yamhill, Lincoln, or Washington State are incomplete for homes.",
+  "units": [
+    {
+      "code": "170800030801",
+      "name": "West Creek-Frontal Columbia River",
+      "areasqkm": 87.45,
+      "areaacres": 21609.8,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 121,
+      "surface_pods": 44,
+      "homes_off_city": 323
+    },
+    {
+      "code": "170800030802",
+      "name": "Hunt Creek-Frontal Columbia River",
+      "areasqkm": 39.63,
+      "areaacres": 9793.26,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 14,
+      "surface_pods": 9,
+      "homes_off_city": 149
+    },
+    {
+      "code": "170800030900",
+      "name": "Cathlamet Channel-Columbia River",
+      "areasqkm": 183.31,
+      "areaacres": 45297.7,
+      "states": "OR,WA",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 91,
+      "surface_pods": 19,
+      "homes_off_city": 8
+    },
+    {
+      "code": "170800060101",
+      "name": "Gnat Creek-Frontal Columbia River",
+      "areasqkm": 110.88,
+      "areaacres": 27397.94,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 26,
+      "surface_pods": 21,
+      "homes_off_city": 525
+    },
+    {
+      "code": "170800060102",
+      "name": "Big Creek",
+      "areasqkm": 98.92,
+      "areaacres": 24444.45,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 14,
+      "surface_pods": 21,
+      "homes_off_city": 408
+    },
+    {
+      "code": "170800060103",
+      "name": "Bear Creek-Frontal Columbia River",
+      "areasqkm": 92.44,
+      "areaacres": 22842.12,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 154,
+      "surface_pods": 33,
+      "homes_off_city": 1380
+    },
+    {
+      "code": "170800060201",
+      "name": "North Fork Klaskanine River",
+      "areasqkm": 68.49,
+      "areaacres": 16924.6,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 31,
+      "surface_pods": 6,
+      "homes_off_city": 98
+    },
+    {
+      "code": "170800060202",
+      "name": "South Fork Klaskanine River",
+      "areasqkm": 59.79,
+      "areaacres": 14774.09,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 16,
+      "surface_pods": 7,
+      "homes_off_city": 39
+    },
+    {
+      "code": "170800060203",
+      "name": "Upper Youngs River",
+      "areasqkm": 95.33,
+      "areaacres": 23555.84,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 11,
+      "surface_pods": 12,
+      "homes_off_city": 41
+    },
+    {
+      "code": "170800060204",
+      "name": "Wallooskee River",
+      "areasqkm": 40.2,
+      "areaacres": 9934.3,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 6,
+      "surface_pods": 8,
+      "homes_off_city": 227
+    },
+    {
+      "code": "170800060205",
+      "name": "Lower Youngs River-Frontal Youngs Bay",
+      "areasqkm": 54.92,
+      "areaacres": 13570.86,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 335,
+      "surface_pods": 58,
+      "homes_off_city": 732
+    },
+    {
+      "code": "170800060206",
+      "name": "Upper Lewis and Clark River",
+      "areasqkm": 72.61,
+      "areaacres": 17942.89,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 0,
+      "surface_pods": 4,
+      "homes_off_city": 0
+    },
+    {
+      "code": "170800060207",
+      "name": "Lower Lewis and Clark River",
+      "areasqkm": 87.42,
+      "areaacres": 21602.54,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 88,
+      "surface_pods": 25,
+      "homes_off_city": 866
+    },
+    {
+      "code": "170800060208",
+      "name": "Skipanon River-Frontal Columbia River",
+      "areasqkm": 66.62,
+      "areaacres": 16462.55,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 161,
+      "surface_pods": 22,
+      "homes_off_city": 739
+    },
+    {
+      "code": "170800060500",
+      "name": "Baker Bay-Columbia River",
+      "areasqkm": 388.05,
+      "areaacres": 95890.38,
+      "states": "OR,WA",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 1,
+      "surface_pods": 61,
+      "homes_off_city": 25
+    },
+    {
+      "code": "170900080101",
+      "name": "Upper Willamina Creek",
+      "areasqkm": 101.91,
+      "areaacres": 25182.7,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 28,
+      "surface_pods": 40,
+      "homes_off_city": 0
+    },
+    {
+      "code": "170900100101",
+      "name": "Upper Gales Creek",
+      "areasqkm": 86.11,
+      "areaacres": 21279.36,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 110,
+      "surface_pods": 66,
+      "homes_off_city": 0
+    },
+    {
+      "code": "170900100201",
+      "name": "Headwaters Tualatin River",
+      "areasqkm": 61.44,
+      "areaacres": 15182.09,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 1,
+      "surface_pods": 2,
+      "homes_off_city": 0
+    },
+    {
+      "code": "170900100203",
+      "name": "Sain Creek-Scoggins Creek",
+      "areasqkm": 115.5,
+      "areaacres": 28539.62,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 197,
+      "surface_pods": 81,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171001060800",
+      "name": "Peacock Spit-Pacific Ocean",
+      "areasqkm": 464.95,
+      "areaacres": 114891.56,
+      "states": "OR,WA",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 0,
+      "surface_pods": 0,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002010101",
+      "name": "Upper Necanicum River",
+      "areasqkm": 61.23,
+      "areaacres": 15131.11,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 38,
+      "surface_pods": 36,
+      "homes_off_city": 111
+    },
+    {
+      "code": "171002010102",
+      "name": "Middle Necanicum River",
+      "areasqkm": 61.44,
+      "areaacres": 15182.38,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 30,
+      "surface_pods": 56,
+      "homes_off_city": 77
+    },
+    {
+      "code": "171002010103",
+      "name": "Lower Necanicum River",
+      "areasqkm": 91.85,
+      "areaacres": 22697.43,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 186,
+      "surface_pods": 117,
+      "homes_off_city": 1792
+    },
+    {
+      "code": "171002010104",
+      "name": "Ecola Creek",
+      "areasqkm": 55.72,
+      "areaacres": 13768.41,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 36,
+      "surface_pods": 42,
+      "homes_off_city": 66
+    },
+    {
+      "code": "171002010105",
+      "name": "Arch Cape Creek-Frontal Pacific Ocean",
+      "areasqkm": 87.34,
+      "areaacres": 21582.66,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 165,
+      "surface_pods": 95,
+      "homes_off_city": 1986
+    },
+    {
+      "code": "171002010200",
+      "name": "Smuggler Cove-Pacific Ocean",
+      "areasqkm": 462.43,
+      "areaacres": 114268.45,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 15,
+      "surface_pods": 1,
+      "homes_off_city": 2
+    },
+    {
+      "code": "171002020101",
+      "name": "Lousignont Creek-Nehalem River",
+      "areasqkm": 74.07,
+      "areaacres": 18302.17,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 21,
+      "surface_pods": 6,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020102",
+      "name": "Wolf Creek",
+      "areasqkm": 43.69,
+      "areaacres": 10795.09,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 1,
+      "surface_pods": 22,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020103",
+      "name": "Clear Creek-Nehalem River",
+      "areasqkm": 63.04,
+      "areaacres": 15577.56,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 27,
+      "surface_pods": 17,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020104",
+      "name": "Upper Rock Creek",
+      "areasqkm": 56.41,
+      "areaacres": 13938.14,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 0,
+      "surface_pods": 0,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020105",
+      "name": "Middle Rock Creek",
+      "areasqkm": 53.93,
+      "areaacres": 13325.22,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 8,
+      "surface_pods": 4,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020106",
+      "name": "Lower Rock Creek",
+      "areasqkm": 51.38,
+      "areaacres": 12696.4,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 75,
+      "surface_pods": 44,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020204",
+      "name": "Fishhawk Creek",
+      "areasqkm": 60.33,
+      "areaacres": 14908.87,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 20,
+      "surface_pods": 5,
+      "homes_off_city": 195
+    },
+    {
+      "code": "171002020206",
+      "name": "Deep Creek",
+      "areasqkm": 58.31,
+      "areaacres": 14408.13,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 4,
+      "surface_pods": 18,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020207",
+      "name": "Northrup Creek-Nehalem River",
+      "areasqkm": 76.29,
+      "areaacres": 18850.55,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 21,
+      "surface_pods": 31,
+      "homes_off_city": 55
+    },
+    {
+      "code": "171002020301",
+      "name": "Little Fishhawk Creek",
+      "areasqkm": 62.91,
+      "areaacres": 15545.57,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 13,
+      "surface_pods": 11,
+      "homes_off_city": 15
+    },
+    {
+      "code": "171002020302",
+      "name": "Beneke Creek",
+      "areasqkm": 66.42,
+      "areaacres": 16412.45,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 9,
+      "surface_pods": 42,
+      "homes_off_city": 11
+    },
+    {
+      "code": "171002020303",
+      "name": "Mulak Creek-Nehalem River",
+      "areasqkm": 34.86,
+      "areaacres": 8615.12,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 22,
+      "surface_pods": 24,
+      "homes_off_city": 25
+    },
+    {
+      "code": "171002020304",
+      "name": "Buster Creek",
+      "areasqkm": 44.75,
+      "areaacres": 11057.23,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 0,
+      "surface_pods": 4,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020305",
+      "name": "Cow Creek-Nehalem River",
+      "areasqkm": 83.48,
+      "areaacres": 20628.87,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 121,
+      "surface_pods": 107,
+      "homes_off_city": 598
+    },
+    {
+      "code": "171002020306",
+      "name": "Humbug Creek",
+      "areasqkm": 75.04,
+      "areaacres": 18542.17,
+      "states": "OR",
+      "counties": [
+        "Clatsop"
+      ],
+      "county_touch": "Clatsop",
+      "wells": 36,
+      "surface_pods": 52,
+      "homes_off_city": 72
+    },
+    {
+      "code": "171002020307",
+      "name": "Cronin Creek-Nehalem River",
+      "areasqkm": 93.49,
+      "areaacres": 23102.48,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 25,
+      "surface_pods": 61,
+      "homes_off_city": 76
+    },
+    {
+      "code": "171002020401",
+      "name": "Upper Salmonberry River",
+      "areasqkm": 63.69,
+      "areaacres": 15738.62,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 1,
+      "surface_pods": 2,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020402",
+      "name": "North Fork Salmonberry River",
+      "areasqkm": 59.46,
+      "areaacres": 14692.65,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 0,
+      "surface_pods": 0,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002020403",
+      "name": "Lower Salmonberry River",
+      "areasqkm": 60.74,
+      "areaacres": 15009.82,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 2,
+      "surface_pods": 4,
+      "homes_off_city": 6
+    },
+    {
+      "code": "171002020501",
+      "name": "Upper North Fork Nehalem River",
+      "areasqkm": 81.01,
+      "areaacres": 20018.45,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 28,
+      "surface_pods": 18,
+      "homes_off_city": 83
+    },
+    {
+      "code": "171002020502",
+      "name": "Middle North Fork Nehalem River",
+      "areasqkm": 69.7,
+      "areaacres": 17223.36,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 7,
+      "surface_pods": 45,
+      "homes_off_city": 6
+    },
+    {
+      "code": "171002020503",
+      "name": "Lower North Fork Nehalem River",
+      "areasqkm": 100.97,
+      "areaacres": 24949.46,
+      "states": "OR",
+      "counties": [
+        "Clatsop",
+        "Tillamook"
+      ],
+      "county_touch": "Clatsop and Tillamook",
+      "wells": 166,
+      "surface_pods": 123,
+      "homes_off_city": 293
+    },
+    {
+      "code": "171002020601",
+      "name": "Cook Creek",
+      "areasqkm": 76.31,
+      "areaacres": 18856.15,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 0,
+      "surface_pods": 1,
+      "homes_off_city": 1
+    },
+    {
+      "code": "171002020602",
+      "name": "Lost Creek-Nehalem River",
+      "areasqkm": 67.47,
+      "areaacres": 16673.11,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 4,
+      "surface_pods": 33,
+      "homes_off_city": 4
+    },
+    {
+      "code": "171002020603",
+      "name": "Foley Creek",
+      "areasqkm": 43.83,
+      "areaacres": 10829.55,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 121,
+      "surface_pods": 34,
+      "homes_off_city": 167
+    },
+    {
+      "code": "171002020604",
+      "name": "Anderson Creek-Nehalem River",
+      "areasqkm": 41.09,
+      "areaacres": 10152.78,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 74,
+      "surface_pods": 134,
+      "homes_off_city": 175
+    },
+    {
+      "code": "171002020605",
+      "name": "Nehalem Bay",
+      "areasqkm": 56.46,
+      "areaacres": 13951.11,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 73,
+      "surface_pods": 83,
+      "homes_off_city": 1166
+    },
+    {
+      "code": "171002030101",
+      "name": "Upper Little Nestucca River",
+      "areasqkm": 59.09,
+      "areaacres": 14600.46,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 26,
+      "surface_pods": 9,
+      "homes_off_city": 19
+    },
+    {
+      "code": "171002030102",
+      "name": "Middle Little Nestucca River",
+      "areasqkm": 42.08,
+      "areaacres": 10398.71,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 26,
+      "surface_pods": 47,
+      "homes_off_city": 21
+    },
+    {
+      "code": "171002030103",
+      "name": "Lower Little Nestucca River",
+      "areasqkm": 58.87,
+      "areaacres": 14547.76,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 102,
+      "surface_pods": 91,
+      "homes_off_city": 153
+    },
+    {
+      "code": "171002030201",
+      "name": "Headwaters Nestucca River",
+      "areasqkm": 50.61,
+      "areaacres": 12505.43,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 5,
+      "surface_pods": 9,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002030202",
+      "name": "Elk Creek-Nestucca River",
+      "areasqkm": 47.07,
+      "areaacres": 11632.06,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 7,
+      "surface_pods": 8,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002030203",
+      "name": "Testament Creek-Nestucca River",
+      "areasqkm": 66.61,
+      "areaacres": 16459.81,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 7,
+      "surface_pods": 47,
+      "homes_off_city": 13
+    },
+    {
+      "code": "171002030204",
+      "name": "Niagara Creek-Nestucca River",
+      "areasqkm": 60.32,
+      "areaacres": 14905.92,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 10,
+      "surface_pods": 23,
+      "homes_off_city": 8
+    },
+    {
+      "code": "171002030205",
+      "name": "Moon Creek",
+      "areasqkm": 50.51,
+      "areaacres": 12480.62,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 10,
+      "surface_pods": 31,
+      "homes_off_city": 28
+    },
+    {
+      "code": "171002030206",
+      "name": "Powder Creek-Nestucca River",
+      "areasqkm": 73.08,
+      "areaacres": 18058.16,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 50,
+      "surface_pods": 90,
+      "homes_off_city": 62
+    },
+    {
+      "code": "171002030207",
+      "name": "Beaver Creek",
+      "areasqkm": 75.74,
+      "areaacres": 18714.71,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 109,
+      "surface_pods": 80,
+      "homes_off_city": 202
+    },
+    {
+      "code": "171002030208",
+      "name": "Three Rivers",
+      "areasqkm": 98.04,
+      "areaacres": 24227.33,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 97,
+      "surface_pods": 93,
+      "homes_off_city": 226
+    },
+    {
+      "code": "171002030209",
+      "name": "Farmer Creek-Nestucca River",
+      "areasqkm": 73.24,
+      "areaacres": 18096.93,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 133,
+      "surface_pods": 153,
+      "homes_off_city": 316
+    },
+    {
+      "code": "171002030210",
+      "name": "Nestucca River",
+      "areasqkm": 70.73,
+      "areaacres": 17478.26,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 162,
+      "surface_pods": 124,
+      "homes_off_city": 1702
+    },
+    {
+      "code": "171002030301",
+      "name": "Upper Tillamook River",
+      "areasqkm": 89.53,
+      "areaacres": 22122.44,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 68,
+      "surface_pods": 84,
+      "homes_off_city": 319
+    },
+    {
+      "code": "171002030302",
+      "name": "Lower Tillamook River",
+      "areasqkm": 70.7,
+      "areaacres": 17469.4,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 65,
+      "surface_pods": 66,
+      "homes_off_city": 423
+    },
+    {
+      "code": "171002030401",
+      "name": "Middle Fork North Fork Trask River",
+      "areasqkm": 111.89,
+      "areaacres": 27647.85,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 4,
+      "surface_pods": 4,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002030402",
+      "name": "North Fork Trask River",
+      "areasqkm": 95.63,
+      "areaacres": 23631,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 16,
+      "surface_pods": 43,
+      "homes_off_city": 1
+    },
+    {
+      "code": "171002030403",
+      "name": "East Fork South Fork Trask River",
+      "areasqkm": 75.4,
+      "areaacres": 18632.55,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 1,
+      "surface_pods": 20,
+      "homes_off_city": 1
+    },
+    {
+      "code": "171002030404",
+      "name": "South Fork Trask River",
+      "areasqkm": 60.2,
+      "areaacres": 14875.26,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 16,
+      "surface_pods": 38,
+      "homes_off_city": 46
+    },
+    {
+      "code": "171002030405",
+      "name": "Upper Trask River",
+      "areasqkm": 51.89,
+      "areaacres": 12823.18,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 70,
+      "surface_pods": 59,
+      "homes_off_city": 94
+    },
+    {
+      "code": "171002030406",
+      "name": "Lower Trask River",
+      "areasqkm": 55.6,
+      "areaacres": 13739,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 183,
+      "surface_pods": 81,
+      "homes_off_city": 993
+    },
+    {
+      "code": "171002030501",
+      "name": "South Fork Wilson River",
+      "areasqkm": 41.31,
+      "areaacres": 10208.01,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 4,
+      "surface_pods": 2,
+      "homes_off_city": 2
+    },
+    {
+      "code": "171002030502",
+      "name": "Devils Lake Fork",
+      "areasqkm": 68.94,
+      "areaacres": 17034.99,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 5,
+      "surface_pods": 0,
+      "homes_off_city": 2
+    },
+    {
+      "code": "171002030503",
+      "name": "North Fork Wilson River",
+      "areasqkm": 69.85,
+      "areaacres": 17260.07,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 3,
+      "surface_pods": 6,
+      "homes_off_city": 3
+    },
+    {
+      "code": "171002030504",
+      "name": "Upper Wilson River",
+      "areasqkm": 78.29,
+      "areaacres": 19344.9,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 32,
+      "surface_pods": 52,
+      "homes_off_city": 30
+    },
+    {
+      "code": "171002030505",
+      "name": "Jordan Creek",
+      "areasqkm": 65.47,
+      "areaacres": 16178.51,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 3,
+      "surface_pods": 3,
+      "homes_off_city": 3
+    },
+    {
+      "code": "171002030506",
+      "name": "Middle Wilson River",
+      "areasqkm": 54.6,
+      "areaacres": 13490.83,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 13,
+      "surface_pods": 47,
+      "homes_off_city": 20
+    },
+    {
+      "code": "171002030507",
+      "name": "Little North Fork Wilson River",
+      "areasqkm": 51.07,
+      "areaacres": 12620,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 2,
+      "surface_pods": 0,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002030508",
+      "name": "Lower Wilson River",
+      "areasqkm": 68.68,
+      "areaacres": 16971.43,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 208,
+      "surface_pods": 126,
+      "homes_off_city": 611
+    },
+    {
+      "code": "171002030601",
+      "name": "North Fork Kilchis River",
+      "areasqkm": 68.19,
+      "areaacres": 16850.75,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 0,
+      "surface_pods": 17,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002030602",
+      "name": "Little South Fork Kilchis River-Kilchis River",
+      "areasqkm": 98.82,
+      "areaacres": 24419.28,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 55,
+      "surface_pods": 115,
+      "homes_off_city": 82
+    },
+    {
+      "code": "171002030701",
+      "name": "Upper Miami River",
+      "areasqkm": 45.06,
+      "areaacres": 11134.92,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 36,
+      "surface_pods": 20,
+      "homes_off_city": 27
+    },
+    {
+      "code": "171002030702",
+      "name": "Lower Miami River",
+      "areasqkm": 48.28,
+      "areaacres": 11929.34,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 20,
+      "surface_pods": 46,
+      "homes_off_city": 43
+    },
+    {
+      "code": "171002030800",
+      "name": "Tillamook Bay",
+      "areasqkm": 86.16,
+      "areaacres": 21291.64,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 156,
+      "surface_pods": 114,
+      "homes_off_city": 605
+    },
+    {
+      "code": "171002030901",
+      "name": "Netarts Bay-Frontal Pacific Ocean",
+      "areasqkm": 67,
+      "areaacres": 16556.45,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 17,
+      "surface_pods": 36,
+      "homes_off_city": 1860
+    },
+    {
+      "code": "171002030902",
+      "name": "Sand Creek-Frontal Pacific Ocean",
+      "areasqkm": 65.98,
+      "areaacres": 16304.4,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 117,
+      "surface_pods": 83,
+      "homes_off_city": 651
+    },
+    {
+      "code": "171002030903",
+      "name": "Neskowin Creek-Frontal Pacific Ocean",
+      "areasqkm": 65.87,
+      "areaacres": 16277.44,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 126,
+      "surface_pods": 71,
+      "homes_off_city": 1077
+    },
+    {
+      "code": "171002030904",
+      "name": "Spring Creek-Frontal Pacific Ocean",
+      "areasqkm": 21.81,
+      "areaacres": 5389.51,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 13,
+      "surface_pods": 19,
+      "homes_off_city": 429
+    },
+    {
+      "code": "171002031000",
+      "name": "Three Arch Rocks-Pacific Ocean",
+      "areasqkm": 446.82,
+      "areaacres": 110410.85,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 14,
+      "surface_pods": 0,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002040802",
+      "name": "Upper Salmon River",
+      "areasqkm": 82.47,
+      "areaacres": 20379.72,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 108,
+      "surface_pods": 78,
+      "homes_off_city": 1
+    },
+    {
+      "code": "171002040803",
+      "name": "Lower Salmon River",
+      "areasqkm": 73.29,
+      "areaacres": 18109.91,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 364,
+      "surface_pods": 163,
+      "homes_off_city": 74
+    },
+    {
+      "code": "171002040901",
+      "name": "Devils Lake-Frontal Pacific Ocean",
+      "areasqkm": 43.5,
+      "areaacres": 10749.8,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 127,
+      "surface_pods": 64,
+      "homes_off_city": 0
+    },
+    {
+      "code": "171002041000",
+      "name": "Whale Cove-Pacific Ocean",
+      "areasqkm": 305.12,
+      "areaacres": 75397.18,
+      "states": "OR",
+      "counties": [
+        "Tillamook"
+      ],
+      "county_touch": "Tillamook",
+      "wells": 29,
+      "surface_pods": 8,
+      "homes_off_city": 0
+    }
+  ]
+}

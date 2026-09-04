@@ -15,7 +15,7 @@ assert.ok(/location\.replace\(["']\.\.\/nccwp\/["']\)/.test(html), "old Nehalem 
 assert.ok(html.includes('http-equiv="refresh"') && html.includes("../nccwp/"), "meta refresh to nccwp/");
 assert.ok(html.includes('href="../nccwp/"'), "no-JS link to the desk map");
 assert.ok(
-  /how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
+  /how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices/.test(html),
   "lead with why"
 );
 assert.ok(!html.includes("leaflet@"), "redirect is not a second Leaflet map");
