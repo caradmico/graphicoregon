@@ -19,6 +19,7 @@
       --panel: rgba(26, 23, 18, 0.94);
       --well: #6ec8c2;
       --pod: #f3e7c8;
+      --heat: #c4922a;
     }
     * { box-sizing: border-box; }
     html, body {
@@ -95,7 +96,7 @@
       border-radius: 50%;
       vertical-align: baseline;
     }
-    .swatch.home { background: var(--gold); }
+    .swatch.heat { background: var(--heat); }
     .swatch.well { background: var(--well); }
     .swatch.pod { background: var(--pod); border: 1px solid rgba(26, 23, 18, 0.35); }
     .leaflet-control-attribution {
@@ -167,19 +168,19 @@
     <p class="why">You’re on this page to see how many people per HUC-8 watershed have drinking water that might be impacted by forestry pesticides and forestry practices.</p>
     <dl>
       <dt>On the map</dt>
-      <dd>Homes off city water, wells, stream points of diversion</dd>
+      <dd>This HUC-8, filled by how many residential parcels are off city water</dd>
       <dt>HUC-8</dt>
       <dd id="huc-code">17100202</dd>
       <dt>Area</dt>
       <dd id="huc-area"></dd>
-      <dt><span class="swatch home"></span>Homes off city</dt>
+      <dt><span class="swatch heat"></span>Homes off city</dt>
       <dd id="count-homes"></dd>
-      <dt><span class="swatch well"></span>Wells</dt>
+      <dt><span class="swatch well"></span>Wells in this HUC-8</dt>
       <dd id="count-wells"></dd>
-      <dt><span class="swatch pod"></span>Stream PODs</dt>
+      <dt><span class="swatch pod"></span>Surface stream PODs</dt>
       <dd id="count-pods"></dd>
     </dl>
-    <p class="hint">Click a point. <a href="COUNTS.md">How these numbers were queried</a></p>
+    <p class="hint">Click the watershed. Fill is homes off city — not a parcel-to-well pin. <a href="COUNTS.md">How these numbers were queried</a></p>
   </aside>
   <div id="status" class="status">Loading layers…</div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -220,20 +221,54 @@
         });
       }
 
+      function stripPrivateProps(collection) {
+        const banned = /owner|situs|addr|address|site_address/i;
+        const feats = (collection && collection.features) || [];
+        feats.forEach(function (f) {
+          const p = f.properties || {};
+          Object.keys(p).forEach(function (k) {
+            if (banned.test(k)) delete p[k];
+          });
+        });
+        return collection;
+      }
+
+      function hexToRgb(hex) {
+        const h = hex.replace("#", "");
+        return [
+          parseInt(h.slice(0, 2), 16),
+          parseInt(h.slice(2, 4), 16),
+          parseInt(h.slice(4, 6), 16)
+        ];
+      }
+      function lerpColor(a, b, t) {
+        const A = hexToRgb(a);
+        const B = hexToRgb(b);
+        const c = A.map(function (v, i) {
+          return Math.round(v + (B[i] - v) * t);
+        });
+        return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+      }
+      // Choropleth fill uses homes_off_city (residential parcels off city water).
+      // Homes-off-city proxy — not a parcel-level well assignment. Scale 0–5000.
+      function heatStyle(n) {
+        const t = Math.max(0, Math.min(1, Number(n || 0) / 5000));
+        return {
+          color: "#2aa8a0",
+          weight: 2.5,
+          fillColor: lerpColor("#ead7a4", "#c4922a", t),
+          fillOpacity: 0.22 + 0.4 * t
+        };
+      }
+
       Promise.all([
         loadJSON("data/summary.json"),
         loadJSON("data/nehalem_huc8.geojson"),
-        loadJSON("data/cities.geojson"),
-        loadJSON("data/homes.geojson"),
-        loadJSON("data/wells.geojson"),
-        loadJSON("data/pods.geojson")
+        loadJSON("data/cities.geojson")
       ]).then(function (all) {
         const summary = all[0];
-        const huc = all[1];
-        const cities = all[2];
-        const homes = all[3];
-        const wells = all[4];
-        const pods = all[5];
+        const huc = stripPrivateProps(all[1]);
+        const cities = stripPrivateProps(all[2]);
         const counts = summary.counts || {};
         const feat = huc.features && huc.features[0];
         const props = (feat && feat.properties) || {};
@@ -241,27 +276,26 @@
           throw new Error("Expected HUC-8 17100202, got " + (props.huc8 || "none"));
         }
 
+        const homesOff = counts.homes_off_city || 0;
+        const wellsN = counts.wells || 0;
+        const podsN = counts.surface_pods || 0;
+
         document.getElementById("huc-code").textContent = props.huc8;
         document.getElementById("huc-area").textContent =
           typeof props.areasqkm === "number" ? fmt.format(props.areasqkm) + " km²" : "";
-        document.getElementById("count-homes").textContent = fmtInt.format(counts.homes_off_city || 0);
-        document.getElementById("count-wells").textContent = fmtInt.format(counts.wells || 0);
-        document.getElementById("count-pods").textContent = fmtInt.format(counts.surface_pods || 0);
+        document.getElementById("count-homes").textContent = fmtInt.format(homesOff);
+        document.getElementById("count-wells").textContent = fmtInt.format(wellsN);
+        document.getElementById("count-pods").textContent = fmtInt.format(podsN);
 
         const hucLayer = L.geoJSON(huc, {
-          style: {
-            color: "#2aa8a0",
-            weight: 2,
-            fillColor: "#d4b05a",
-            fillOpacity: 0.08
-          },
+          style: heatStyle(homesOff),
           onEachFeature: function (feature, lyr) {
             const p = feature.properties || {};
             lyr.bindPopup(pop(p.name || "Nehalem", [
-              "Watershed boundary",
-              p.huc8 ? "HUC-8 " + p.huc8 : "",
-              typeof p.areasqkm === "number" ? fmt.format(p.areasqkm) + " km²" : ""
-            ]), { maxWidth: 220, className: "nccwp-pop" });
+              fmtInt.format(homesOff) + " residential parcels in this HUC-8 off city water",
+              fmtInt.format(wellsN) + " registered wells in this HUC-8",
+              fmtInt.format(podsN) + " surface stream PODs in this HUC-8"
+            ]), { maxWidth: 280, className: "nccwp-pop" });
           }
         });
 
@@ -272,86 +306,15 @@
             fillColor: "#a89a78",
             fillOpacity: 0.12
           },
-          onEachFeature: function (feature, lyr) {
-            const p = feature.properties || {};
-            lyr.bindPopup(pop(p.name || "City", ["City limits"]), {
-              maxWidth: 220,
-              className: "nccwp-pop"
-            });
-          }
-        });
-
-        const homeLayer = L.geoJSON(homes, {
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-              radius: 4,
-              color: "#1a1712",
-              weight: 0.6,
-              fillColor: "#d4b05a",
-              fillOpacity: 0.85
-            });
-          },
-          onEachFeature: function (feature, lyr) {
-            const p = feature.properties || {};
-            const bits = ["Off city water", p.county || ""];
-            if (p.class) bits.push("Class " + p.class);
-            if (p.situs) bits.push(p.situs);
-            lyr.bindPopup(pop("Home", bits), { maxWidth: 220, className: "nccwp-pop" });
-          }
-        });
-
-        const wellLayer = L.geoJSON(wells, {
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-              radius: 4,
-              color: "#1a1712",
-              weight: 0.6,
-              fillColor: "#6ec8c2",
-              fillOpacity: 0.9
-            });
-          },
-          onEachFeature: function (feature, lyr) {
-            const p = feature.properties || {};
-            lyr.bindPopup(pop("Well", [
-              p.log || "Water well",
-              p.use || "",
-              p.wl_id != null ? "OWRD " + p.wl_id : ""
-            ]), { maxWidth: 220, className: "nccwp-pop" });
-          }
-        });
-
-        const podLayer = L.geoJSON(pods, {
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-              radius: 4,
-              color: "#1a1712",
-              weight: 0.6,
-              fillColor: "#f3e7c8",
-              fillOpacity: 0.9
-            });
-          },
-          onEachFeature: function (feature, lyr) {
-            const p = feature.properties || {};
-            lyr.bindPopup(pop(p.name || "Stream POD", [
-              "Surface point of diversion",
-              p.use || "",
-              p.source || ""
-            ]), { maxWidth: 240, className: "nccwp-pop" });
-          }
+          interactive: false
         });
 
         cityLayer.addTo(map);
         hucLayer.addTo(map);
-        homeLayer.addTo(map);
-        wellLayer.addTo(map);
-        podLayer.addTo(map);
 
         L.control.layers(null, {
-          "Watershed": hucLayer,
-          "City limits": cityLayer,
-          "Homes off city": homeLayer,
-          "Wells": wellLayer,
-          "Stream PODs": podLayer
+          "Watershed heat": hucLayer,
+          "City limits": cityLayer
         }, { collapsed: false }).addTo(map);
 
         map.fitBounds(hucLayer.getBounds(), { padding: [28, 28] });
