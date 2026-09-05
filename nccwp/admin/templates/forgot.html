@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Reset password{% endblock %}
+{% block body %}
+<h1>Reset password</h1>
+<p>Enter the email on your account. If mail is set up on this server, a link will be sent. If it is not, ask another person on the People list to type a new password for you.</p>
+<form method="post" class="row">
+  <label>Email<br><input type="email" name="email" required></label>
+  <button type="submit">Request reset</button>
+</form>
+{% endblock %}

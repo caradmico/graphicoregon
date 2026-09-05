@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}People{% endblock %}
+{% block body %}
+<h1>People</h1>
+<p>Only someone already on this list can add another person. There is no join link.</p>
+<form action="{{ url_for('people_add') }}" method="post" class="row">
+  <label>Email<br><input type="email" name="email" required></label>
+  <label>Name<br><input type="text" name="name"></label>
+  <label>Temporary password<br><input type="text" name="password" required minlength="10"></label>
+  <button type="submit">Add person</button>
+</form>
+<table>
+  <thead><tr><th>Email</th><th>Name</th><th>On</th><th>Added</th><th></th></tr></thead>
+  <tbody>
+  {% for p in people %}
+    <tr>
+      <td>{{ p['email'] }}</td>
+      <td>{{ p['name'] }}</td>
+      <td>{{ 'yes' if p['active'] else 'off' }}</td>
+      <td>{{ p['created_at'][:16] }} {% if p['created_by'] %}<span class="muted">by {{ p['created_by'] }}</span>{% endif %}</td>
+      <td>
+        <form action="{{ url_for('people_password') }}" method="post" class="row">
+          <input type="hidden" name="id" value="{{ p['id'] }}">
+          <input type="text" name="password" placeholder="new password" minlength="10" required>
+          <button type="submit">Set password</button>
+        </form>
+        {% if p['id'] != me['id'] %}
+        <form action="{{ url_for('people_toggle') }}" method="post">
+          <input type="hidden" name="id" value="{{ p['id'] }}">
+          <button type="submit">{{ 'Turn off' if p['active'] else 'Turn on' }}</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

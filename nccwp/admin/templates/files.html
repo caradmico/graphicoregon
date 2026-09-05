@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Files{% endblock %}
+{% block body %}
+<h1>Files</h1>
+<p>Everything under <code>{{ data_dir }}</code>. New files land in <code>uploads/</code>. The creek map files that already ship with the site stay put — only uploads can be deleted from this page.</p>
+<form action="{{ url_for('files_upload') }}" method="post" enctype="multipart/form-data" class="row">
+  <label>Add a layer file<br><input type="file" name="file" required></label>
+  <button type="submit">Upload</button>
+</form>
+<p class="note">Allowed: geojson, json, csv, zip (shapefile), kml, gpkg, md, txt. Cap is 40 MB.</p>
+<table>
+  <thead><tr><th>File</th><th>Size</th><th>Changed</th><th></th></tr></thead>
+  <tbody>
+  {% for f in files %}
+    <tr>
+      <td><a href="{{ url_for('files_download', name=f.name) }}">{{ f.name }}</a></td>
+      <td>{{ '%.1f'|format(f.size / 1024) }} KB</td>
+      <td>{{ f.mtime }}</td>
+      <td>
+        {% if f.deletable %}
+        <form action="{{ url_for('files_delete') }}" method="post" onsubmit="return confirm('Remove {{ f.name }}?')">
+          <input type="hidden" name="name" value="{{ f.name }}">
+          <button type="submit">Remove</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4" class="muted">No files yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

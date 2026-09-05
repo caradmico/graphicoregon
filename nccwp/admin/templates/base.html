@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}North Coast map desk{% endblock %}</title>
+  <style>
+    :root { --ink:#1a1712; --paper:#efe6d4; --gold:#ead7a4; --teal:#2aa8a0; --muted:#a89a78; --panel:#2a2620; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--ink); color:var(--paper); font: 17px/1.4 "Iowan Old Style", Palatino, Georgia, serif; }
+    header { display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; padding:14px 20px; border-bottom:1px solid rgba(212,176,90,.28); }
+    header a { color:var(--gold); text-decoration:none; }
+    header a.on { color:var(--paper); }
+    header .who { margin-left:auto; color:var(--muted); font-size:.9rem; }
+    main { max-width:860px; margin:0 auto; padding:24px 20px 48px; }
+    h1 { font-size:1.4rem; color:var(--gold); font-weight:600; }
+    p, li, td, th, label { font-size:1rem; }
+    .flash { background:#3a2a12; border:1px solid var(--gold); padding:10px 12px; margin:0 0 16px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:8px 6px; border-bottom:1px solid rgba(212,176,90,.2); vertical-align:top; }
+    form.row { display:flex; flex-wrap:wrap; gap:8px; align-items:end; margin:16px 0; }
+    input[type=email], input[type=password], input[type=text], input[type=file] {
+      background:var(--panel); color:var(--paper); border:1px solid rgba(212,176,90,.35); padding:8px 10px; font:inherit;
+    }
+    button { background:transparent; color:var(--gold); border:1px solid rgba(212,176,90,.45); padding:8px 12px; font:inherit; cursor:pointer; }
+    button:hover { border-color:var(--teal); color:var(--paper); }
+    .muted { color:var(--muted); }
+    .note { color:var(--muted); font-size:.92rem; }
+    code { font-size:.88em; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>North Coast map desk</strong>
+    {% if me %}
+      <a href="{{ url_for('files') }}" class="{{ 'on' if request.endpoint and request.endpoint.startswith('files') else '' }}">Files</a>
+      <a href="{{ url_for('people') }}" class="{{ 'on' if request.endpoint and request.endpoint.startswith('people') else '' }}">People</a>
+      <span class="who">{{ me['email'] }} · <a href="{{ url_for('logout') }}">Sign out</a></span>
+    {% endif %}
+  </header>
+  <main>
+    {% for msg in get_flashed_messages() %}
+      <p class="flash">{{ msg }}</p>
+    {% endfor %}
+    {% block body %}{% endblock %}
+  </main>
+</body>
+</html>

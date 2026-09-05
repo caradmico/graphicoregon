@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}New password{% endblock %}
+{% block body %}
+<h1>New password</h1>
+<p class="muted">{{ email }}</p>
+<form method="post" class="row">
+  <label>Password (ten characters or more)<br><input type="password" name="password" required minlength="10"></label>
+  <button type="submit">Save</button>
+</form>
+{% endblock %}
