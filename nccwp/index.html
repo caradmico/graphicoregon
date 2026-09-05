@@ -49,8 +49,11 @@
     .leaflet-popup-content-wrapper, .leaflet-popup-tip { background:var(--ink); color:var(--paper); }
     .leaflet-popup-content { margin:12px 14px; font-family:inherit; line-height:1.35; }
     .leaflet-popup-content strong { display:block; margin-bottom:4px; color:var(--gold-soft); }
-    .leaflet-popup-content .pop-line { font-size:0.92rem; }
-    .leaflet-popup-content .pop-proxy { color:var(--muted); font-size:0.8rem; }
+    .leaflet-popup-content .pop-proxy { color:var(--muted); font-size:0.8rem; margin:6px 0 0; }
+    .pop-table { width:100%; border-collapse:collapse; margin:8px 0 4px; font-size:0.92rem; }
+    .pop-table th { text-align:left; font-weight:normal; padding:3px 10px 3px 0; color:var(--muted); }
+    .pop-table td { text-align:right; padding:3px 0; color:var(--paper); }
+    .leaflet-tooltip { background:var(--ink) !important; color:var(--paper) !important; border:1px solid rgba(212,176,90,0.35) !important; font-family:inherit !important; }
     .status { position:fixed; z-index:400; right:16px; bottom:28px; padding:10px 12px; background:var(--panel); border:1px solid rgba(212,176,90,0.28); color:var(--gold-soft); font-size:0.88rem; }
     .status[hidden] { display:none; }
     @media (max-width:640px) { .panel { top:auto; bottom:0; left:0; width:100%; max-height:48vh; border:0; border-top:1px solid rgba(212,176,90,0.28); } }
@@ -99,7 +102,7 @@
         <ul class="hotspots" id="hotspot-list"></ul>
       </dd>
     </dl>
-    <p class="hint">Tap a creek for its three counts. <a href="COUNTS.md">Where the numbers come from</a>. Keepers sign in on the desk app in <a href="admin/">admin/</a> (not this public page).</p>
+    <p class="hint">Tap a creek for a table of well logs, stream rights, and houses. Hover for the well-log count. <a href="COUNTS.md">Where the numbers come from</a>. Keepers sign in on the desk app in <a href="admin/">admin/</a> (not this public page).</p>
   </aside>
   <div id="status" class="status">Loading the creeks…</div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

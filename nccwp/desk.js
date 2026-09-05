@@ -25,10 +25,19 @@
     wells_per_home: { from: "#ead7a4", to: "#2aa8a0", stroke: "#d4b05a" }
   };
 
-  function line(text, cls) {
-    if (!text) return "";
-    return "<div class='" + (cls || "pop-line") + "'>" + text + "</div>";
-  }
+  var towns = [
+    ["Astoria", 46.188, -123.831],
+    ["Seaside", 45.993, -123.922],
+    ["Cannon Beach", 45.892, -123.961],
+    ["Warrenton", 46.165, -123.924],
+    ["Tillamook", 45.456, -123.844],
+    ["Manzanita", 45.718, -123.935],
+    ["Nehalem", 45.722, -123.894],
+    ["Rockaway", 45.613, -123.943],
+    ["Pacific City", 45.202, -123.963],
+    ["Garibaldi", 45.560, -123.911]
+  ];
+
   function hexToRgb(hex) {
     var h = hex.replace("#", "");
     return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
@@ -65,14 +74,24 @@
       return "\u0026gt;";
     });
   }
-
-  function countTable(p) {
+  function row(label, value) {
+    return "<tr><th>" + label + "</th><td>" + value + "</td></tr>";
+  }
+  function popupHtml(p) {
     var n = nums(p);
-    return "<table class='pop-table'>" +
-      "<tr><th>Well logs</th><td>" + fmtInt.format(n.wells) + "</td></tr>" +
-      "<tr><th>Stream water rights</th><td>" + fmtInt.format(n.surface_pods) + "</td></tr>" +
-      "<tr><th>Houses outside city limits</th><td>" + fmtInt.format(n.homes_off_city) + "</td></tr>" +
-      "</table>";
+    var f = flags(p);
+    var note = "Oregon well logs whose mapped point falls in this creek. A log is a well report, not always a water-right permit.";
+    if (f.fewWells) note = "Many houses outside city limits and few well logs. They may still sit on a district pipe.";
+    else if (f.wellDominant) note = "More well logs than stream rights. Next check is well date versus when a groundwater right was required.";
+    else if (f.podDominant) note = "Stream rights dominate the paper trail here.";
+    return "<strong>" + escapeHtml(p.name || "Creek") + "</strong>" +
+      (p.code ? "<div class='pop-proxy'>" + escapeHtml(p.code) + "</div>" : "") +
+      "<table class='pop-table'>" +
+      row("Well logs", fmtInt.format(n.wells)) +
+      row("Stream water rights", fmtInt.format(n.surface_pods)) +
+      row("Houses outside city limits", fmtInt.format(n.homes_off_city)) +
+      "</table>" +
+      "<div class='pop-proxy'>" + note + "</div>";
   }
 
   Promise.all([
@@ -118,9 +137,9 @@
     var layersByCode = {};
     var legendNote = document.getElementById("legend-note");
     var hotspotList = document.getElementById("hotspot-list");
-    var findBox = document.getElementById("find");
     var findHits = document.getElementById("find-hits");
-    var townsBox = document.getElementById("towns");
+    var findBox = document.getElementById("find");
+    var townBar = document.getElementById("towns");
 
     function heatStyle(n, maxN, palette) {
       var t = Math.max(0, Math.min(1, Number(n || 0) / (maxN || 1)));
@@ -150,31 +169,11 @@
       return style;
     }
 
-    function popupHtml(p) {
-      var n = nums(p);
-      var f = flags(p);
-      var extra = [];
-      if (n.homes_off_city > 0) {
-        extra.push(line(n.wells_per_home.toFixed(2) + " well logs per house outside city limits"));
-      }
-      if (f.wellDominant) {
-        extra.push(line("More well logs than stream rights. Next check: well date vs when groundwater rights were required."));
-      }
-      if (f.fewWells) {
-        extra.push(line("Many houses outside city limits, few well logs. They may still sit on a city or district line."));
-      }
-      if (f.podDominant) {
-        extra.push(line("Stream rights dominate the paper trail here."));
-      }
-      return "<strong>" + escapeHtml(p.name || "Creek") + "</strong>" +
-        countTable(p) +
-        extra.join("") +
-        line("Well logs are OWRD construction records that fall in this creek. They are not the same as a water right.", "pop-proxy");
-    }
-
-    function tooltipHtml(p) {
-      var n = nums(p);
-      return "<strong>" + escapeHtml(p.name || "Creek") + "</strong>" + countTable(p);
+    function openCreek(p) {
+      var lyr = layersByCode[p.code];
+      if (!lyr) return;
+      map.fitBounds(lyr.getBounds(), { padding: [36, 36], maxZoom: 11 });
+      lyr.openPopup();
     }
 
     function renderLegend() {
@@ -185,8 +184,6 @@
         wells_per_home: "Darker = more well logs per house outside city limits"
       };
       legendNote.textContent = labels[mode] || "";
-      var maxEl = document.getElementById("legend-max");
-      if (maxEl) maxEl.textContent = mode === "wells_per_home" ? maxes[mode].toFixed(1) : fmtInt.format(maxes[mode] || 0);
       hotspotList.textContent = "";
       var groups = [
         { kind: "wellDominant", title: "More wells than stream rights", on: activeFlags.wellDominant, fmt: function (n) {
@@ -224,82 +221,66 @@
           var btn = document.createElement("button");
           btn.type = "button";
           btn.textContent = (p.name || "Creek") + " \u00b7 " + group.fmt(nums(p));
-          btn.addEventListener("click", function () {
-            var lyr = layersByCode[p.code];
-            if (!lyr) return;
-            map.fitBounds(lyr.getBounds(), { padding: [36, 36], maxZoom: 11 });
-            lyr.openPopup();
-          });
+          btn.addEventListener("click", function () { openCreek(p); });
           li.appendChild(btn);
           hotspotList.appendChild(li);
         });
       });
     }
 
-    function goToLayer(lyr) {
-      if (!lyr) return;
-      map.fitBounds(lyr.getBounds(), { padding: [36, 36], maxZoom: 11 });
-      lyr.openPopup();
-    }
-
     var layer = L.geoJSON({ type: "FeatureCollection", features: features }, {
       style: styleFeature,
       onEachFeature: function (feature, lyr) {
         var p = feature.properties || {};
+        var n = nums(p);
         layersByCode[p.code] = lyr;
         lyr.bindPopup(function () { return popupHtml(p); });
-        lyr.bindTooltip(function () { return tooltipHtml(p); }, {
-          sticky: true,
-          opacity: 0.96,
-          className: "creek-tip"
-        });
+        lyr.bindTooltip(
+          escapeHtml(p.name || "Creek") + " \u00b7 " + fmtInt.format(n.wells) + " well logs",
+          { sticky: true, direction: "top", opacity: 0.95 }
+        );
       }
     }).addTo(map);
 
     map.fitBounds(layer.getBounds(), { padding: [24, 24], maxZoom: 10 });
 
-    var towns = [
-      { name: "Astoria", lat: 46.188, lon: -123.83 },
-      { name: "Seaside", lat: 45.993, lon: -123.92 },
-      { name: "Tillamook", lat: 45.456, lon: -123.84 },
-      { name: "Nehalem", lat: 45.722, lon: -123.89 },
-      { name: "Pacific City", lat: 45.202, lon: -123.96 }
-    ];
-    if (townsBox) {
+    if (townBar) {
       towns.forEach(function (t) {
         var btn = document.createElement("button");
         btn.type = "button";
-        btn.textContent = t.name;
+        btn.textContent = t[0];
         btn.addEventListener("click", function () {
-          map.setView([t.lat, t.lon], 11);
+          map.setView([t[1], t[2]], 12);
         });
-        townsBox.appendChild(btn);
+        townBar.appendChild(btn);
       });
     }
 
-    function renderFind(q) {
-      if (!findHits) return;
-      findHits.textContent = "";
-      var needle = String(q || "").trim().toLowerCase();
-      if (needle.length < 2) return;
-      features.filter(function (f) {
-        var p = f.properties || {};
-        return String(p.name || "").toLowerCase().indexOf(needle) !== -1 ||
-          String(p.code || "").indexOf(needle) !== -1;
-      }).slice(0, 12).forEach(function (f) {
-        var p = f.properties || {};
-        var n = nums(p);
-        var li = document.createElement("li");
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = (p.name || "Creek") + " \u00b7 " + fmtInt.format(n.wells) + " well logs";
-        btn.addEventListener("click", function () { goToLayer(layersByCode[p.code]); });
-        li.appendChild(btn);
-        findHits.appendChild(li);
+    if (findBox && findHits) {
+      findBox.addEventListener("input", function () {
+        var q = findBox.value.trim().toLowerCase();
+        findHits.textContent = "";
+        if (q.length < 2) return;
+        features.filter(function (f) {
+          var p = f.properties || {};
+          return String(p.name || "").toLowerCase().indexOf(q) !== -1 ||
+            String(p.code || "").toLowerCase().indexOf(q) !== -1;
+        }).slice(0, 12).forEach(function (f) {
+          var p = f.properties || {};
+          var n = nums(p);
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = (p.name || "Creek") + " \u00b7 " + fmtInt.format(n.wells) + " well logs";
+          btn.addEventListener("click", function () {
+            findHits.textContent = "";
+            findBox.value = p.name || "";
+            openCreek(p);
+          });
+          li.appendChild(btn);
+          findHits.appendChild(li);
+        });
       });
-    }
-    if (findBox) {
-      findBox.addEventListener("input", function () { renderFind(findBox.value); });
     }
 
     function refresh() {
