@@ -66,6 +66,15 @@
     });
   }
 
+  function countTable(p) {
+    var n = nums(p);
+    return "<table class='pop-table'>" +
+      "<tr><th>Well logs</th><td>" + fmtInt.format(n.wells) + "</td></tr>" +
+      "<tr><th>Stream water rights</th><td>" + fmtInt.format(n.surface_pods) + "</td></tr>" +
+      "<tr><th>Houses outside city limits</th><td>" + fmtInt.format(n.homes_off_city) + "</td></tr>" +
+      "</table>";
+  }
+
   Promise.all([
     fetch("data/creek_size.geojson").then(function (res) {
       if (!res.ok) throw new Error("creek map missing");
@@ -109,6 +118,9 @@
     var layersByCode = {};
     var legendNote = document.getElementById("legend-note");
     var hotspotList = document.getElementById("hotspot-list");
+    var findBox = document.getElementById("find");
+    var findHits = document.getElementById("find-hits");
+    var townsBox = document.getElementById("towns");
 
     function heatStyle(n, maxN, palette) {
       var t = Math.max(0, Math.min(1, Number(n || 0) / (maxN || 1)));
@@ -155,11 +167,14 @@
         extra.push(line("Stream rights dominate the paper trail here."));
       }
       return "<strong>" + escapeHtml(p.name || "Creek") + "</strong>" +
-        line(fmtInt.format(n.homes_off_city) + " houses outside city limits") +
-        line(fmtInt.format(n.wells) + " well logs") +
-        line(fmtInt.format(n.surface_pods) + " stream water rights") +
+        countTable(p) +
         extra.join("") +
-        line("These are counts in the creek, not who drinks from what.", "pop-proxy");
+        line("Well logs are OWRD construction records that fall in this creek. They are not the same as a water right.", "pop-proxy");
+    }
+
+    function tooltipHtml(p) {
+      var n = nums(p);
+      return "<strong>" + escapeHtml(p.name || "Creek") + "</strong>" + countTable(p);
     }
 
     function renderLegend() {
@@ -170,6 +185,8 @@
         wells_per_home: "Darker = more well logs per house outside city limits"
       };
       legendNote.textContent = labels[mode] || "";
+      var maxEl = document.getElementById("legend-max");
+      if (maxEl) maxEl.textContent = mode === "wells_per_home" ? maxes[mode].toFixed(1) : fmtInt.format(maxes[mode] || 0);
       hotspotList.textContent = "";
       var groups = [
         { kind: "wellDominant", title: "More wells than stream rights", on: activeFlags.wellDominant, fmt: function (n) {
@@ -219,16 +236,71 @@
       });
     }
 
+    function goToLayer(lyr) {
+      if (!lyr) return;
+      map.fitBounds(lyr.getBounds(), { padding: [36, 36], maxZoom: 11 });
+      lyr.openPopup();
+    }
+
     var layer = L.geoJSON({ type: "FeatureCollection", features: features }, {
       style: styleFeature,
       onEachFeature: function (feature, lyr) {
         var p = feature.properties || {};
         layersByCode[p.code] = lyr;
         lyr.bindPopup(function () { return popupHtml(p); });
+        lyr.bindTooltip(function () { return tooltipHtml(p); }, {
+          sticky: true,
+          opacity: 0.96,
+          className: "creek-tip"
+        });
       }
     }).addTo(map);
 
     map.fitBounds(layer.getBounds(), { padding: [24, 24], maxZoom: 10 });
+
+    var towns = [
+      { name: "Astoria", lat: 46.188, lon: -123.83 },
+      { name: "Seaside", lat: 45.993, lon: -123.92 },
+      { name: "Tillamook", lat: 45.456, lon: -123.84 },
+      { name: "Nehalem", lat: 45.722, lon: -123.89 },
+      { name: "Pacific City", lat: 45.202, lon: -123.96 }
+    ];
+    if (townsBox) {
+      towns.forEach(function (t) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = t.name;
+        btn.addEventListener("click", function () {
+          map.setView([t.lat, t.lon], 11);
+        });
+        townsBox.appendChild(btn);
+      });
+    }
+
+    function renderFind(q) {
+      if (!findHits) return;
+      findHits.textContent = "";
+      var needle = String(q || "").trim().toLowerCase();
+      if (needle.length < 2) return;
+      features.filter(function (f) {
+        var p = f.properties || {};
+        return String(p.name || "").toLowerCase().indexOf(needle) !== -1 ||
+          String(p.code || "").indexOf(needle) !== -1;
+      }).slice(0, 12).forEach(function (f) {
+        var p = f.properties || {};
+        var n = nums(p);
+        var li = document.createElement("li");
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = (p.name || "Creek") + " \u00b7 " + fmtInt.format(n.wells) + " well logs";
+        btn.addEventListener("click", function () { goToLayer(layersByCode[p.code]); });
+        li.appendChild(btn);
+        findHits.appendChild(li);
+      });
+    }
+    if (findBox) {
+      findBox.addEventListener("input", function () { renderFind(findBox.value); });
+    }
 
     function refresh() {
       layer.setStyle(styleFeature);
