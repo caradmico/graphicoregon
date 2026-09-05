@@ -1,60 +1,40 @@
-# Creek-size watersheds — Tillamook and Clatsop
+# Where these numbers come from
 
-You’re on the map to see how many people per creek-size watershed have drinking water that might be impacted by forestry pesticides and forestry practices.
+The map is 96 USGS creek polygons that touch Clatsop or Tillamook. Color is a count inside each creek, not a point on a house.
 
-These numbers were queried from public endpoints on 2026-09-04. They are not estimates.
+Queried from public servers on 4 September 2026.
 
-## Foley Creek is the size
+## Counts
 
-**Foley Creek** (Tillamook), code `171002020603`, is **43.83 km²** (10,829.55 acres). That is the Foley-size unit on this desk.
-
-Its parent, Lower Nehalem River `1710020206`, has five creek-size children: Cook Creek, Lost Creek–Nehalem River, Foley Creek, Anderson Creek–Nehalem River, and Nehalem Bay.
-
-The public map draws every USGS WBD unit of that Foley size whose polygon intersects Clatsop or Tillamook County. **96** units. The map does not publish home, well, or stream-POD points, owner names, or addresses.
-
-## Counts on the map
-
-| Layer | Count | How counted |
+| What | Number | Meaning |
 | --- | ---: | --- |
-| Creek-size units | **96** | USGS WBD Foley-size polygons intersecting Clatsop or Tillamook |
-| Wells | **5,373** | Unique OWRD `wl_id` inside each creek polygon |
-| Surface stream PODs | **4,081** | Unique OWRD `pod_use_id` on the Streams layer inside each creek polygon |
-| Homes off city | **22,689** | Residential taxlot centroids in Clatsop or Tillamook, outside city limits, assigned to a creek polygon |
+| Creeks | **96** | USGS watershed units at the creek scale that intersect either county |
+| Houses off city water | **22,689** | Residential taxlots outside city limits, assigned to a creek (10,202 Clatsop, 12,487 Tillamook) |
+| Registered wells | **5,373** | Unique Oregon well-log IDs inside those creeks |
+| Stream water rights | **4,081** | Unique Oregon stream points of diversion inside those creeks |
 
-Foley Creek itself: **121** wells, **34** surface PODs, **167** homes off city.
+A well record or a stream right is a paper trail. It is not "this house drinks from that."
 
-Homes off city use the Clatsop taxlot FeatureServer and the OWRD Tillamook public taxlots only. Creeks that run into Columbia, Washington, Yamhill, Lincoln, or Washington State are incomplete for homes. Wells and surface PODs are counted for the whole creek polygon.
+Houses are only counted in Clatsop and Tillamook. A creek that runs into Columbia, Washington, Yamhill, Lincoln, or Washington State is short on the house number. Wells and stream rights are counted for the whole creek.
 
-Breakdown of the 22,689 homes: **10,202 Clatsop** + **12,487 Tillamook**.
+## How a house was kept
 
-## Endpoints queried
+Clatsop: residential property class. Farm and forest lots dropped.
+Tillamook: a site address and eighty acres or less (the county file has no class field).
+Off city: the lot center sits outside Oregon city limits.
 
-1. **Oregon Framework counties** — Clatsop and Tillamook polygons
-2. **USGS WBD creek-size units** — `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` (12-digit codes; Foley Creek = `171002020603`)
-3. **Clatsop taxlots** — `https://delta.co.clatsop.or.us/server/rest/services/Taxlots/FeatureServer/1`
-4. **Tillamook taxlots** — `https://gis.wrd.state.or.us/server/rest/services/tax/Tax_Lots_Public_Query_WGS84/FeatureServer/2` where `county_name='Tillamook'`
-5. **Oregon Framework city limits** — `https://navigator.state.or.us/arcgis/rest/services/Framework/Admin_Bounds/MapServer/0`
-6. **OWRD water wells** — `https://gis.wrd.state.or.us/server/rest/services/dynamic/Wells_by_Theme_WGS84/FeatureServer/2`
-7. **OWRD surface stream PODs** — `https://gis.wrd.state.or.us/server/rest/services/dynamic/PODs_By_Source_WGS84/FeatureServer/3`
+Cities in the query: Astoria, Bay City, Cannon Beach, Garibaldi, Gearhart, Manzanita, Nehalem, Rockaway Beach, Seaside, Tillamook, Warrenton, Wheeler.
 
-Each layer was pulled for the county or creek envelope, then assigned to the Foley-size polygon. Same privacy rule as [Nehalem](../nccwp-nehalem/COUNTS.md): aggregates only.
+## Sources
 
-## Rules
-
-**Selection:** the USGS creek-size polygon intersects Clatsop or Tillamook.
-
-**Wells:** 6,437 well-log rows in those polygons collapse to **5,373** unique `wl_id`.
-
-**Stream PODs:** 4,349 Streams-layer rows collapse to **4,081** unique `pod_use_id`.
-
-**Clatsop residential** via `PROPERTY_C`: keep 0 / 1 / 7xx or 400 / 401 / 409; drop 5xx farm and 6xx forest.
-
-**Tillamook residential** (no class field): keep a lot if it has a `site_address` and acreage is empty or ≤ 80.
-
-**Off city:** centroid is outside Oregon Framework city limits.
-
-Cities touching these counties in the query: Astoria, Bay City, Cannon Beach, Garibaldi, Gearhart, Manzanita, Nehalem, Rockaway Beach, Seaside, Tillamook, Warrenton, Wheeler.
+1. Oregon Framework counties
+2. USGS Watershed Boundary Dataset, creek-scale units
+3. Clatsop taxlots
+4. Tillamook public taxlots (Oregon Water Resources)
+5. Oregon Framework city limits
+6. Oregon Water Resources wells
+7. Oregon Water Resources stream points of diversion
 
 Replay: `python3 nccwp/query_huc12.py`
 
-Inventory: [wbd_inventory_tillamook_clatsop.json](wbd_inventory_tillamook_clatsop.json)
+The creek-scale cut was chosen so the map is not six giant basins. Foley Creek in Tillamook (~44 km²) was the size example used to pick that cut. It is not featured on the map.
