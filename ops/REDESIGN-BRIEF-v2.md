@@ -11,7 +11,7 @@
 3. Smaller less-zoomed work tiles on mobile — phone-first scale, smaller crops, less aggressive zoom.
 4. Kill Weather Report + any videos.
 5. Showcase Pete Anderson, Cougar Ridge, Gold Silver + recent made sites. Commit into `assets/` as needed. Do NOT use `weather-report.jpg`.
-6. Exactly THREE SMALL tiles in a hover-scroll left→right shadow-box strip (simple strip, not giant hero zooms).
+6. Exactly SEVEN SMALL tiles in a hover-scroll left→right shadow-box strip (simple strip, not giant hero zooms): Pete Anderson, Cougar Ridge, Gold Silver, Offshore Grill, Hueca, Farm to Table, Pioneer Podcast. Gold Silver caption is “Gold Silver”.
 7. Keep tagline “Business is hard. Websites shouldn’t be.” Skills Branding / Market research / Timeless collateral as HEADERS over small ethos text boxes (brief blurbs each) — not empty ladder/chips.
 8. Footer = Get in touch only (caradmico@gmail.com · 503-277-8757 firm voice). No Softstyle/Autonomy/Links noise.
 9. No personal name; creek OFF selling face (`/creek/` intact WIP); no DNS/Bluehost/Elementor.
@@ -23,4 +23,4 @@ Tagline, no personal name, creek off face, contact above.
 Light/paper theme, pill/chip chrome, oversized zoomed hero tiles on mobile, Weather Report, video embeds, skills-as-empty-ladder, busy footer.
 
 ## Done when
-Phone look: dark ground, architectural lines, tagline + three ethos boxes, three small scrolling work tiles (Pete / Cougar / Gold Silver + recent), simple Get in touch footer.
+Phone look: dark ground, architectural lines, tagline + three ethos boxes, seven small scrolling work tiles (Pete / Cougar / Gold Silver / Offshore / Hueca / Farm to Table / Pioneer), simple Get in touch footer.

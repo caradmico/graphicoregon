@@ -39,20 +39,41 @@ assert.ok(!/No invented clients/i.test(html), "no disclaimer tone");
 assert.ok(!/handoff and teach|Email Cara/i.test(html), "VOID copy is gone");
 
 const tiles = html.match(/<article class="tile">/g) || [];
-assert.strictEqual(tiles.length, 3, "exactly three small work tiles");
+assert.strictEqual(tiles.length, 7, "exactly seven small work tiles");
 assert.ok(html.includes("class=\"strip\""), "tiles live in a hover-scroll strip");
-assert.ok(html.includes("Pete Anderson"), "named work: Pete Anderson");
-assert.ok(html.includes("Cougar Ridge"), "named work: Cougar Ridge");
-assert.ok(html.includes("Gold Silver"), "named work: Gold Silver");
+assert.ok(!/Recent made site/i.test(html), "Gold Silver caption is not placeholder copy");
+
+const workBlock = html.slice(html.indexOf('id="work-title"'), html.indexOf('id="contact"'));
+const names = [
+  "Pete Anderson",
+  "Cougar Ridge",
+  "Gold Silver",
+  "Offshore Grill",
+  "Hueca",
+  "Farm to Table",
+  "Pioneer Podcast"
+];
+let cursor = -1;
+names.forEach((name) => {
+  const next = workBlock.indexOf("<strong>" + name + "</strong>");
+  assert.ok(next > cursor, "named work in order: " + name);
+  cursor = next;
+});
 
 [
   "assets/work/pete-anderson.jpg",
   "assets/work/cougar-ridge.jpg",
-  "assets/work/gold-silver.jpg"
+  "assets/work/gold-silver.jpg",
+  "assets/work/offshore-grill.jpg",
+  "assets/work/hueca-omeyocan.jpg",
+  "assets/work/farm-to-table.jpg",
+  "assets/work/pioneer-podcast.jpg"
 ].forEach((src) => {
   assert.ok(html.includes(src), "screenshot " + src);
   assert.ok(fs.existsSync(path.join(root, src)), src + " is on disk");
 });
+assert.ok(!html.includes("assets/work/weather-report.jpg"), "do not use weather-report.jpg");
+assert.ok(!html.includes("assets/work/ai-space.jpg"), "AI Space stays off this strip");
 
 assert.ok(html.includes("Get in touch"), "footer is Get in touch");
 assert.ok(html.includes("mailto:caradmico@gmail.com"), "email is the existing contact");
@@ -72,4 +93,4 @@ assert.ok(css.includes('"Segoe UI"'), "GO type");
 assert.ok(!/jarvis|commander/i.test(face), "home stays off canvas voice");
 assert.ok(!fs.existsSync(path.join(root, "creek", "home.css")), "do not drop stand-in CSS into creek/");
 
-console.log("home: dark architectural lander, ethos boxes, three small tiles — all assertions passed");
+console.log("home: dark architectural lander, ethos boxes, seven small tiles — all assertions passed");
