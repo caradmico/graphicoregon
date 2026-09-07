@@ -40,12 +40,10 @@ const faces = {
   teacher: "female-portrait-oil.jpg",
   musician: "female-portrait-oil-3.jpg"
 };
-assert.ok(html.includes('rel="preload"') && html.includes("assets/art/ocean.jpg"), "ocean is preloaded");
 Object.keys(faces).forEach((id) => {
   const file = faces[id];
   assert.ok(her.includes(file), id + " uses " + file);
   assert.ok(fs.existsSync(path.join(root, "assets/art", file)), file + " is already on disk");
-  assert.ok(html.includes("assets/art/" + file), "preload " + file);
 });
 
 assert.ok(her.includes("self-portrait-charcoal.jpg"), "charcoal side part and brow stay the face");
@@ -75,7 +73,6 @@ assert.ok(!/jarvis|commander|experiment|v0/i.test(html), "canvas copy stays quie
   assert.ok(!/jarvis|commander/i.test(src), file + " stays off the canvas");
 });
 assert.ok(!/Museum|Jarvis|Commander/.test(her), "the six are not labeled as a hall");
-assert.ok(html.includes('id="roster"') && html.includes('id="back"'), "Orbit's taps stay");
 assert.ok(/if \(roster\) roster\.hidden = true/.test(app), "the HTML name list stays off first paint");
 assert.ok(/setRosterChrome\(true\)/.test(app), "boot hides the name-stack chrome");
 assert.ok(/PIXEL_RATIO = 1\.25/.test(app), "pixel ratio stays at or under 1.25");
@@ -83,14 +80,8 @@ const hook = app.slice(app.indexOf("function buildLineupHook"), app.indexOf("fun
 assert.ok(/depthWrite:\s*true/.test(hook), "dusk writes depth so the six stay in front");
 assert.ok(!/depthWrite:\s*false/.test(hook), "dusk is not a late overlay");
 assert.ok(/hideLoader\(\)/.test(app) && /display = "none"/.test(app), "JS keeps the loader off first paint");
-assert.ok(/id="loader"[^>]*\bhidden\b/.test(html), "markup hides the loader before JS");
 assert.ok(/#loader[\s\S]*#loader\[hidden\][\s\S]*display:\s*none\s*!important/.test(css), "loader is not first paint");
-assert.ok(/id="lineup-preload"/.test(html), "hidden preload images sit in markup");
-assert.ok(/id="lineup-preload"[\s\S]*crossorigin="anonymous"/.test(html), "preload faces load CORS-clean for WebGL");
-assert.ok(/src="figures\.js"/.test(html), "index loads the renamed figures script");
-assert.ok(!/src="faces\.js"/.test(html), "do not keep the cached faces.js src");
-assert.ok(!/src="look\.js"/.test(html), "do not keep the cached look.js src");
-assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
+assert.ok(!/src="figures\.js"|src="faces\.js"|src="look\.js"|src="field\.js"|three\.min\.js/i.test(html), "root door does not load the field");
 assert.ok(!/\?v=/.test(html), "no cache-buster query on assets");
 assert.ok(/visibility:\s*hidden/.test(css) && /canvas#stage\.ready/.test(css), "canvas stays hidden until maps");
 assert.ok(/function hideStage/.test(app) && /function showStage/.test(app), "JS holds the canvas until the six are dressed");

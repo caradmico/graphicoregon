@@ -6,7 +6,6 @@ const Roster = require("../roster.js");
 const root = path.join(__dirname, "..");
 const app = fs.readFileSync(path.join(root, "figures.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const help = (html.match(/id="help"[^>]*>([^<]+)/) || [])[1] || "";
 
 assert.deepStrictEqual(
   Roster.IDS,
@@ -60,21 +59,9 @@ const teacher = Roster.sheet("teacher");
 assert.ok(/thinner|thin/i.test(teacher.body), "teacher does not pad thin work");
 assert.ok(!/classroom/i.test(teacher.body) || /no classroom/i.test(teacher.body), "no invented classroom");
 
-Roster.IDS.forEach((id) => {
-  assert.ok(html.includes('data-class="' + id + '"'), "roster button for " + id);
-});
-assert.ok(html.includes('id="roster"'), "phone-first name list exists");
-assert.ok(/id="roster"[^>]*\bhidden\b/.test(html), "markup hides the name list before JS");
-assert.ok(html.includes('src="figures.js"'), "index loads the renamed figures script");
-assert.ok(!/src="faces\.js"/.test(html), "do not keep the cached faces.js src");
-assert.ok(!/src="look\.js"/.test(html), "do not keep the cached look.js src");
-assert.ok(!/src="field\.js"/.test(html), "do not keep the cached field.js src");
+assert.ok(!/src="figures\.js"|src="faces\.js"|src="look\.js"|src="field\.js"|three\.min\.js/i.test(html), "root door does not load the field");
 assert.ok(!/src="app\.js"/.test(html), "do not keep the cached app.js src");
-assert.ok(html.includes('href="chrome.css"'), "index loads the renamed chrome sheet");
-assert.ok(html.includes('id="back"'), "visible Back control exists");
-assert.ok(/tap a face/i.test(help), "help says tap a face");
-assert.ok(!/WASD/i.test(help), "help does not advertise WASD as the way in");
-assert.ok(!/WASD/i.test(html.match(/id="help"[\s\S]*?<\/div>/)[0]), "help copy has no WASD");
+assert.ok(!/WASD/i.test(html), "stand-in copy has no WASD");
 
 const css = fs.readFileSync(path.join(root, "chrome.css"), "utf8");
 assert.ok(/#roster,\s*#roster\[hidden\]\s*\{[\s\S]*display:\s*none\s*!important/.test(css), "CSS kills the name list even if hidden is fought");
@@ -107,7 +94,6 @@ assert.ok(/addClick\(face/.test(plant), "a face card is a clickable pick");
 assert.ok(/PlaneGeometry\(FACE_W \* 1\.55/.test(plant), "an invisible larger hit mesh covers the card");
 assert.ok(/userData\.id[\s\S]*Roster\.isId[\s\S]*pickClass/.test(app), "tapping a face dollies that class");
 assert.ok(/setRosterChrome\(true\)/.test(app), "boot keeps the name list off");
-assert.ok(html.includes('rel="preload"'), "lineup images preload");
 assert.ok(!/\?v=/.test(html), "boot still strips query; no cache-buster on assets");
 assert.ok(/onRosterHome\(\)\) el\.requestPointerLock|!onRosterHome\(\)\) el\.requestPointerLock/.test(app), "roster home does not lock the pointer");
 

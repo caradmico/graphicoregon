@@ -3,99 +3,158 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Graphic Oregon</title>
-  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art.">
-  <meta name="theme-color" content="#1a1712">
+  <title>Graphic Oregon · website design &amp; systems</title>
+  <meta name="description" content="Graphic Oregon designs websites and systems, then hands them off and teaches the next manager to keep shipping.">
+  <meta name="theme-color" content="#f4f6f8">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
-  <link rel="stylesheet" href="chrome.css">
-  <link rel="preload" as="image" href="assets/art/ocean.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/self-portrait-charcoal.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/self-portrait-graphite.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/monochromatic-self-portrait.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/self-portrait-acrylic.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/female-portrait-oil.jpg" crossorigin="anonymous">
-  <link rel="preload" as="image" href="assets/art/female-portrait-oil-3.jpg" crossorigin="anonymous">
+  <link rel="stylesheet" href="home.css">
 </head>
 <body>
-  <div id="lineup-preload" hidden>
-    <img src="assets/art/ocean.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/self-portrait-charcoal.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/self-portrait-graphite.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/monochromatic-self-portrait.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/self-portrait-acrylic.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/female-portrait-oil.jpg" alt="" crossorigin="anonymous">
-    <img src="assets/art/female-portrait-oil-3.jpg" alt="" crossorigin="anonymous">
-  </div>
-  <div id="loader" hidden>
-    <div class="inner">
-      <h1>Graphic Oregon</h1>
-      <p>Research · Mapping · Design · Writing · Fine Art</p>
+  <header class="site-header">
+    <div class="wrap">
+      <p class="brand">
+        <strong>Graphic Oregon</strong>
+        <span>website design &amp; systems</span>
+      </p>
+      <a class="nav-contact" href="#contact">Contact</a>
     </div>
-  </div>
-  <canvas id="stage" tabindex="0"></canvas>
-  <div id="hud">
-    <header class="top" hidden>
-      <h1>Graphic Oregon</h1>
-      <p class="tag">Research, website design, media, and fine art</p>
-    </header>
-    <button type="button" id="back" hidden>Back</button>
-    <nav id="roster" hidden aria-label="Classes">
-      <button type="button" data-class="journalist">Journalist</button>
-      <button type="button" data-class="scientist">Scientist</button>
-      <button type="button" data-class="radio">Radio</button>
-      <button type="button" data-class="artist">Artist</button>
-      <button type="button" data-class="teacher">Teacher</button>
-      <button type="button" data-class="musician">Musician</button>
-    </nav>
-    <aside id="panel" hidden>
-      <div class="meta" id="panel-meta"></div>
-      <h2 id="panel-title"></h2>
-      <p id="panel-body"></p>
-      <figure id="panel-figure" hidden>
-        <img id="panel-img" alt="">
-      </figure>
-      <div id="panel-subs" hidden></div>
-      <div id="panel-links"></div>
-    </aside>
-    <div id="help" hidden>Tap a face · Back or Esc returns</div>
-  </div>
-  <div id="paper" hidden>
-    <div class="sheet">
-      <button type="button" id="paper-close">Fold</button>
-      <p class="kicker">a paper from the path</p>
-      <h2 class="mast">Graphic Oregon</h2>
-      <p class="deck">Writing · the coast papers · the studio</p>
-      <div class="spread">
-        <figure>
-          <img src="assets/news/gazette-puffin.jpg" alt="Gazette">
-          <figcaption>Gazette</figcaption>
-        </figure>
-        <figure>
-          <img src="assets/news/hipfish-1016.jpg" alt="Hipfish">
-          <figcaption>Hipfish</figcaption>
-        </figure>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Websites and systems people can run after she leaves.</h1>
+      <p>Handoff and teach — maintainable builds with a graphic-design spine, not a locked CMS maze.</p>
+      <div class="hero-actions">
+        <a class="btn" href="mailto:caradmico@gmail.com?subject=Graphic%20Oregon%20website%20project">Email Cara</a>
+        <a class="btn btn-ghost" href="#work">See the work</a>
       </div>
-      <div class="spread folio">
-        <figure>
-          <img src="assets/news/pioneer-archive.jpg" alt="Pioneer">
-          <figcaption>Pioneer</figcaption>
-        </figure>
-        <figure>
-          <img src="assets/news/signal-beach-books.jpg" alt="Signal">
-          <figcaption>Signal</figcaption>
-        </figure>
+    </section>
+
+    <section id="work" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent builds</h2>
+      <p class="note">Live doors. Creek stays the Hair-and-river walk.</p>
+      <div class="grid thirds">
+        <a class="tile" href="creek/">
+          <img src="assets/art/20201206_134759.jpg" width="1650" height="2200" alt="Hair and river pen drawing — woman at the creek" loading="eager">
+          <div class="cap">
+            <strong>Hair and river</strong>
+            <span>3D explore · creek</span>
+          </div>
+        </a>
+        <a class="tile" href="https://caradmico.github.io/company-soup/brands/grant-desk/">
+          <div class="tile-text cap">
+            <strong>Grant Desk</strong>
+            <span>Quote-only grant writing</span>
+          </div>
+        </a>
+        <a class="tile" href="https://caradmico.github.io/company-soup/businesses/fine-art/">
+          <img src="assets/art/neahkahnie.jpg" width="800" height="1200" alt="Neahkahnie coastal painting" loading="lazy">
+          <div class="cap">
+            <strong>Fine Art</strong>
+            <span>Neahkahnie Atelier</span>
+          </div>
+        </a>
+        <a class="tile" href="https://caradmico.github.io/company-soup/businesses/watershed/">
+          <img src="assets/maps/01-context.jpg" width="1200" height="900" alt="North Coast watershed context map" loading="lazy">
+          <div class="cap">
+            <strong>Watershed / Demeter</strong>
+            <span>Field assessment door</span>
+          </div>
+        </a>
+        <a class="tile" href="https://caradmico.github.io/company-soup/brands/coast-desk/">
+          <img src="assets/news/pioneer-archive.jpg" width="1200" height="800" alt="Tillamook County Pioneer archive page" loading="lazy">
+          <div class="cap">
+            <strong>Coast Desk</strong>
+            <span>Bylines wall</span>
+          </div>
+        </a>
       </div>
-      <nav class="cols">
-        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">graphicoregon.com</a>
-        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">Writing</a>
-        <a href="https://www.tillamookcountypioneer.net/author/assistant-editor/" target="_blank" rel="noopener">Tillamook County Pioneer</a>
-      </nav>
-    </div>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
-  <script src="field-nav.js"></script>
-  <script src="art-inventory.js"></script>
-  <script src="roster.js"></script>
-  <script src="figures.js"></script>
+      <p class="also">
+        <a href="https://caradmico.github.io/company-soup/ops/autonomy/">Autonomy</a>
+        <a href="https://caradmico.github.io/company-soup/ops/links/">Links</a>
+      </p>
+    </section>
+
+    <section aria-labelledby="managed-title">
+      <h2 id="managed-title">Managed / designed work</h2>
+      <p class="note">Named screenshots from sites she built. No invented clients.</p>
+      <div class="grid thirds">
+        <a class="tile" href="https://sassmeharder.com/">
+          <img src="assets/shop/copper-horizon-overlay-1000x1500.jpg" width="1000" height="1500" alt="Copper Horizon design on Sassmeharder" loading="lazy">
+          <div class="cap">
+            <strong>Sassmeharder</strong>
+            <span>managed / paid-run</span>
+          </div>
+        </a>
+        <article class="tile">
+          <img src="assets/work/offshore-grill.jpg" width="1280" height="717" alt="Offshore Grill website screenshot" loading="lazy">
+          <div class="cap">
+            <strong>Offshore Grill</strong>
+            <span>Restaurant site</span>
+          </div>
+        </article>
+        <article class="tile">
+          <img src="assets/work/hueca-omeyocan.jpg" width="1179" height="611" alt="Hueca Omeyocan website screenshot" loading="lazy">
+          <div class="cap">
+            <strong>Hueca Omeyocan</strong>
+          </div>
+        </article>
+        <article class="tile">
+          <img src="assets/work/pioneer-podcast.jpg" width="1180" height="619" alt="Tillamook County Pioneer Podcast website screenshot" loading="lazy">
+          <div class="cap">
+            <strong>Tillamook County Pioneer Podcast</strong>
+            <span>Media desk</span>
+          </div>
+        </article>
+        <article class="tile">
+          <img src="assets/work/weather-report.jpg" width="1204" height="643" alt="Tillamook County Weather Report website screenshot" loading="lazy">
+          <div class="cap">
+            <strong>Tillamook County Weather Report</strong>
+            <span>Local info site</span>
+          </div>
+        </article>
+        <article class="tile">
+          <img src="assets/work/farm-to-table.jpg" width="1199" height="620" alt="Farm to Table website screenshot" loading="lazy">
+          <div class="cap">
+            <strong>Farm to Table</strong>
+            <span>Food / local</span>
+          </div>
+        </article>
+        <article class="tile">
+          <img src="assets/work/ai-space.jpg" width="1280" height="853" alt="AI Space project visual" loading="lazy">
+          <div class="cap">
+            <strong>AI Space</strong>
+            <span>Project surface</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="stack-title">
+      <h2 id="stack-title">Stacks</h2>
+      <ul class="chips">
+        <li>WordPress</li>
+        <li>Webflow</li>
+        <li>Node.js</li>
+        <li>Python</li>
+        <li>C</li>
+        <li>C++</li>
+        <li>Three.js</li>
+      </ul>
+    </section>
+
+    <section class="contact" id="contact">
+      <h2>Talk about a site</h2>
+      <p>She builds, hands off, and teaches — so the next manager can keep shipping.</p>
+      <div class="row">
+        <a class="btn" href="mailto:caradmico@gmail.com?subject=Graphic%20Oregon%20website%20project">caradmico@gmail.com</a>
+        <a class="btn btn-ghost" href="tel:+15032778757">503-277-8757</a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      Graphic Oregon · website design &amp; systems
+    </footer>
+  </main>
 </body>
 </html>

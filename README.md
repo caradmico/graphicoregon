@@ -1,7 +1,7 @@
 # Graphic Oregon
 
-Research, mapping, design, writing, and fine art.
+Website design and systems. Handoff and teach.
 
-This repository is the [portfolio field](https://caradmico.github.io/graphicoregon/) — a coastal clearing. You start at the center and can travel out along X, Y, and Z.
+Live: [caradmico.github.io/graphicoregon](https://caradmico.github.io/graphicoregon/)
 
-Source pages also live on [graphicoregon.com](https://graphicoregon.com).
+Hair and river stays at [creek/](https://caradmico.github.io/graphicoregon/creek/).
