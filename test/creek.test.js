@@ -1,38 +1,30 @@
 const assert = require("assert");
-const Cut = require("../creek/layers.js");
+const Form = require("../creek/form.js");
 const Nav = require("../field-nav.js");
 
-const paper = Cut.liftColor(134, 141, 142);
-assert.ok(paper[0] > 230 && paper[1] > 230 && paper[2] > 230, "paper lifts toward white");
+assert.strictEqual(Form.INK, 0x1a2744, "ink is the drawing’s dark blue");
+assert.strictEqual(Form.RED, 0xa3262b, "red is the drawing’s pen red");
+assert.strictEqual(Form.PAPER, 0xf4efe6, "ground stays paper, not lawn");
 
-const red = Cut.preparePixel(130, 36, 36, 0.52, 0.45);
-assert.ok(red[0] > red[1] + 40, "red ink stays red after lift");
-assert.ok(Cut.inkAlpha(red[0], red[1], red[2]) > 0.7, "red ink is opaque");
+const strand = Form.hairStrand(3, 12);
+const drop = Form.strandDrops(strand);
+assert.ok(strand.length >= 6, "hair has a path through space");
+assert.ok(drop.flattens, "hair falls then becomes the creek");
+assert.ok(drop.towardViewer, "creek comes toward the walker");
+assert.ok(drop.leftward, "creek turns left as in the drawing");
+assert.ok(drop.drop > 1.5, "cascade has real vertical drop");
 
-const liftedPaper = Cut.preparePixel(134, 141, 142, 0.5, 0.35);
-assert.ok(Cut.inkAlpha(liftedPaper[0], liftedPaper[1], liftedPaper[2]) < 0.2, "paper knocks out");
-
-const left = Cut.exclusive(Cut.weights(0.08, 0.4));
-assert.ok(left.trees > left.woman && left.trees > left.mountains, "left column is the trees");
-
-const cascade = Cut.exclusive(Cut.weights(0.52, 0.48));
-assert.ok(cascade.hair >= cascade.trees, "hair waterfall stays on the hair plane");
-
-const peak = Cut.exclusive(Cut.weights(0.78, 0.12));
-assert.ok(peak.mountains > peak.trees, "upper right is mountains");
-
-const creek = Cut.exclusive(Cut.weights(0.35, 0.88));
-assert.ok(creek.river > creek.mountains, "bottom flow is the river plane");
-
-assert.deepStrictEqual(Cut.ORDER, ["mountains", "hills", "woman", "hair", "trees", "river"]);
-assert.ok(Math.abs(Cut.ASPECT - 1650 / 2200) < 1e-9, "drawing aspect is the shipped scan");
+const trees = Form.treeSpec();
+assert.ok(trees.thick.r > trees.slim[0].r, "foreground tree is the thick trunk");
+assert.ok(trees.red.z < trees.thick.z, "red tree stands behind the woman");
+assert.ok(Form.hillSpecs().length >= 3, "distant hills exist as volumes");
+assert.ok(Form.HEAD.y > Form.BOULDER.y, "head sits over the boulder");
 
 const fwd = Nav.moveOffset(0, 0, { forward: true }, 1, 10);
-assert.ok(Math.abs(fwd.z + 10) < 1e-6, "W at yaw 0 travels −Z into the drawing");
-assert.ok(Math.abs(fwd.y) < 1e-9, "walk stays on the plane");
+assert.ok(Math.abs(fwd.z + 10) < 1e-6, "W at yaw 0 walks −Z into the creek");
+assert.ok(Math.abs(fwd.y) < 1e-9, "walk stays on the paper plane");
 assert.ok(Nav.dollyStep(-80, 0) > 0, "scroll up walks forward");
-
 const lookRight = Nav.applyLook(0, 0, 12, 0);
 assert.ok(lookRight.yaw > 0, "drag right looks right");
 
-console.log("creek layers ok");
+console.log("creek 3d form ok");
