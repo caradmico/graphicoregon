@@ -10,7 +10,7 @@
   const RED_RGB = [163, 38, 43];
   const PAPER_RGB = [244, 239, 230];
 
-  const SPAWN = { az: 0.22, el: 0.05, dist: 7.6, targetY: 1.85 };
+  const SPAWN = { az: 0.34, el: 0.02, dist: 8.4, targetY: 1.35 };
   const DIST = { min: 3.4, max: 15.5 };
   const EL = { min: -0.12, max: 1.12 };
 
