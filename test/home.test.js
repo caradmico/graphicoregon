@@ -27,6 +27,8 @@ assert.ok(html.includes("https://caradmico.github.io/company-soup/ops/links/"), 
 assert.ok(html.includes("https://sassmeharder.com/"), "Sassmeharder live URL");
 assert.ok(html.includes("Sassmeharder"), "Sassmeharder tile name");
 assert.ok(/managed \/ paid-run/i.test(html), "Sassmeharder labeled as managed / paid-run");
+assert.ok(/Softstyle \/ merch shop/.test(html), "managed-work tile names Softstyle / merch shop");
+assert.ok((html.match(/href="https:\/\/sassmeharder\.com\/"/g) || []).length >= 2, "shop root is the primary href on both tiles");
 assert.ok(html.includes("https://sassmeharder.com/product/31685244"), "Winged North Softstyle KEEP is a secondary link-out");
 assert.ok(!/Printify|how-to|POD tutorial/i.test(html), "not a Printify how-to");
 
