@@ -129,8 +129,8 @@
         "  vec3 N = normalize(vNormal);",
         "  vec3 V = normalize(cameraPosition - vWorld);",
         "  float ndl = dot(N, normalize(uLight));",
-        "  float shadow = smoothstep(0.32, -0.18, ndl);",
-        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 1.35);",
+        "  float shadow = smoothstep(0.28, -0.22, ndl);",
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 3.4);",
         "  vec3 hatch = texture2D(uHatch, vUv * vec2(1.0, 2.6)).rgb;",
         "  float nwave = sin(vUv.y * 34.0 + vUv.x * 5.0) * 0.014;",
         "  float col = (vUv.x + nwave) * 48.0;",
@@ -139,10 +139,9 @@
         "  float diag = fract((vUv.x * 0.62 + vUv.y) * 36.0 + hash(vec2(floor(vUv.y * 42.0), 2.2)) * 0.28);",
         "  float cross = 1.0 - smoothstep(0.0, 0.17, abs(diag - 0.5));",
         "  vec3 c = hatch;",
-        "  c = mix(c, uNavy, navyLine * shadow * 0.92);",
-        "  c = mix(c, uNavy, cross * shadow * 0.62);",
-        "  c = mix(c, uNavy, shadow * 0.22);",
-        "  c = mix(c, uNavy, rim * 0.58);",
+        "  c = mix(c, uNavy, navyLine * shadow * 0.78);",
+        "  c = mix(c, uNavy, cross * shadow * 0.38);",
+        "  c = mix(c, uNavy, rim * 0.72);",
         "  gl_FragColor = vec4(c, 1.0);",
         "}"
       ].join("\n")
@@ -254,7 +253,7 @@
         const rA = root.r0 + (root.r1 - root.r0) * t0;
         const rB = root.r0 + (root.r1 - root.r0) * t1;
         const len = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
-        const piece = inkVolume(horn(rA, rB, len), 0.02);
+        const piece = inkVolume(horn(rA, rB, len), 0.012);
         aimY(piece, a, b);
         g.add(piece);
       }
