@@ -234,10 +234,10 @@
     return geo;
   }
 
-  function inkVolume(geo) {
+  function inkVolume(geo, outlineAmt) {
     const g = new THREE.Group();
     g.add(new THREE.Mesh(geo, inkMat));
-    g.add(outlineOf(geo));
+    g.add(outlineOf(geo, outlineAmt));
     return g;
   }
 
@@ -251,8 +251,8 @@
 
   function buildRoots(spec) {
     spec.roots.forEach((root) => {
-      const geo = rumple(tubeTaper(root.pts, root.r0, root.r1), 0.012);
-      addNamed(inkVolume(geo), root.name);
+      const geo = tubeTaper(root.pts, root.r0, root.r1);
+      addNamed(inkVolume(geo, 0.018), root.name);
     });
   }
 
