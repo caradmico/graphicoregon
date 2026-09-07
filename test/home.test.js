@@ -39,16 +39,33 @@ assert.ok(!/No invented clients/i.test(html), "no disclaimer tone");
 assert.ok(!/handoff and teach|Email Cara/i.test(html), "VOID copy is gone");
 
 const tiles = html.match(/<article class="tile">/g) || [];
-assert.strictEqual(tiles.length, 3, "exactly three small work tiles");
+assert.strictEqual(tiles.length, 7, "exactly seven small work tiles");
 assert.ok(html.includes("class=\"strip\""), "tiles live in a hover-scroll strip");
-assert.ok(html.includes("Pete Anderson"), "named work: Pete Anderson");
-assert.ok(html.includes("Cougar Ridge"), "named work: Cougar Ridge");
-assert.ok(html.includes("Gold Silver"), "named work: Gold Silver");
+
+const names = [
+  "Pete Anderson",
+  "Cougar Ridge",
+  "Gold Silver",
+  "Offshore Grill",
+  "Hueca",
+  "Farm to Table",
+  "Pioneer Podcast"
+];
+names.forEach((name) => {
+  assert.ok(html.includes(name), "named work: " + name);
+});
+
+const titleOrder = [...html.matchAll(/<article class="tile">[\s\S]*?<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+assert.deepStrictEqual(titleOrder, names, "tiles stay in the selling order");
 
 [
   "assets/work/pete-anderson.jpg",
   "assets/work/cougar-ridge.jpg",
-  "assets/work/gold-silver.jpg"
+  "assets/work/gold-silver.jpg",
+  "assets/work/offshore-grill.jpg",
+  "assets/work/hueca-omeyocan.jpg",
+  "assets/work/farm-to-table.jpg",
+  "assets/work/pioneer-podcast.jpg"
 ].forEach((src) => {
   assert.ok(html.includes(src), "screenshot " + src);
   assert.ok(fs.existsSync(path.join(root, src)), src + " is on disk");
@@ -72,4 +89,4 @@ assert.ok(css.includes('"Segoe UI"'), "GO type");
 assert.ok(!/jarvis|commander/i.test(face), "home stays off canvas voice");
 assert.ok(!fs.existsSync(path.join(root, "creek", "home.css")), "do not drop stand-in CSS into creek/");
 
-console.log("home: dark architectural lander, ethos boxes, three small tiles — all assertions passed");
+console.log("home: dark architectural lander, ethos boxes, seven small tiles — all assertions passed");
