@@ -128,8 +128,8 @@
         "  vec3 N = normalize(vNormal);",
         "  vec3 V = normalize(cameraPosition - vWorld);",
         "  float ndl = dot(N, normalize(uLight));",
-        "  float shadow = smoothstep(0.24, -0.32, ndl);",
-        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 1.65);",
+        "  float shadow = smoothstep(0.32, -0.18, ndl);",
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 1.35);",
         "  vec3 hatch = texture2D(uHatch, vUv * vec2(1.0, 2.6)).rgb;",
         "  float nwave = sin(vUv.y * 34.0 + vUv.x * 5.0) * 0.014;",
         "  float col = (vUv.x + nwave) * 48.0;",
@@ -138,9 +138,10 @@
         "  float diag = fract((vUv.x * 0.62 + vUv.y) * 36.0 + hash(vec2(floor(vUv.y * 42.0), 2.2)) * 0.28);",
         "  float cross = 1.0 - smoothstep(0.0, 0.17, abs(diag - 0.5));",
         "  vec3 c = hatch;",
-        "  c = mix(c, uNavy, navyLine * shadow * 0.84);",
-        "  c = mix(c, uNavy, cross * shadow * 0.42);",
-        "  c = mix(c, uNavy, rim * 0.48);",
+        "  c = mix(c, uNavy, navyLine * shadow * 0.92);",
+        "  c = mix(c, uNavy, cross * shadow * 0.62);",
+        "  c = mix(c, uNavy, shadow * 0.22);",
+        "  c = mix(c, uNavy, rim * 0.58);",
         "  gl_FragColor = vec4(c, 1.0);",
         "}"
       ].join("\n")
@@ -151,15 +152,29 @@
     return new THREE.MeshBasicMaterial({ color: Ink.NAVY });
   }
 
-  function outlineOf(geo, scale) {
-    const hull = new THREE.Mesh(
-      geo.clone(),
+  function inflate(geo, amt) {
+    const g = geo.clone();
+    if (!g.attributes.normal) g.computeVertexNormals();
+    const pos = g.attributes.position;
+    const nrm = g.attributes.normal;
+    const k = amt == null ? 0.028 : amt;
+    for (let i = 0; i < pos.count; i++) {
+      pos.setXYZ(
+        i,
+        pos.getX(i) + nrm.getX(i) * k,
+        pos.getY(i) + nrm.getY(i) * k,
+        pos.getZ(i) + nrm.getZ(i) * k
+      );
+    }
+    pos.needsUpdate = true;
+    return g;
+  }
+
+  function outlineOf(geo, amt) {
+    return new THREE.Mesh(
+      inflate(geo, amt == null ? 0.03 : amt),
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     );
-    const s = scale == null ? 1.055 : scale;
-    hull.scale.setScalar(s);
-    rumple(hull.geometry, 0.012);
-    return hull;
   }
 
   function rumple(geo, amt) {
@@ -228,7 +243,7 @@
 
   function buildTrunk(spec) {
     const profile = spec.profile.map((p) => new THREE.Vector2(p[0], p[1]));
-    const geo = rumple(new THREE.LatheGeometry(profile, 28), 0.028);
+    const geo = rumple(new THREE.LatheGeometry(profile, 30), 0.042);
     const g = inkVolume(geo);
     g.rotation.z = spec.lean;
     addNamed(g, "tree");
@@ -289,12 +304,23 @@
   }
 
   function groundPatch() {
-    const geo = new THREE.CircleGeometry(1.35, 22);
+    const shape = new THREE.Shape();
+    const n = 18;
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const r = 1.15 + Math.sin(a * 2.2) * 0.28 + Math.cos(a * 3.7) * 0.16;
+      const x = Math.cos(a) * r - 0.22;
+      const y = Math.sin(a) * r * 0.78;
+      if (i === 0) shape.moveTo(x, y);
+      else shape.lineTo(x, y);
+    }
+    const geo = new THREE.ShapeGeometry(shape);
     const mat = new THREE.MeshBasicMaterial({
       map: hatchTexture(),
-      color: 0xe8e0d2
+      color: 0xe8e0d2,
+      side: THREE.DoubleSide
     });
-    mat.map.repeat.set(1.6, 1.6);
+    mat.map.repeat.set(1.4, 1.4);
     const patch = new THREE.Mesh(geo, mat);
     patch.rotation.x = -Math.PI / 2;
     patch.position.y = 0.008;
