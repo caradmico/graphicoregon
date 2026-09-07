@@ -20,6 +20,7 @@
   let dist0 = dist;
   const names = [];
   let inkMat = null;
+  let hatchMat = null;
 
   function hasThree(root) {
     const T = root || window.THREE;
@@ -226,9 +227,9 @@
     obj.position.set(from.x, from.y, from.z);
   }
 
-  function inkVolume(geo, outlineAmt) {
+  function inkVolume(geo, outlineAmt, mat) {
     const g = new THREE.Group();
-    g.add(new THREE.Mesh(geo, inkMat));
+    g.add(new THREE.Mesh(geo, mat || inkMat));
     g.add(outlineOf(geo, outlineAmt));
     return g;
   }
@@ -239,9 +240,10 @@
     const g = inkVolume(geo);
     g.rotation.z = spec.lean;
     addNamed(g, "tree");
+    return g;
   }
 
-  function buildRoots(spec) {
+  function buildRoots(spec, parent) {
     spec.roots.forEach((root) => {
       const g = new THREE.Group();
       const last = root.pts.length - 1;
@@ -253,11 +255,13 @@
         const rA = root.r0 + (root.r1 - root.r0) * t0;
         const rB = root.r0 + (root.r1 - root.r0) * t1;
         const len = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
-        const piece = inkVolume(horn(rA, rB, len), 0.012);
+        const piece = inkVolume(horn(rA, rB, len), 0.014, hatchMat);
         aimY(piece, a, b);
         g.add(piece);
       }
-      addNamed(g, root.name);
+      g.name = root.name;
+      names.push(root.name);
+      parent.add(g);
     });
   }
 
@@ -443,8 +447,8 @@
     const spec = Ink.tree();
     paperFloor();
     groundPatch();
-    buildTrunk(spec);
-    buildRoots(spec);
+    const trunk = buildTrunk(spec);
+    buildRoots(spec, trunk);
     buildBranches(spec);
     reeds();
   }
@@ -467,6 +471,11 @@
     fit();
     clock = new THREE.Clock();
     inkMat = inkMaterial();
+    hatchMat = new THREE.MeshBasicMaterial({
+      map: hatchTexture(),
+      side: THREE.DoubleSide
+    });
+    hatchMat.map.repeat.set(1, 2.2);
     buildTree();
     applyCamera();
     bindInput();
