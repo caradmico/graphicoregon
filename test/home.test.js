@@ -34,12 +34,17 @@ assert.ok(fs.existsSync(path.join(root, "creek", "index.html")), "creek KEEP sta
 
 assert.ok(!/Softstyle|Autonomy|Links/.test(html), "Softstyle / Autonomy / Links stay off the face");
 assert.ok(!/Weather Report|weather-report\.jpg/i.test(html), "Weather Report is gone");
-assert.ok(!/sassmeharder/i.test(html), "Sass is not on this face");
+assert.ok(!/ai-space\.jpg|AI Space/i.test(html), "AI Space dropped — not a website screenshot");
+assert.ok(!/Recent made site/i.test(html), "Gold Silver is not captioned Recent made site");
+assert.ok(!/<video\b/i.test(html), "no video elements");
+assert.ok(!/<iframe\b/i.test(html), "no iframes");
+assert.ok(!/youtube|vimeo|\.mp4|\.webm/i.test(html), "no video hosts or files");
+assert.ok((html.match(/<strong>Sassmeharder<\/strong>/g) || []).length === 1, "Sassmeharder is one storefront tile");
 assert.ok(!/No invented clients/i.test(html), "no disclaimer tone");
 assert.ok(!/handoff and teach|Email Cara/i.test(html), "VOID copy is gone");
 
-const tiles = html.match(/<article class="tile">/g) || [];
-assert.strictEqual(tiles.length, 7, "exactly seven small work tiles");
+const tiles = html.match(/class="tile"/g) || [];
+assert.ok(tiles.length >= 18, "screenshots-only strip has the original set plus fresh soup/Pages shots");
 assert.ok(html.includes("class=\"strip\""), "tiles live in a hover-scroll strip");
 
 const names = [
@@ -47,15 +52,27 @@ const names = [
   "Cougar Ridge",
   "Gold Silver",
   "Offshore Grill",
-  "Hueca",
+  "Hueca Omeyocan",
   "Farm to Table",
-  "Pioneer Podcast"
+  "Pioneer Podcast",
+  "Coast Broadcasting",
+  "North Tillamook Library",
+  "Manzanita Beach Company",
+  "Housable",
+  "Color Outside the Lines",
+  "Stories",
+  "Grant Desk",
+  "Fine Art",
+  "Watershed",
+  "Coast Desk",
+  "NCCWP",
+  "Sassmeharder"
 ];
 names.forEach((name) => {
   assert.ok(html.includes(name), "named work: " + name);
 });
 
-const titleOrder = [...html.matchAll(/<article class="tile">[\s\S]*?<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+const titleOrder = [...html.matchAll(/class="tile"[\s\S]*?<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
 assert.deepStrictEqual(titleOrder, names, "tiles stay in the selling order");
 
 [
@@ -65,7 +82,19 @@ assert.deepStrictEqual(titleOrder, names, "tiles stay in the selling order");
   "assets/work/offshore-grill.jpg",
   "assets/work/hueca-omeyocan.jpg",
   "assets/work/farm-to-table.jpg",
-  "assets/work/pioneer-podcast.jpg"
+  "assets/work/pioneer-podcast.jpg",
+  "assets/work/coast-broadcasting.jpg",
+  "assets/work/north-tillamook-library.jpg",
+  "assets/work/manzanita-beach.jpg",
+  "assets/work/housable.jpg",
+  "assets/work/color-outside-the-lines.jpg",
+  "assets/work/talent-features.jpg",
+  "assets/work/grant-desk.jpg",
+  "assets/work/fine-art.jpg",
+  "assets/work/watershed.jpg",
+  "assets/work/coast-desk.jpg",
+  "assets/work/nccwp.jpg",
+  "assets/work/sassmeharder.jpg"
 ].forEach((src) => {
   assert.ok(html.includes(src), "screenshot " + src);
   assert.ok(fs.existsSync(path.join(root, src)), src + " is on disk");
@@ -89,4 +118,4 @@ assert.ok(css.includes('"Segoe UI"'), "GO type");
 assert.ok(!/jarvis|commander/i.test(face), "home stays off canvas voice");
 assert.ok(!fs.existsSync(path.join(root, "creek", "home.css")), "do not drop stand-in CSS into creek/");
 
-console.log("home: dark architectural lander, ethos boxes, seven small tiles — all assertions passed");
+console.log("home: dark architectural lander, ethos boxes, screenshots-only strip — all assertions passed");
