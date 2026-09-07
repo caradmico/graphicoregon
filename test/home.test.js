@@ -15,8 +15,9 @@ assert.ok(/website design &amp; systems/i.test(html), "header names the offer");
 assert.ok(html.includes('href="#contact"'), "header contact jumps to contact");
 assert.ok(/handoff and teach/i.test(html), "hero names handoff and teach");
 
-assert.ok(/href="creek\/"/.test(html), "Hair and river links to creek/");
-assert.ok(html.includes("assets/art/20201206_134759.jpg"), "creek tile uses the drawing already in the repo");
+assert.ok(!/href=["']creek\/["']/.test(html), "do not sell creek on the stand-in");
+assert.ok(!/Hair and river|3D explore/i.test(html), "creek is not finished-craft copy");
+assert.ok(fs.existsSync(path.join(root, "creek", "index.html")), "creek KEEP stays on disk");
 assert.ok(html.includes("https://caradmico.github.io/company-soup/brands/grant-desk/"), "Grant Desk live URL");
 assert.ok(html.includes("https://caradmico.github.io/company-soup/businesses/fine-art/"), "Fine Art live URL");
 assert.ok(html.includes("https://caradmico.github.io/company-soup/businesses/watershed/"), "Watershed/Demeter live URL");
