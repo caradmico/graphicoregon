@@ -57,6 +57,7 @@ assert.ok(html.indexOf("hair-and-river.jpg") !== -1, "source drawing is the same
 
 const study = fs.readFileSync(path.join(__dirname, "../creek/tree-study/study.js"), "utf8");
 assert.ok(study.indexOf("ShaderMaterial") !== -1, "ink is a hatch shader, not a marble material");
+assert.ok(study.indexOf("function horn") !== -1, "roots are lathe horns like the trunk, not crushed tubes");
 assert.ok(!/MeshStandardMaterial|MeshPhongMaterial|MeshPhysicalMaterial|MeshNormalMaterial/.test(study), "no lit-marble materials");
 assert.ok(study.indexOf("BoxGeometry") === -1, "no box people as the tree");
 assert.ok(study.indexOf("cdnjs") === -1, "study does not load cdnjs");

@@ -97,6 +97,7 @@
   function inkMaterial() {
     const tex = hatchTexture();
     return new THREE.ShaderMaterial({
+      side: THREE.DoubleSide,
       uniforms: {
         uHatch: { value: tex },
         uLight: { value: new THREE.Vector3(-0.72, 0.28, 0.48).normalize() },
@@ -204,34 +205,26 @@
 
   function tubeTaper(pts, r0, r1) {
     const curve = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(p.x, p.y, p.z)));
-    const tubular = 28;
-    const radial = 9;
-    const frames = curve.computeFrenetFrames(tubular, false);
-    const geo = new THREE.TubeGeometry(curve, tubular, 1, radial, false);
-    const pos = geo.attributes.position;
-    const ring = radial + 1;
-    for (let i = 0; i <= tubular; i++) {
-      const t = i / tubular;
-      const r = r0 + (r1 - r0) * t;
-      const center = curve.getPointAt(t);
-      const normal = frames.normals[i];
-      const binormal = frames.binormals[i];
-      for (let j = 0; j < ring; j++) {
-        const v = i * ring + j;
-        const ang = (j / radial) * Math.PI * 2;
-        const cx = Math.cos(ang);
-        const sx = Math.sin(ang);
-        pos.setXYZ(
-          v,
-          center.x + (cx * normal.x + sx * binormal.x) * r,
-          center.y + (cx * normal.y + sx * binormal.y) * r,
-          center.z + (cx * normal.z + sx * binormal.z) * r
-        );
-      }
-    }
-    pos.needsUpdate = true;
-    geo.computeVertexNormals();
-    return geo;
+    return new THREE.TubeGeometry(curve, 28, (r0 + r1) * 0.5, 10, false);
+  }
+
+  function horn(r0, r1, len) {
+    const profile = [
+      new THREE.Vector2(r0, 0),
+      new THREE.Vector2(r0 * 0.92, len * 0.22),
+      new THREE.Vector2((r0 + r1) * 0.48, len * 0.55),
+      new THREE.Vector2(r1 * 1.15, len * 0.84),
+      new THREE.Vector2(r1, len)
+    ];
+    return new THREE.LatheGeometry(profile, 18);
+  }
+
+  function aimY(obj, from, to) {
+    const dir = new THREE.Vector3(to.x - from.x, to.y - from.y, to.z - from.z);
+    if (dir.lengthSq() < 1e-8) return;
+    dir.normalize();
+    obj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    obj.position.set(from.x, from.y, from.z);
   }
 
   function inkVolume(geo, outlineAmt) {
@@ -251,8 +244,21 @@
 
   function buildRoots(spec) {
     spec.roots.forEach((root) => {
-      const geo = tubeTaper(root.pts, root.r0, root.r1);
-      addNamed(inkVolume(geo, 0.018), root.name);
+      const g = new THREE.Group();
+      const last = root.pts.length - 1;
+      for (let i = 0; i < last; i++) {
+        const a = root.pts[i];
+        const b = root.pts[i + 1];
+        const t0 = i / last;
+        const t1 = (i + 1) / last;
+        const rA = root.r0 + (root.r1 - root.r0) * t0;
+        const rB = root.r0 + (root.r1 - root.r0) * t1;
+        const len = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+        const piece = inkVolume(horn(rA, rB, len), 0.02);
+        aimY(piece, a, b);
+        g.add(piece);
+      }
+      addNamed(g, root.name);
     });
   }
 
