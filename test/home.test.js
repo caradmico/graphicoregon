@@ -27,6 +27,7 @@ assert.ok(html.includes("https://caradmico.github.io/company-soup/ops/links/"), 
 assert.ok(html.includes("https://sassmeharder.com/"), "Sassmeharder live URL");
 assert.ok(html.includes("Sassmeharder"), "Sassmeharder tile name");
 assert.ok(/managed \/ paid-run/i.test(html), "Sassmeharder labeled as managed / paid-run");
+assert.ok(html.includes("https://sassmeharder.com/product/31685244"), "Winged North Softstyle KEEP is a secondary link-out");
 assert.ok(!/Printify|how-to|POD tutorial/i.test(html), "not a Printify how-to");
 
 ["Offshore Grill", "Hueca Omeyocan", "Tillamook County Pioneer Podcast", "Tillamook County Weather Report", "Farm to Table", "AI Space"].forEach((name) => {
