@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Hair and river · Graphic Oregon</title>
-  <meta name="description" content="Walk into Hair and river — a pen drawing of a woman at the creek, opened in space.">
+  <meta name="description" content="Walk into Hair and river — a pen drawing of a woman at the creek, opened as 3D forms.">
   <meta name="theme-color" content="#f4efe6">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/creek/">
   <link rel="stylesheet" href="creek.css">
@@ -14,7 +14,7 @@
   <div id="loader">
     <div class="inner">
       <h1>Hair and river</h1>
-      <p>pen · woman at the creek</p>
+      <p id="loader-msg">pen · woman at the creek</p>
     </div>
   </div>
   <canvas id="stage" tabindex="0"></canvas>
@@ -23,11 +23,15 @@
       <h1>Hair and river</h1>
       <p class="tag">pen · woman at the creek</p>
     </header>
-    <div id="help">Drag to look · scroll or WASD to walk</div>
+    <div id="help">Slide to look · Walk or WASD</div>
+    <div id="walk" aria-label="Walk">
+      <button type="button" id="walk-back">Back</button>
+      <button type="button" id="walk-fwd">Walk</button>
+    </div>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
+  <script src="vendor/three.min.js"></script>
   <script src="../field-nav.js"></script>
-  <script src="layers.js"></script>
+  <script src="form.js"></script>
   <script src="creek.js"></script>
 </body>
 </html>

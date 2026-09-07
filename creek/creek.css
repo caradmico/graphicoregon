@@ -13,6 +13,7 @@ html, body {
   background: var(--paper);
   color: var(--ink);
   font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  touch-action: none;
 }
 
 canvas#stage {
@@ -37,13 +38,13 @@ canvas#stage.drag { cursor: grabbing; }
 
 header.top {
   position: absolute;
-  top: 22px;
-  left: 26px;
+  top: max(18px, env(safe-area-inset-top));
+  left: 22px;
   max-width: min(420px, calc(100vw - 48px));
 }
 
 header.top h1 {
-  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  font-size: clamp(1.25rem, 2.6vw, 1.85rem);
   font-weight: 600;
   letter-spacing: 0.03em;
   line-height: 1.1;
@@ -60,11 +61,42 @@ header.top p.tag {
 
 #help {
   position: absolute;
-  left: 26px;
-  bottom: 22px;
+  left: 22px;
+  bottom: max(18px, env(safe-area-inset-bottom));
   color: var(--mute);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   letter-spacing: 0.02em;
+  max-width: 46vw;
+}
+
+#walk {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+#walk button {
+  appearance: none;
+  min-width: 76px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(28, 39, 64, 0.28);
+  background: rgba(244, 239, 230, 0.92);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#walk button:active,
+#walk button.held {
+  background: rgba(157, 42, 46, 0.12);
+  border-color: var(--red);
 }
 
 #loader {
@@ -78,9 +110,7 @@ header.top p.tag {
 
 #loader[hidden] { display: none !important; }
 
-#loader .inner {
-  text-align: center;
-}
+#loader .inner { text-align: center; padding: 0 24px; }
 
 #loader h1 {
   font-size: 1.5rem;
@@ -94,4 +124,12 @@ header.top p.tag {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.72rem;
+}
+
+#loader.error p {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--red);
+  font-size: 0.92rem;
+  max-width: 22rem;
 }
