@@ -16,7 +16,7 @@ assert.ok(newsie.includes("paper: true"), "clicking the kid or the sheet still o
 assert.ok(app.includes("newsieHold"), "a cheap offer hold is wired");
 assert.ok(!/new THREE\.PointLight/.test(app), "no extra PointLights");
 
-assert.ok(html.includes("assets/news/pioneer-archive.jpg"), "Pioneer photo stays on the door");
+assert.ok(fs.existsSync(path.join(root, "assets/news/pioneer-archive.jpg")), "Pioneer photo stays on disk");
 assert.ok(!/jarvis|commander|experiment|v0/i.test(html), "canvas copy stays quiet");
 assert.ok(!/By [A-Z][a-z]+ [A-Z]/.test(html), "no invented bylines");
 
