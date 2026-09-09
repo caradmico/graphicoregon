@@ -1,4 +1,4 @@
-/* Graphic Oregon — hair over the boulder, and the clear creek it enters. */
+/* Graphic Oregon — woman on the boulder, hair into the creek, waterfall, tree. */
 (function () {
   const Ink = window.WaterInk;
   const PIXEL_RATIO = 1.25;
@@ -176,6 +176,24 @@
     return geo;
   }
 
+  function rumpleXZ(geo, amt) {
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const a = Math.atan2(z, x);
+      const wobble = Math.sin(y * 2.35 + a * 3.1) * amt + Math.sin(y * 5.2 - a * 2.2) * amt * 0.5;
+      const r = Math.hypot(x, z);
+      if (r < 1e-5) continue;
+      const nr = r + wobble;
+      pos.setXYZ(i, x * (nr / r), y, z * (nr / r));
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+    return geo;
+  }
+
   function addNamed(obj, name) {
     obj.name = name;
     names.push(name);
@@ -270,7 +288,7 @@
     addNamed(rock, "boulder");
   }
 
-  /* Previous "water" tubes — these are hair. Keep the drape; the body comes later. */
+  /* Previous "water" tubes — these are hair, now grown from her head. */
   function buildHair() {
     const g = new THREE.Group();
     const red = inkStrandMat("red");
@@ -456,6 +474,321 @@
     });
   }
 
+  function inkVolume(geo, fill, outlineAmt) {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: fill == null ? Ink.PAPER : fill })));
+    g.add(new THREE.Mesh(
+      inflate(geo, outlineAmt == null ? 0.012 : outlineAmt),
+      new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
+    ));
+    return g;
+  }
+
+  function ball(rx, ry, rz, seg) {
+    const geo = new THREE.SphereGeometry(1, seg || 10, (seg || 10) - 2);
+    geo.scale(rx, ry, rz);
+    return geo;
+  }
+
+  function aimBone(group, from, to) {
+    const mid = {
+      x: (from.x + to.x) * 0.5,
+      y: (from.y + to.y) * 0.5,
+      z: (from.z + to.z) * 0.5
+    };
+    const dir = new THREE.Vector3(to.x - from.x, to.y - from.y, to.z - from.z);
+    if (dir.lengthSq() < 1e-8) return;
+    dir.normalize();
+    group.position.set(mid.x, mid.y, mid.z);
+    group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+  }
+
+  function limbBetween(from, to, rx, fill) {
+    const len = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z);
+    const g = inkVolume(ball(rx, Math.max(0.04, len * 0.5), rx, 8), fill, 0.01);
+    aimBone(g, from, to);
+    return g;
+  }
+
+  function buildWoman() {
+    const w = Ink.woman();
+    const g = new THREE.Group();
+    const hip = inkVolume(ball(0.11, 0.07, 0.09, 10), Ink.PAPER, 0.011);
+    hip.position.set(w.hip.x, w.hip.y, w.hip.z);
+    hip.rotation.z = -0.55;
+    hip.rotation.x = 0.22;
+
+    const torso = inkVolume(ball(0.12, 0.16, 0.09, 10), Ink.PAPER, 0.012);
+    aimBone(torso, w.hip, w.chest);
+    torso.rotation.z -= 0.15;
+
+    const neck = inkVolume(ball(0.035, 0.04, 0.032, 8), Ink.PAPER, 0.008);
+    aimBone(neck, w.chest, w.head);
+
+    const head = inkVolume(ball(w.headR * 0.82, w.headR, w.headR * 0.88, 12), Ink.PAPER, 0.012);
+    head.position.set(w.head.x, w.head.y, w.head.z);
+    head.rotation.x = 0.85;
+    head.rotation.z = -0.28;
+
+    const dipUpper = limbBetween(w.shoulderL, w.elbowDip, 0.032, Ink.PAPER);
+    const dipFore = limbBetween(w.elbowDip, w.handDip, 0.026, Ink.PAPER);
+    const hand = inkVolume(ball(0.034, 0.018, 0.028, 8), Ink.PAPER, 0.008);
+    hand.position.set(w.handDip.x, w.handDip.y, w.handDip.z);
+    hand.rotation.x = 0.4;
+    hand.name = "hand-dip";
+
+    const restUpper = limbBetween(w.shoulderR, w.elbowRest, 0.03, Ink.PAPER);
+    const restFore = limbBetween(w.elbowRest, w.handRest, 0.024, Ink.PAPER);
+
+    const thighL = limbBetween(w.hip, w.kneeL, 0.042, Ink.PAPER);
+    const thighR = limbBetween(w.hip, w.kneeR, 0.042, Ink.PAPER);
+    const shinL = limbBetween(w.kneeL, w.footL, 0.03, Ink.PAPER);
+    const shinR = limbBetween(w.kneeR, w.footR, 0.03, Ink.PAPER);
+
+    g.add(hip, torso, neck, head, dipUpper, dipFore, hand, restUpper, restFore, thighL, thighR, shinL, shinR);
+    addNamed(g, "woman");
+  }
+
+  function fallMat() {
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uTime: { value: 0 },
+        uPaper: { value: new THREE.Color(Ink.PAPER) },
+        uNavy: { value: new THREE.Color(Ink.NAVY) }
+      },
+      vertexShader: [
+        "varying vec2 vUv;",
+        "varying vec3 vWorld;",
+        "varying vec3 vNormal;",
+        "uniform float uTime;",
+        "void main() {",
+        "  vUv = uv;",
+        "  vec3 pos = position;",
+        "  pos.x += sin(uv.y * 18.0 + uTime * 2.2) * 0.008 * (1.0 - uv.y);",
+        "  vNormal = normalize(mat3(modelMatrix) * normal);",
+        "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
+        "  vWorld = wp.xyz;",
+        "  gl_Position = projectionMatrix * viewMatrix * wp;",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "varying vec2 vUv;",
+        "varying vec3 vWorld;",
+        "varying vec3 vNormal;",
+        "uniform vec3 uPaper;",
+        "uniform vec3 uNavy;",
+        "uniform float uTime;",
+        "float hash(vec2 p) {",
+        "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
+        "}",
+        "void main() {",
+        "  vec3 N = normalize(vNormal);",
+        "  vec3 V = normalize(cameraPosition - vWorld);",
+        "  float fresnel = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 1.8);",
+        "  float streak = abs(sin(vUv.x * 22.0 + sin(vUv.y * 9.0 + uTime * 1.8) * 0.6));",
+        "  float line = smoothstep(0.82, 0.97, streak);",
+        "  float skip = step(0.22, hash(vec2(floor(vUv.x * 18.0), floor(vUv.y * 6.0 - uTime))));",
+        "  float foam = smoothstep(0.12, 0.0, vUv.y) * (0.45 + 0.55 * hash(vec2(floor(vUv.x * 20.0), 2.2)));",
+        "  vec3 col = mix(uPaper, uNavy, 0.22 + line * skip * 0.55 + foam * 0.35);",
+        "  col = mix(col, uNavy, fresnel * 0.28);",
+        "  float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);",
+        "  float alpha = (0.10 + line * skip * 0.38 + foam * 0.28 + fresnel * 0.18) * edge;",
+        "  if (alpha < 0.02) discard;",
+        "  gl_FragColor = vec4(col, alpha);",
+        "}"
+      ].join("\n")
+    });
+    waterMats.push(mat);
+    return mat;
+  }
+
+  function buildWaterfall() {
+    const g = new THREE.Group();
+    const mat = fallMat();
+    Ink.waterfallSheets().forEach((s) => {
+      const sheet = new THREE.Mesh(new THREE.PlaneGeometry(s.w, s.h, 8, 16), mat);
+      sheet.position.set(s.x, s.y, s.z);
+      sheet.rotation.y = s.yaw;
+      g.add(sheet);
+    });
+    const lineMat = new THREE.LineBasicMaterial({
+      color: Ink.NAVY,
+      transparent: true,
+      opacity: 0.42
+    });
+    Ink.waterfallFilaments().forEach((pts) => {
+      g.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(pts.map((p) => new THREE.Vector3(p.x, p.y, p.z))),
+        lineMat
+      ));
+    });
+    const plunge = Ink.waterfallPlunge();
+    const ring = [];
+    for (let i = 0; i <= 22; i++) {
+      const a = (i / 22) * Math.PI * 2;
+      ring.push(new THREE.Vector3(
+        plunge.x + Math.cos(a) * 0.22,
+        plunge.y,
+        plunge.z + Math.sin(a) * 0.16
+      ));
+    }
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ring), lineMat));
+    addNamed(g, "waterfall");
+  }
+
+  function hatchTexture() {
+    const w = 256;
+    const h = 256;
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d");
+    const img = ctx.createImageData(w, h);
+    img.data.set(Ink.hatchPixels(w, h));
+    ctx.putImageData(img, 0, 0);
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 2.2);
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  function barkMat() {
+    const tex = hatchTexture();
+    return new THREE.ShaderMaterial({
+      side: THREE.DoubleSide,
+      uniforms: {
+        uHatch: { value: tex },
+        uNavy: { value: new THREE.Color(Ink.NAVY) }
+      },
+      vertexShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "varying vec2 vUv;",
+        "void main() {",
+        "  vUv = uv;",
+        "  vNormal = normalize(normalMatrix * normal);",
+        "  vec4 wp = modelMatrix * vec4(position, 1.0);",
+        "  vWorld = wp.xyz;",
+        "  gl_Position = projectionMatrix * viewMatrix * wp;",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "varying vec2 vUv;",
+        "uniform sampler2D uHatch;",
+        "uniform vec3 uNavy;",
+        "float hash(vec2 p) {",
+        "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
+        "}",
+        "void main() {",
+        "  vec3 N = normalize(vNormal);",
+        "  vec3 V = normalize(cameraPosition - vWorld);",
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 3.2);",
+        "  vec3 hatch = texture2D(uHatch, vUv * vec2(1.0, 2.4)).rgb;",
+        "  float col = vUv.x * 42.0;",
+        "  float skip = step(0.16, hash(vec2(floor(col), 3.7)));",
+        "  float navyLine = (1.0 - smoothstep(0.0, 0.2, abs(fract(col) - 0.5))) * skip;",
+        "  vec3 c = hatch;",
+        "  c = mix(c, uNavy, navyLine * 0.55);",
+        "  c = mix(c, uNavy, rim * 0.68);",
+        "  gl_FragColor = vec4(c, 1.0);",
+        "}"
+      ].join("\n")
+    });
+  }
+
+  function horn(r0, r1, len) {
+    return new THREE.LatheGeometry([
+      new THREE.Vector2(r0, 0),
+      new THREE.Vector2(r0 * 0.92, len * 0.22),
+      new THREE.Vector2((r0 + r1) * 0.48, len * 0.55),
+      new THREE.Vector2(r1 * 1.15, len * 0.84),
+      new THREE.Vector2(r1, len)
+    ], 14);
+  }
+
+  function starLeaf(spec) {
+    const geo = new THREE.CircleGeometry(spec.r, 5);
+    const color = spec.ink === "navy" ? Ink.NAVY : Ink.RED;
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+      color: color,
+      side: THREE.DoubleSide
+    })));
+    const loop = [];
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      loop.push(new THREE.Vector3(Math.cos(a) * spec.r, Math.sin(a) * spec.r, 0.002));
+    }
+    g.add(new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(loop),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.7 })
+    ));
+    g.position.set(spec.x, spec.y, spec.z);
+    g.rotation.y = spec.spin;
+    g.rotation.x = spec.tilt || 0.15;
+    return g;
+  }
+
+  function buildTree() {
+    const spec = Ink.tree();
+    const bark = barkMat();
+    const profile = spec.profile.map((p) => new THREE.Vector2(p[0], p[1]));
+    const trunkGeo = rumpleXZ(new THREE.LatheGeometry(profile, 22), 0.036);
+    const g = new THREE.Group();
+    const trunk = new THREE.Group();
+    trunk.add(new THREE.Mesh(trunkGeo, bark));
+    trunk.add(new THREE.Mesh(
+      inflate(trunkGeo, 0.018),
+      new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
+    ));
+    trunk.rotation.z = spec.lean;
+    g.add(trunk);
+
+    spec.roots.forEach((root) => {
+      const last = root.pts.length - 1;
+      for (let i = 0; i < last; i++) {
+        const a = root.pts[i];
+        const b = root.pts[i + 1];
+        const t0 = i / last;
+        const t1 = (i + 1) / last;
+        const rA = root.r0 + (root.r1 - root.r0) * t0;
+        const rB = root.r0 + (root.r1 - root.r0) * t1;
+        const len = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+        const piece = inkVolume(horn(rA, rB, len), Ink.RED, 0.012);
+        piece.children[0].material = bark;
+        const dir = new THREE.Vector3(b.x - a.x, b.y - a.y, b.z - a.z);
+        if (dir.lengthSq() > 1e-8) {
+          piece.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+        }
+        piece.position.set(a.x, a.y, a.z);
+        g.add(piece);
+      }
+    });
+
+    const twig = new THREE.MeshBasicMaterial({ color: Ink.NAVY });
+    spec.branches.forEach((br) => {
+      g.add(tubeFrom(br.pts, br.r, twig));
+    });
+
+    const crown = new THREE.Group();
+    Ink.treeCrown().forEach((leaf) => crown.add(starLeaf(leaf)));
+    crown.name = "crown";
+    names.push("crown");
+    g.add(crown);
+
+    g.position.set(spec.x, 0, spec.z);
+    addNamed(g, "tree");
+  }
+
   function applyCamera() {
     const p = Ink.cameraPos(az, el, dist, target);
     camera.position.set(p.x, p.y, p.z);
@@ -550,10 +883,13 @@
   function buildWorld() {
     paperFloor();
     buildHills();
+    buildTree();
     buildCreekBed();
     buildBoulder();
+    buildWoman();
     buildWater();
     buildHair();
+    buildWaterfall();
     buildReeds();
   }
 
@@ -593,6 +929,10 @@
     hasHair: () => names.indexOf("hair") !== -1,
     hasWater: () => names.indexOf("water") !== -1,
     hasBed: () => names.indexOf("creek-bed") !== -1,
+    hasWoman: () => names.indexOf("woman") !== -1,
+    hasWaterfall: () => names.indexOf("waterfall") !== -1,
+    hasTree: () => names.indexOf("tree") !== -1,
+    hasCrown: () => names.indexOf("crown") !== -1,
     waterClear: () => {
       const w = scene && scene.getObjectByName("water");
       return !!(w && w.material && w.material.transparent && w.material.depthWrite === false);
