@@ -572,7 +572,7 @@
     const g = new THREE.Group();
 
     const torsoGeo = latheFrom(Ink.womanTorso(), 10);
-    torsoGeo.scale(0.92, 1, 0.32);
+    torsoGeo.scale(1.15, 1.15, 0.38);
     const torso = inkVolume(torsoGeo, Ink.PAPER, 0.012);
     aimBone(torso, w.hip, w.chest);
     torso.rotation.z -= 0.55;
@@ -606,12 +606,12 @@
     hand.rotation.x = 0.55;
     hand.name = "hand-dip";
 
-    g.add(strokeLine(ink.head, 0.006));
-    g.add(strokeLine(ink.spine, 0.008));
-    g.add(strokeLine(ink.reach, 0.007));
-    g.add(strokeLine(ink.rest, 0.005));
-    g.add(strokeLine(ink.legL, 0.007));
-    g.add(strokeLine(ink.legR, 0.005));
+    g.add(strokeLine(ink.head, 0.010));
+    g.add(strokeLine(ink.spine, 0.014));
+    g.add(strokeLine(ink.reach, 0.012));
+    g.add(strokeLine(ink.rest, 0.008));
+    g.add(strokeLine(ink.legL, 0.011));
+    g.add(strokeLine(ink.legR, 0.008));
 
     const splash = [];
     for (let i = 0; i <= 8; i++) {

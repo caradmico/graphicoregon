@@ -12,7 +12,7 @@
   const PAPER_RGB = [244, 239, 230];
   const FIGURE_RGB = [226, 212, 192];
 
-  const SPAWN = { az: 0.18, el: 0.16, dist: 5.9, targetX: -0.22, targetY: 0.92, targetZ: 0.58 };
+  const SPAWN = { az: 0.16, el: 0.15, dist: 5.7, targetX: -0.42, targetY: 1.05, targetZ: 0.55 };
   const DIST = { min: 3.5, max: 13.2 };
   const EL = { min: -0.06, max: 1.06 };
 
@@ -86,22 +86,22 @@
   /* Woman perched on the boulder — slender profile, lean, one hand in the creek. */
   function woman() {
     return {
-      hip: { x: -0.48, y: 1.52, z: -0.08 },
-      chest: { x: -0.22, y: 1.78, z: 0.10 },
-      neck: { x: -0.08, y: 1.92, z: 0.16 },
-      head: { x: 0.02, y: 2.04, z: 0.20 },
-      headR: 0.10,
-      shoulderL: { x: -0.18, y: 1.76, z: 0.22 },
-      shoulderR: { x: 0.02, y: 1.70, z: -0.08 },
-      elbowDip: outsideBoulder({ x: 0.42, y: 1.02, z: 0.68 }, 0.055),
-      handDip: { x: 0.52, y: 0.024, z: 1.08 },
-      elbowRest: { x: -0.02, y: 1.46, z: 0.04 },
-      handRest: { x: 0.12, y: 1.32, z: 0.22 },
-      kneeL: { x: -0.52, y: 1.38, z: 0.04 },
-      kneeR: { x: -0.18, y: 1.36, z: -0.04 },
-      footL: { x: -0.38, y: 1.30, z: 0.28 },
-      footR: { x: -0.08, y: 1.28, z: 0.22 },
-      tear: { x: 0.10, y: 2.00, z: 0.26 }
+      hip: { x: -0.92, y: 1.40, z: 0.32 },
+      chest: { x: -0.52, y: 1.86, z: 0.42 },
+      neck: { x: -0.32, y: 2.10, z: 0.40 },
+      head: { x: -0.16, y: 2.30, z: 0.36 },
+      headR: 0.11,
+      shoulderL: { x: -0.62, y: 1.84, z: 0.58 },
+      shoulderR: { x: -0.38, y: 1.78, z: 0.18 },
+      elbowDip: outsideBoulder({ x: -0.08, y: 1.00, z: 0.82 }, 0.055),
+      handDip: { x: 0.22, y: 0.024, z: 1.12 },
+      elbowRest: { x: -0.48, y: 1.48, z: 0.28 },
+      handRest: { x: -0.28, y: 1.34, z: 0.46 },
+      kneeL: { x: -1.08, y: 1.28, z: 0.38 },
+      kneeR: { x: -0.72, y: 1.26, z: 0.18 },
+      footL: { x: -0.88, y: 1.22, z: 0.62 },
+      footR: { x: -0.58, y: 1.20, z: 0.42 },
+      tear: { x: -0.08, y: 2.24, z: 0.44 }
     };
   }
 
