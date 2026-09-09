@@ -8,6 +8,9 @@ const css = fs.readFileSync(path.join(root, "home.css"), "utf8");
 const face = html + css;
 
 assert.ok(html.includes('href="home.css"'), "lander loads home.css");
+assert.ok(html.includes('href="https://graphicoregon.com/"'), "canonical is the apex");
+assert.ok(html.includes('href="https://graphicoregon.com/nccwp/"'), "NCCWP tile points at the apex desk");
+assert.ok(!html.includes("caradmico.github.io/graphicoregon"), "lander does not hardcode the project-pages host");
 assert.ok(!/src=["'][^"']*(three(\.min)?\.js|figures\.js|roster\.js|faces\.js|look\.js|field-nav\.js)/i.test(html), "home does not load the field");
 assert.ok(!/href=["']chrome\.css["']/.test(html), "home does not load field chrome");
 assert.ok(!/<canvas/i.test(html), "home is not a Three canvas");
