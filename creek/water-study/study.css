@@ -81,10 +81,10 @@ header.top p.tag {
 }
 
 #ref img {
-  width: 340%;
-  height: 170%;
+  width: 240%;
+  height: 155%;
   object-fit: cover;
-  object-position: 46% 40%;
+  object-position: 54% 52%;
   display: block;
 }
 

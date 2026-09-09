@@ -10,7 +10,7 @@
   const RED_RGB = [163, 38, 43];
   const PAPER_RGB = [244, 239, 230];
 
-  const SPAWN = { az: 0.62, el: 0.16, dist: 7.15, targetX: 0.12, targetY: 0.52, targetZ: 0.78 };
+  const SPAWN = { az: 0.38, el: 0.20, dist: 6.85, targetX: 0.05, targetY: 0.62, targetZ: 0.55 };
   const DIST = { min: 3.5, max: 13.2 };
   const EL = { min: -0.06, max: 1.06 };
 
@@ -83,28 +83,27 @@
   function waterStrand(i, n) {
     const count = n == null ? FALL_N : n;
     const lane = laneOf(i, count);
-    const wrap = Math.abs(lane) > 0.28 ? Math.sign(lane) : lane * 0.35;
-    const crestY = 2.04 + hash(i * 3.1) * 0.1;
-    const crestX = lane * 0.42;
-    const crestZ = -0.22 + hash(i * 5.2) * 0.16;
+    const shoulder = Math.abs(lane) > 0.62 ? Math.sign(lane) : 0;
+    const crestY = 2.02 + hash(i * 3.1) * 0.08;
+    const crestX = lane * 0.36 + shoulder * 0.18;
+    const crestZ = 0.12 + hash(i * 5.2) * 0.08 - Math.abs(shoulder) * 0.22;
 
-    const around = Math.abs(wrap);
-    const faceX = lane * (0.32 + around * 0.95);
-    const faceZ = 0.72 - around * 1.12;
+    const faceX = lane * 0.44 + shoulder * 0.72;
+    const faceZ = 0.92 - Math.abs(shoulder) * 0.55;
 
-    const bendX = faceX * 1.12 + wrap * 0.22;
-    const bendZ = 1.02 + around * 0.22;
+    const bendX = faceX * 1.08 + (shoulder || lane) * 0.55;
+    const bendZ = 1.08 + Math.abs(shoulder) * 0.18;
 
     const pts = [
-      { x: crestX * 0.35, y: crestY + 0.38, z: crestZ - 0.28 },
+      { x: crestX * 0.28, y: crestY + 0.32, z: crestZ - 0.08 },
       { x: crestX, y: crestY, z: crestZ },
-      { x: faceX * 0.62, y: 1.48, z: faceZ * 0.42 + crestZ * 0.18 },
-      { x: faceX, y: 0.92, z: faceZ },
-      { x: faceX * 1.04, y: 0.34, z: faceZ * 1.02 },
+      { x: faceX * 0.55, y: 1.52, z: faceZ * 0.72 },
+      { x: faceX, y: 0.96, z: faceZ },
+      { x: faceX * 1.02, y: 0.32, z: faceZ * 1.02 },
       { x: bendX, y: 0.075, z: bendZ },
-      { x: bendX - 0.42 - lane * 0.18, y: 0.055, z: bendZ + 1.05 },
-      { x: bendX - 1.05 - Math.max(0, -wrap) * 0.35, y: 0.045, z: bendZ + 2.15 },
-      { x: bendX - 1.72 - lane * 0.22, y: 0.038, z: bendZ + 3.35 }
+      { x: bendX - 0.38 - lane * 0.12, y: 0.055, z: bendZ + 1.02 },
+      { x: bendX - 1.02 - Math.max(0, -lane) * 0.28, y: 0.045, z: bendZ + 2.12 },
+      { x: bendX - 1.68 - lane * 0.18, y: 0.038, z: bendZ + 3.28 }
     ];
 
     return pts.map((p, idx) => {

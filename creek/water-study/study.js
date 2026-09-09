@@ -128,12 +128,12 @@
         "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
         "}",
         "void main() {",
-        "  vec2 suv = vec2(vUv.x * 3.6 - uTime * 0.14, vUv.y);",
+        "  vec2 suv = vec2(vUv.x * 3.6 - uTime * 0.16, vUv.y);",
         "  vec3 stroke = texture2D(uStroke, suv).rgb;",
-        "  float press = 0.78 + 0.22 * sin(vUv.x * 36.0 - uTime * 2.1);",
-        "  float skip = step(0.08, hash(vec2(floor(vUv.x * 56.0), 3.4)));",
-        "  vec3 c = mix(uPaper, stroke, skip);",
-        "  c = mix(c, uInk, 0.42 * press);",
+        "  float press = 0.88 + 0.12 * sin(vUv.x * 34.0 - uTime * 2.4);",
+        "  float skip = step(0.06, hash(vec2(floor(vUv.x * 48.0), 3.4)));",
+        "  vec3 c = mix(uPaper, uInk, skip * press);",
+        "  c = mix(c, stroke, 0.28);",
         "  gl_FragColor = vec4(c, 1.0);",
         "}"
       ].join("\n")
@@ -219,7 +219,7 @@
 
   function buildBoulder() {
     const spec = Ink.boulder();
-    const geo = rumple(new THREE.IcosahedronGeometry(1, 2), 0.12);
+    const geo = rumple(new THREE.IcosahedronGeometry(1, 1), 0.18);
     geo.scale(spec.rx, spec.ry, spec.rz);
     const rock = new THREE.Group();
     rock.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: Ink.PAPER })));
@@ -228,8 +228,8 @@
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     ));
     rock.add(new THREE.LineSegments(
-      new THREE.EdgesGeometry(geo, 22),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.72 })
+      new THREE.EdgesGeometry(geo, 32),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.42 })
     ));
     const cracks = [
       [
@@ -241,6 +241,16 @@
         { x: -0.55, y: 1.18, z: 0.62 },
         { x: -0.22, y: 1.32, z: 0.48 },
         { x: 0.18, y: 1.38, z: 0.22 }
+      ],
+      [
+        { x: -1.05, y: 0.42, z: 0.28 },
+        { x: -0.72, y: 0.68, z: 0.62 },
+        { x: -0.28, y: 0.82, z: 0.88 }
+      ],
+      [
+        { x: 0.42, y: 1.42, z: -0.35 },
+        { x: 0.68, y: 1.18, z: -0.55 },
+        { x: 0.92, y: 0.88, z: -0.62 }
       ]
     ];
     const crackMat = new THREE.LineBasicMaterial({ color: Ink.NAVY });
@@ -265,7 +275,7 @@
     const navy = inkStrandMat("navy");
     Ink.allStrands().forEach((pts, i) => {
       const kind = Ink.strandColor(i);
-      const rad = 0.018 + (i % 5) * 0.004;
+      const rad = 0.022 + (i % 5) * 0.005;
       g.add(tubeFrom(pts, rad, kind === "red" ? red : navy));
     });
     Ink.allRipples().forEach((pts, i) => {
