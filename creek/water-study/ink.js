@@ -12,7 +12,7 @@
   const PAPER_RGB = [244, 239, 230];
   const FIGURE_RGB = [226, 212, 192];
 
-  const SPAWN = { az: 0.38, el: 0.20, dist: 6.85, targetX: 0.05, targetY: 0.62, targetZ: 0.55 };
+  const SPAWN = { az: 0.62, el: 0.18, dist: 6.2, targetX: -0.15, targetY: 0.78, targetZ: 0.45 };
   const DIST = { min: 3.5, max: 13.2 };
   const EL = { min: -0.06, max: 1.06 };
 

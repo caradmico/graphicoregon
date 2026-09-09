@@ -448,9 +448,9 @@
         "  vec3 col = mix(uPaper, uNavy, 0.78);",
         "  float edge = smoothstep(0.0, 0.07, vUv.x) * smoothstep(1.0, 0.93, vUv.x);",
         "  edge *= smoothstep(0.0, 0.05, vUv.y) * smoothstep(1.0, 0.88, vUv.y);",
-        "  float alpha = mark * 0.72 + fresnel * 0.06;",
+        "  float alpha = mark * 0.62 + fresnel * 0.03;",
         "  alpha *= edge * rock;",
-        "  if (alpha < 0.02) discard;",
+        "  if (alpha < 0.03) discard;",
         "  gl_FragColor = vec4(col, alpha);",
         "}"
       ].join("\n")
@@ -562,17 +562,8 @@
     return g;
   }
 
-  function strokeLine(pts, opacity) {
-    return new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(
-        pts.map((p) => new THREE.Vector3(p.x, p.y, p.z))
-      ),
-      new THREE.LineBasicMaterial({
-        color: Ink.NAVY,
-        transparent: true,
-        opacity: opacity == null ? 0.92 : opacity
-      })
-    );
+  function strokeLine(pts, radius) {
+    return tubeFrom(pts, radius == null ? 0.007 : radius, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
   }
 
   function buildWoman() {
@@ -615,12 +606,12 @@
     hand.rotation.x = 0.55;
     hand.name = "hand-dip";
 
-    g.add(strokeLine(ink.head));
-    g.add(strokeLine(ink.spine));
-    g.add(strokeLine(ink.reach));
-    g.add(strokeLine(ink.rest, 0.7));
-    g.add(strokeLine(ink.legL));
-    g.add(strokeLine(ink.legR, 0.7));
+    g.add(strokeLine(ink.head, 0.006));
+    g.add(strokeLine(ink.spine, 0.008));
+    g.add(strokeLine(ink.reach, 0.007));
+    g.add(strokeLine(ink.rest, 0.005));
+    g.add(strokeLine(ink.legL, 0.007));
+    g.add(strokeLine(ink.legR, 0.005));
 
     const splash = [];
     for (let i = 0; i <= 8; i++) {
