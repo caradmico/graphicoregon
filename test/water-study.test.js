@@ -9,6 +9,7 @@ assert.strictEqual(Ink.PAPER, 0xf4efe6, "ground stays paper, not lawn");
 assert.ok(!Ink.isLawn(Ink.PAPER_RGB), "paper is not green");
 assert.ok(!Ink.isLawn(Ink.RED_RGB), "red ink is not lawn");
 assert.ok(!Ink.isLawn(Ink.NAVY_RGB), "navy ink is not lawn");
+assert.ok(!Ink.isLawn(Ink.FIGURE_RGB), "figure fill is paper-warm, not lawn");
 
 const b = Ink.boulder();
 assert.ok(b.rx > b.ry, "boulder is wider than it is tall");
@@ -106,7 +107,7 @@ assert.ok(Math.abs(plunge.y - Ink.waterY()) < 0.03, "plunge sits on the film");
 const tr = Ink.tree();
 assert.ok(tr.x < -2.2, "tree stands on the left bank");
 assert.ok(tr.rBase > tr.rTop, "trunk tapers");
-assert.ok(tr.height > 3.8, "tree is tall enough to read");
+assert.ok(tr.height > 2.8 && tr.height < 4.2, "tree is tall enough to read, short enough for the spawn view");
 assert.ok(tr.roots.length >= 2, "roots stay in the bark language");
 assert.ok(tr.branches.length >= 2, "branches hold a crown");
 const crown = Ink.treeCrown();

@@ -6,9 +6,11 @@
   const NAVY = 0x1a2744;
   const RED = 0xa3262b;
   const PAPER = 0xf4efe6;
+  const FIGURE = 0xe2d4c0;
   const NAVY_RGB = [26, 39, 68];
   const RED_RGB = [163, 38, 43];
   const PAPER_RGB = [244, 239, 230];
+  const FIGURE_RGB = [226, 212, 192];
 
   const SPAWN = { az: 0.38, el: 0.20, dist: 6.85, targetX: 0.05, targetY: 0.62, targetZ: 0.55 };
   const DIST = { min: 3.5, max: 13.2 };
@@ -84,21 +86,21 @@
   /* Woman perched on the boulder — crouched, bowed, one hand in the creek. */
   function woman() {
     return {
-      hip: { x: 0.08, y: 1.66, z: -0.08 },
-      chest: { x: 0.16, y: 1.86, z: 0.08 },
-      neck: { x: 0.20, y: 1.96, z: 0.14 },
-      head: { x: 0.22, y: 2.06, z: 0.16 },
-      headR: 0.125,
-      shoulderL: { x: 0.02, y: 1.88, z: 0.20 },
-      shoulderR: { x: 0.30, y: 1.82, z: -0.02 },
-      elbowDip: outsideBoulder({ x: 0.62, y: 0.98, z: 0.78 }, 0.05),
-      handDip: { x: 0.58, y: 0.028, z: 0.96 },
-      elbowRest: { x: 0.42, y: 1.52, z: 0.22 },
-      handRest: { x: 0.52, y: 1.38, z: 0.38 },
-      kneeL: { x: -0.10, y: 1.48, z: 0.18 },
-      kneeR: { x: 0.28, y: 1.46, z: 0.16 },
-      footL: { x: -0.02, y: 1.36, z: 0.42 },
-      footR: { x: 0.34, y: 1.34, z: 0.40 }
+      hip: { x: 0.10, y: 1.64, z: -0.16 },
+      chest: { x: 0.22, y: 1.92, z: 0.02 },
+      neck: { x: 0.28, y: 2.04, z: 0.10 },
+      head: { x: 0.32, y: 2.16, z: 0.14 },
+      headR: 0.155,
+      shoulderL: { x: 0.04, y: 1.96, z: 0.18 },
+      shoulderR: { x: 0.38, y: 1.88, z: -0.10 },
+      elbowDip: outsideBoulder({ x: 0.72, y: 1.02, z: 0.82 }, 0.06),
+      handDip: { x: 0.68, y: 0.026, z: 1.02 },
+      elbowRest: { x: 0.48, y: 1.58, z: 0.12 },
+      handRest: { x: 0.58, y: 1.42, z: 0.32 },
+      kneeL: { x: -0.12, y: 1.50, z: 0.10 },
+      kneeR: { x: 0.32, y: 1.48, z: 0.06 },
+      footL: { x: -0.02, y: 1.38, z: 0.36 },
+      footR: { x: 0.38, y: 1.36, z: 0.32 }
     };
   }
 
@@ -106,11 +108,11 @@
     const head = woman().head;
     const count = n == null ? FALL_N : n;
     const lane = laneOf(i, count);
-    const a = lane * 1.2;
+    const a = lane * 1.15;
     return {
-      x: head.x + Math.sin(a) * 0.10,
-      y: head.y + 0.10 + Math.cos(a * 1.3) * 0.028,
-      z: head.z - 0.02 + Math.cos(a) * 0.07
+      x: head.x + Math.sin(a) * 0.09 - 0.02,
+      y: head.y + 0.08 + Math.cos(a * 1.3) * 0.03,
+      z: head.z - 0.12 + Math.cos(a) * 0.05
     };
   }
 
@@ -297,11 +299,11 @@
   /* Falling water to the right of the boulder — sheets and filaments, not hair. */
   function waterfall() {
     return {
-      x: 1.46,
-      z: 0.38,
-      topY: 1.82,
+      x: 1.58,
+      z: 0.22,
+      topY: 1.88,
       botY: WATER_Y,
-      width: 0.78
+      width: 0.92
     };
   }
 
@@ -309,8 +311,9 @@
     const w = waterfall();
     const h = w.topY - w.botY;
     return [
-      { x: w.x - 0.04, y: w.botY + h * 0.5, z: w.z, w: 0.72, h: h, yaw: 0.22 },
-      { x: w.x + 0.14, y: w.botY + h * 0.46, z: w.z + 0.18, w: 0.52, h: h * 0.9, yaw: -0.1 }
+      { x: w.x - 0.04, y: w.botY + h * 0.5, z: w.z, w: 0.86, h: h, yaw: 0.28 },
+      { x: w.x + 0.16, y: w.botY + h * 0.46, z: w.z + 0.16, w: 0.58, h: h * 0.92, yaw: -0.12 },
+      { x: w.x - 0.12, y: w.botY + h * 0.48, z: w.z - 0.12, w: 0.48, h: h * 0.84, yaw: 0.55 }
     ];
   }
 
@@ -342,74 +345,74 @@
   /* Left-bank tree: hatched trunk (tree-study bark language) plus a readable crown. */
   function tree() {
     return {
-      x: -3.18,
-      z: 0.18,
-      height: 5.12,
-      rBase: 0.36,
-      rMid: 0.25,
-      rTop: 0.12,
-      lean: 0.034,
+      x: -2.72,
+      z: 0.42,
+      height: 3.28,
+      rBase: 0.34,
+      rMid: 0.24,
+      rTop: 0.11,
+      lean: 0.03,
       profile: [
         [0.04, 0.00],
-        [0.40, 0.02],
-        [0.34, 0.28],
-        [0.29, 0.92],
-        [0.26, 1.85],
-        [0.23, 2.85],
-        [0.19, 3.72],
-        [0.15, 4.42],
-        [0.12, 4.88],
-        [0.06, 5.06],
-        [0.03, 5.12]
+        [0.38, 0.02],
+        [0.32, 0.24],
+        [0.28, 0.72],
+        [0.25, 1.35],
+        [0.22, 1.95],
+        [0.18, 2.48],
+        [0.14, 2.88],
+        [0.11, 3.12],
+        [0.05, 3.22],
+        [0.03, 3.28]
       ],
       roots: [
         {
           name: "root-left",
-          r0: 0.20,
-          r1: 0.05,
+          r0: 0.18,
+          r1: 0.048,
           pts: [
-            { x: -0.22, y: 0.42, z: 0.10 },
-            { x: -0.78, y: 0.16, z: 0.18 },
-            { x: -1.42, y: 0.04, z: -0.12 }
+            { x: -0.20, y: 0.38, z: 0.10 },
+            { x: -0.72, y: 0.14, z: 0.16 },
+            { x: -1.22, y: 0.04, z: -0.08 }
           ]
         },
         {
           name: "root-right",
-          r0: 0.12,
-          r1: 0.036,
+          r0: 0.11,
+          r1: 0.034,
           pts: [
-            { x: 0.20, y: 0.34, z: 0.06 },
-            { x: 0.52, y: 0.12, z: -0.06 },
-            { x: 0.88, y: 0.03, z: -0.10 }
+            { x: 0.18, y: 0.30, z: 0.06 },
+            { x: 0.48, y: 0.12, z: -0.04 },
+            { x: 0.78, y: 0.03, z: -0.08 }
           ]
         }
       ],
       branches: [
         {
           name: "branch-low-right",
-          r: 0.026,
+          r: 0.024,
           pts: [
-            { x: 0.22, y: 2.15, z: 0.05 },
-            { x: 0.62, y: 2.32, z: 0.14 },
-            { x: 1.02, y: 2.18, z: 0.04 }
+            { x: 0.20, y: 1.72, z: 0.06 },
+            { x: 0.52, y: 1.92, z: 0.14 },
+            { x: 0.82, y: 1.84, z: 0.06 }
           ]
         },
         {
           name: "branch-mid-left",
           r: 0.02,
           pts: [
-            { x: -0.22, y: 3.28, z: 0.04 },
-            { x: -0.62, y: 3.62, z: 0.12 },
-            { x: -0.98, y: 3.92, z: 0.02 }
+            { x: -0.18, y: 2.28, z: 0.04 },
+            { x: -0.52, y: 2.55, z: 0.12 },
+            { x: -0.82, y: 2.72, z: 0.04 }
           ]
         },
         {
           name: "branch-high",
           r: 0.016,
           pts: [
-            { x: -0.10, y: 4.48, z: 0.02 },
-            { x: -0.38, y: 4.82, z: 0.10 },
-            { x: -0.58, y: 5.08, z: 0.04 }
+            { x: -0.08, y: 2.92, z: 0.02 },
+            { x: -0.28, y: 3.12, z: 0.10 },
+            { x: -0.42, y: 3.22, z: 0.04 }
           ]
         }
       ]
@@ -418,19 +421,19 @@
 
   function treeCrown() {
     const leaves = [];
-    const n = 18;
+    const n = 22;
     let i;
     for (i = 0; i < n; i++) {
-      const a = i * 2.15 + hash(i * 3.1) * 0.7;
-      const h = 4.08 + hash(i * 2.4) * 1.08;
-      const rad = 0.16 + hash(i * 5.1) * 0.62;
+      const a = i * 2.05 + hash(i * 3.1) * 0.7;
+      const h = 2.42 + hash(i * 2.4) * 0.78;
+      const rad = 0.22 + hash(i * 5.1) * 0.58;
       leaves.push({
         x: Math.cos(a) * rad,
         y: h,
         z: Math.sin(a) * rad * 0.7,
-        r: 0.085 + hash(i * 7.2) * 0.07,
+        r: 0.13 + hash(i * 7.2) * 0.09,
         spin: hash(i * 4.4) * 6.2,
-        tilt: (hash(i * 1.9) - 0.5) * 0.8,
+        tilt: (hash(i * 1.9) - 0.5) * 0.9,
         ink: i % 5 === 0 ? "navy" : "red"
       });
     }
@@ -438,12 +441,12 @@
     tips.forEach((br, bi) => {
       const tip = br.pts[br.pts.length - 1];
       leaves.push({
-        x: tip.x + 0.04,
-        y: tip.y + 0.08,
+        x: tip.x + 0.05,
+        y: tip.y + 0.10,
         z: tip.z,
-        r: 0.10,
+        r: 0.14,
         spin: 0.4 + bi * 0.7,
-        tilt: 0.2,
+        tilt: 0.25,
         ink: "red"
       });
     });
@@ -612,9 +615,11 @@
     NAVY: NAVY,
     RED: RED,
     PAPER: PAPER,
+    FIGURE: FIGURE,
     NAVY_RGB: NAVY_RGB,
     RED_RGB: RED_RGB,
     PAPER_RGB: PAPER_RGB,
+    FIGURE_RGB: FIGURE_RGB,
     SPAWN: SPAWN,
     DIST: DIST,
     EL: EL,

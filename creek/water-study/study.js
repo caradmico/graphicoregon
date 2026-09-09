@@ -481,6 +481,10 @@
       inflate(geo, outlineAmt == null ? 0.012 : outlineAmt),
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     ));
+    g.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo, 22),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.55 })
+    ));
     return g;
   }
 
@@ -513,37 +517,58 @@
   function buildWoman() {
     const w = Ink.woman();
     const g = new THREE.Group();
-    const hip = inkVolume(ball(0.11, 0.07, 0.09, 10), Ink.PAPER, 0.011);
+    const flesh = Ink.FIGURE;
+    const hip = inkVolume(ball(0.13, 0.08, 0.10, 10), flesh, 0.016);
     hip.position.set(w.hip.x, w.hip.y, w.hip.z);
     hip.rotation.z = -0.55;
     hip.rotation.x = 0.22;
 
-    const torso = inkVolume(ball(0.12, 0.16, 0.09, 10), Ink.PAPER, 0.012);
+    const torso = inkVolume(ball(0.14, 0.19, 0.10, 10), flesh, 0.016);
     aimBone(torso, w.hip, w.chest);
     torso.rotation.z -= 0.15;
 
-    const neck = inkVolume(ball(0.035, 0.04, 0.032, 8), Ink.PAPER, 0.008);
+    const neck = inkVolume(ball(0.042, 0.05, 0.038, 8), flesh, 0.01);
     aimBone(neck, w.chest, w.head);
 
-    const head = inkVolume(ball(w.headR * 0.82, w.headR, w.headR * 0.88, 12), Ink.PAPER, 0.012);
+    const head = inkVolume(ball(w.headR * 0.82, w.headR, w.headR * 0.88, 12), flesh, 0.016);
     head.position.set(w.head.x, w.head.y, w.head.z);
     head.rotation.x = 0.85;
     head.rotation.z = -0.28;
+    const brow = new THREE.Mesh(
+      ball(0.028, 0.01, 0.008, 6),
+      new THREE.MeshBasicMaterial({ color: Ink.NAVY })
+    );
+    brow.position.set(0.02, 0.02, w.headR * 0.72);
+    head.add(brow);
 
-    const dipUpper = limbBetween(w.shoulderL, w.elbowDip, 0.032, Ink.PAPER);
-    const dipFore = limbBetween(w.elbowDip, w.handDip, 0.026, Ink.PAPER);
-    const hand = inkVolume(ball(0.034, 0.018, 0.028, 8), Ink.PAPER, 0.008);
+    const dipUpper = limbBetween(w.shoulderL, w.elbowDip, 0.038, flesh);
+    const dipFore = limbBetween(w.elbowDip, w.handDip, 0.03, flesh);
+    const hand = inkVolume(ball(0.042, 0.02, 0.032, 8), flesh, 0.01);
     hand.position.set(w.handDip.x, w.handDip.y, w.handDip.z);
     hand.rotation.x = 0.4;
     hand.name = "hand-dip";
 
-    const restUpper = limbBetween(w.shoulderR, w.elbowRest, 0.03, Ink.PAPER);
-    const restFore = limbBetween(w.elbowRest, w.handRest, 0.024, Ink.PAPER);
+    const restUpper = limbBetween(w.shoulderR, w.elbowRest, 0.034, flesh);
+    const restFore = limbBetween(w.elbowRest, w.handRest, 0.028, flesh);
 
-    const thighL = limbBetween(w.hip, w.kneeL, 0.042, Ink.PAPER);
-    const thighR = limbBetween(w.hip, w.kneeR, 0.042, Ink.PAPER);
-    const shinL = limbBetween(w.kneeL, w.footL, 0.03, Ink.PAPER);
-    const shinR = limbBetween(w.kneeR, w.footR, 0.03, Ink.PAPER);
+    const thighL = limbBetween(w.hip, w.kneeL, 0.048, flesh);
+    const thighR = limbBetween(w.hip, w.kneeR, 0.048, flesh);
+    const shinL = limbBetween(w.kneeL, w.footL, 0.034, flesh);
+    const shinR = limbBetween(w.kneeR, w.footR, 0.034, flesh);
+
+    const splash = [];
+    for (let i = 0; i <= 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      splash.push(new THREE.Vector3(
+        w.handDip.x + Math.cos(a) * 0.12,
+        Ink.waterY() + 0.002,
+        w.handDip.z + Math.sin(a) * 0.09
+      ));
+    }
+    g.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(splash),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.45 })
+    ));
 
     g.add(hip, torso, neck, head, dipUpper, dipFore, hand, restUpper, restFore, thighL, thighR, shinL, shinR);
     addNamed(g, "woman");
@@ -595,7 +620,7 @@
         "  vec3 col = mix(uPaper, uNavy, 0.22 + line * skip * 0.55 + foam * 0.35);",
         "  col = mix(col, uNavy, fresnel * 0.28);",
         "  float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);",
-        "  float alpha = (0.10 + line * skip * 0.38 + foam * 0.28 + fresnel * 0.18) * edge;",
+        "  float alpha = (0.18 + line * skip * 0.5 + foam * 0.34 + fresnel * 0.24) * edge;",
         "  if (alpha < 0.02) discard;",
         "  gl_FragColor = vec4(col, alpha);",
         "}"
@@ -617,7 +642,7 @@
     const lineMat = new THREE.LineBasicMaterial({
       color: Ink.NAVY,
       transparent: true,
-      opacity: 0.42
+      opacity: 0.62
     });
     Ink.waterfallFilaments().forEach((pts) => {
       g.add(new THREE.Line(
