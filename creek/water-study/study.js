@@ -1,4 +1,4 @@
-/* Graphic Oregon — creek around the boulder from Hair and river, as pen in space. */
+/* Graphic Oregon — hair over the boulder, and the clear creek it enters. */
 (function () {
   const Ink = window.WaterInk;
   const PIXEL_RATIO = 1.25;
@@ -20,6 +20,7 @@
   let dist0 = dist;
   const names = [];
   const flowMats = [];
+  const waterMats = [];
 
   function hasThree(root) {
     const T = root || window.THREE;
@@ -111,8 +112,8 @@
         "void main() {",
         "  vUv = uv;",
         "  vec3 pos = position;",
-        "  float creek = smoothstep(0.42, 0.58, uv.x);",
-        "  pos.y += sin(position.z * 3.1 + uTime * 1.55 + uv.x * 7.0) * 0.016 * creek;",
+          "  float tail = smoothstep(0.42, 0.58, uv.x);",
+          "  pos.y += sin(position.z * 3.1 + uTime * 1.55 + uv.x * 7.0) * 0.016 * tail;",
         "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
         "  vWorld = wp.xyz;",
         "  gl_Position = projectionMatrix * viewMatrix * wp;",
@@ -269,7 +270,8 @@
     addNamed(rock, "boulder");
   }
 
-  function buildWater() {
+  /* Previous "water" tubes — these are hair. Keep the drape; the body comes later. */
+  function buildHair() {
     const g = new THREE.Group();
     const red = inkStrandMat("red");
     const navy = inkStrandMat("navy");
@@ -282,7 +284,121 @@
       const kind = Ink.rippleColor(i);
       g.add(tubeFrom(pts, 0.01 + (i % 3) * 0.002, kind === "red" ? red : navy));
     });
-    addNamed(g, "water");
+    addNamed(g, "hair");
+  }
+
+  function stoneMesh(spec) {
+    const geo = rumple(new THREE.IcosahedronGeometry(1, 0), 0.14);
+    geo.scale(spec.rx, spec.ry, spec.rz);
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: Ink.PAPER })));
+    g.add(new THREE.Mesh(
+      inflate(geo, 0.012),
+      new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
+    ));
+    g.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo, 28),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.5 })
+    ));
+    g.position.set(spec.x, spec.y, spec.z);
+    return g;
+  }
+
+  function buildCreekBed() {
+    const patch = Ink.creekPatch();
+    const g = new THREE.Group();
+    const bed = new THREE.Mesh(
+      new THREE.PlaneGeometry(patch.w * 0.9, patch.d * 0.86),
+      new THREE.MeshBasicMaterial({ color: 0xe8e2d4 })
+    );
+    bed.rotation.x = -Math.PI / 2;
+    bed.position.set(patch.x, 0.006, patch.z);
+    g.add(bed);
+    Ink.bedStones().forEach((s) => g.add(stoneMesh(s)));
+    addNamed(g, "creek-bed");
+  }
+
+  function waterMat() {
+    const b = Ink.boulder();
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uTime: { value: 0 },
+        uPaper: { value: new THREE.Color(Ink.PAPER) },
+        uNavy: { value: new THREE.Color(Ink.NAVY) },
+        uBoulder: { value: new THREE.Vector3(b.x, b.y, b.z) },
+        uBoulderR: { value: new THREE.Vector3(b.rx, b.ry, b.rz) }
+      },
+      vertexShader: [
+        "varying vec3 vWorld;",
+        "varying vec3 vNormal;",
+        "varying vec2 vUv;",
+        "uniform float uTime;",
+        "void main() {",
+        "  vUv = uv;",
+        "  vec3 pos = position;",
+        "  float hx = sin(pos.x * 1.65 + uTime * 0.52) * 0.0055;",
+        "  float hz = sin(pos.z * 2.35 - uTime * 0.38) * 0.0038;",
+        "  pos.y += hx + hz;",
+        "  float dHdx = cos(pos.x * 1.65 + uTime * 0.52) * 1.65 * 0.0055;",
+        "  float dHdz = cos(pos.z * 2.35 - uTime * 0.38) * 2.35 * 0.0038;",
+        "  vec3 n = normalize(vec3(-dHdx, 1.0, -dHdz));",
+        "  vNormal = normalize(mat3(modelMatrix) * n);",
+        "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
+        "  vWorld = wp.xyz;",
+        "  gl_Position = projectionMatrix * viewMatrix * wp;",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "varying vec3 vWorld;",
+        "varying vec3 vNormal;",
+        "varying vec2 vUv;",
+        "uniform vec3 uPaper;",
+        "uniform vec3 uNavy;",
+        "uniform vec3 uBoulder;",
+        "uniform vec3 uBoulderR;",
+        "uniform float uTime;",
+        "float hash(vec2 p) {",
+        "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
+        "}",
+        "void main() {",
+        "  vec3 q = (vWorld - uBoulder) / uBoulderR;",
+        "  float rock = smoothstep(1.02, 1.16, dot(q, q));",
+        "  if (rock < 0.01) discard;",
+        "  vec3 N = normalize(vNormal);",
+        "  vec3 V = normalize(cameraPosition - vWorld);",
+        "  float ndotv = clamp(dot(N, V), 0.0, 1.0);",
+        "  float fresnel = pow(1.0 - ndotv, 2.8);",
+        "  vec3 sheen = mix(uPaper, uNavy, 0.34);",
+        "  vec3 col = mix(mix(uPaper, uNavy, 0.035), sheen, fresnel);",
+        "  float w1 = sin(vWorld.z * 3.55 - uTime * 0.42 + sin(vWorld.x * 1.7) * 1.05);",
+        "  float w2 = sin(vWorld.z * 5.1 + vWorld.x * 0.55 - uTime * 0.28);",
+        "  float line = smoothstep(0.968, 0.996, abs(w1)) + smoothstep(0.982, 0.998, abs(w2)) * 0.55;",
+        "  float skip = step(0.38, hash(floor(vWorld.xz * 1.15)));",
+        "  float mark = line * skip * (0.22 + fresnel * 0.18);",
+        "  col = mix(col, uNavy, mark);",
+        "  float edge = smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x);",
+        "  edge *= smoothstep(0.0, 0.08, vUv.y) * smoothstep(1.0, 0.84, vUv.y);",
+        "  float alpha = mix(0.08, 0.54, fresnel) + mark * 0.2;",
+        "  alpha *= edge * rock;",
+        "  if (alpha < 0.012) discard;",
+        "  gl_FragColor = vec4(col, alpha);",
+        "}"
+      ].join("\n")
+    });
+    waterMats.push(mat);
+    return mat;
+  }
+
+  function buildWater() {
+    const patch = Ink.creekPatch();
+    const geo = new THREE.PlaneGeometry(patch.w, patch.d, 48, 36);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, waterMat());
+    mesh.position.set(patch.x, Ink.waterY(), patch.z);
+    addNamed(mesh, "water");
   }
 
   function buildReeds() {
@@ -408,6 +524,7 @@
     requestAnimationFrame(tick);
     const t = clock.getElapsedTime();
     for (let i = 0; i < flowMats.length; i++) flowMats[i].uniforms.uTime.value = t;
+    for (let i = 0; i < waterMats.length; i++) waterMats[i].uniforms.uTime.value = t;
     applyCamera();
     renderer.render(scene, camera);
   }
@@ -422,8 +539,10 @@
   function buildWorld() {
     paperFloor();
     buildHills();
+    buildCreekBed();
     buildBoulder();
     buildWater();
+    buildHair();
     buildReeds();
   }
 
@@ -460,7 +579,9 @@
     pixelRatio: () => renderer ? renderer.getPixelRatio() : 0,
     names: () => names.slice(),
     hasBoulder: () => names.indexOf("boulder") !== -1,
+    hasHair: () => names.indexOf("hair") !== -1,
     hasWater: () => names.indexOf("water") !== -1,
+    hasBed: () => names.indexOf("creek-bed") !== -1,
     pointLights: () => scene ? scene.children.filter((o) => o.isPointLight).length : 0,
     threeOk: () => hasThree(window.THREE),
     usesCdnjs: () => false,

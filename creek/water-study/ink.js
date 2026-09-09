@@ -1,4 +1,4 @@
-/* Hair and river — the creek around the boulder, as pen math. */
+/* Hair and river — hair over the boulder, and the creek it enters, as pen math. */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.WaterInk = factory();
@@ -16,6 +16,7 @@
 
   const FALL_N = 28;
   const RIPPLE_N = 14;
+  const WATER_Y = 0.052;
 
   function clamp(v, lo, hi) {
     return v < lo ? lo : v > hi ? hi : v;
@@ -80,7 +81,9 @@
     return clamp((u - 0.5) * 2 + wobble, -1, 1);
   }
 
-  function waterStrand(i, n) {
+  /* Hair ribbons from the (still-absent) head, draped over the boulder, then
+     flattening into the creek. Kept as the previous flowing-over-stone form. */
+  function hairStrand(i, n) {
     const count = n == null ? FALL_N : n;
     const lane = laneOf(i, count);
     const shoulder = Math.abs(lane) > 0.62 ? Math.sign(lane) : 0;
@@ -118,6 +121,11 @@
     return { x: p.x + w, y: p.y + v, z: p.z };
   }
 
+  function waterStrand(i, n) {
+    return hairStrand(i, n);
+  }
+
+  /* Extra hair tails on the creek — the previous surface strands, kept visible. */
   function rippleStrand(i, n) {
     const count = n == null ? RIPPLE_N : n;
     const u = count <= 1 ? 0.5 : i / (count - 1);
@@ -140,7 +148,7 @@
   function allStrands() {
     const fall = [];
     let i;
-    for (i = 0; i < FALL_N; i++) fall.push(waterStrand(i, FALL_N));
+    for (i = 0; i < FALL_N; i++) fall.push(hairStrand(i, FALL_N));
     return fall;
   }
 
@@ -194,6 +202,37 @@
       coreHits: coreHits,
       points: points
     };
+  }
+
+  function waterY() {
+    return WATER_Y;
+  }
+
+  function creekPatch() {
+    return { x: -0.45, z: 1.48, w: 9.4, d: 7.8 };
+  }
+
+  /* Looking straight down (ndotv ~ 1) is see-through; grazing is reflective. */
+  function fresnelWeight(ndotv, power) {
+    const n = clamp(ndotv, 0, 1);
+    const p = power == null ? 2.8 : power;
+    return Math.pow(1 - n, p);
+  }
+
+  function waterAlpha(ndotv) {
+    return lerp(0.08, 0.54, fresnelWeight(ndotv));
+  }
+
+  function bedStones() {
+    return [
+      { x: 1.68, y: 0.03, z: 1.48, rx: 0.24, ry: 0.1, rz: 0.18 },
+      { x: 2.02, y: 0.024, z: 2.22, rx: 0.15, ry: 0.072, rz: 0.13 },
+      { x: 1.22, y: 0.022, z: 2.62, rx: 0.12, ry: 0.06, rz: 0.1 },
+      { x: -2.12, y: 0.02, z: 2.38, rx: 0.14, ry: 0.064, rz: 0.12 },
+      { x: -1.48, y: 0.018, z: 3.22, rx: 0.11, ry: 0.052, rz: 0.09 },
+      { x: 0.82, y: 0.02, z: 3.12, rx: 0.13, ry: 0.058, rz: 0.11 },
+      { x: 2.18, y: 0.016, z: 3.42, rx: 0.1, ry: 0.046, rz: 0.085 }
+    ];
   }
 
   function reeds() {
@@ -325,6 +364,7 @@
     EL: EL,
     FALL_N: FALL_N,
     RIPPLE_N: RIPPLE_N,
+    WATER_Y: WATER_Y,
     clamp: clamp,
     hash: hash,
     lerp: lerp,
@@ -333,7 +373,13 @@
     outsideBoulder: outsideBoulder,
     strandColor: strandColor,
     rippleColor: rippleColor,
+    hairStrand: hairStrand,
     waterStrand: waterStrand,
+    waterY: waterY,
+    creekPatch: creekPatch,
+    fresnelWeight: fresnelWeight,
+    waterAlpha: waterAlpha,
+    bedStones: bedStones,
     rippleStrand: rippleStrand,
     allStrands: allStrands,
     allRipples: allRipples,

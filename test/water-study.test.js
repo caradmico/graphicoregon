@@ -15,12 +15,13 @@ assert.ok(b.rx > b.ry, "boulder is wider than it is tall");
 assert.ok(b.rz > 0.8, "boulder has depth");
 assert.ok(b.y > 0.4 && b.y < 1.4, "boulder sits on the paper, not as a marble orb in air");
 
-const mid = Ink.waterStrand(Math.floor(Ink.FALL_N / 2), Ink.FALL_N);
+const mid = Ink.hairStrand(Math.floor(Ink.FALL_N / 2), Ink.FALL_N);
 const travel = Ink.strandTravel(mid);
-assert.ok(travel.falls, "water falls over the stone");
-assert.ok(travel.flattens, "fall becomes the creek");
+assert.ok(travel.falls, "hair falls over the stone");
+assert.ok(travel.flattens, "hair becomes the creek");
 assert.ok(travel.towardViewer, "creek comes toward the looker");
 assert.ok(travel.drop > 1.5, "cascade has real vertical drop");
+assert.strictEqual(Ink.waterStrand(4, 12).length, Ink.hairStrand(4, 12).length, "old waterStrand name still maps to hair");
 
 const strands = Ink.allStrands();
 assert.strictEqual(strands.length, Ink.FALL_N, "curtain has enough strands");
@@ -37,9 +38,20 @@ assert.ok(reds > navies, "fall is mostly red, as in the drawing");
 assert.ok(navies >= 4, "navy strands sit in the curtain");
 
 const rip = Ink.allRipples();
-assert.ok(rip.length >= 8, "creek surface has ripple strands");
+assert.ok(rip.length >= 8, "hair tails still ride the creek");
 const ripNavy = rip.filter((_, i) => Ink.rippleColor(i) === "navy").length;
-assert.ok(ripNavy > rip.length / 2, "ripples are mostly navy");
+assert.ok(ripNavy > rip.length / 2, "tails stay mostly navy");
+
+assert.ok(Ink.waterY() > 0.03 && Ink.waterY() < 0.12, "water is a thin film on the bed");
+assert.ok(Ink.creekPatch().w > 6 && Ink.creekPatch().d > 5, "creek patch covers the boulder and bed");
+assert.ok(Ink.fresnelWeight(1) < 0.02, "looking down is see-through");
+assert.ok(Ink.fresnelWeight(0.12) > 0.55, "grazing is reflective");
+assert.ok(Ink.waterAlpha(1) < Ink.waterAlpha(0.2), "water alpha rises at grazing");
+assert.ok(Ink.bedStones().length >= 5, "creek bed has submerged stones");
+Ink.bedStones().forEach((s) => {
+  assert.ok(!Ink.insideBoulder({ x: s.x, y: s.y, z: s.z }, 0.88), "bed stones sit outside the boulder");
+  assert.ok(s.y < Ink.waterY(), "bed stones sit under the water");
+});
 
 const px = Ink.strokePixels(128, 64, Ink.RED_RGB);
 const st = Ink.strokeStats(px, 128, 64, Ink.RED_RGB);
@@ -74,7 +86,15 @@ assert.ok(html.indexOf("hair-and-river.jpg") !== -1, "source drawing is the same
 
 const study = fs.readFileSync(path.join(__dirname, "../creek/water-study/study.js"), "utf8");
 assert.ok(study.indexOf("ShaderMaterial") !== -1, "ink is a stroke shader, not a glass material");
-assert.ok(study.indexOf("uTime") !== -1, "strands travel — water is not a still blob");
+assert.ok(study.indexOf("uTime") !== -1, "strands travel — hair is not a still blob");
+assert.ok(study.indexOf("buildHair") !== -1, "previous flowing tubes are built as hair");
+assert.ok(study.indexOf('"hair"') !== -1, "hair is a named scene object");
+assert.ok(study.indexOf("fresnel") !== -1, "clear water uses angle-dependent fresnel");
+assert.ok(study.indexOf("cameraPosition") !== -1, "water shader reads the view angle");
+assert.ok(/transparent:\s*true/.test(study), "water surface is transparent");
+assert.ok(study.indexOf("depthWrite: false") !== -1, "water does not hide the bed");
+assert.ok(study.indexOf("buildCreekBed") !== -1, "creek bed sits under the water");
+assert.ok(study.indexOf("PIXEL_RATIO = 1.25") !== -1, "pixel ratio stays capped");
 assert.ok(!Ink.isGlassWord(study), "no glass / PBR words");
 assert.ok(!/MeshStandardMaterial|MeshPhongMaterial|MeshPhysicalMaterial|MeshNormalMaterial/.test(study), "no lit-marble materials");
 assert.ok(study.indexOf("cdnjs") === -1, "study does not load cdnjs");
