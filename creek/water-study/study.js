@@ -541,6 +541,7 @@
     figureShared = new THREE.ShaderMaterial({
       uniforms: {
         uFigure: { value: new THREE.Color(Ink.FIGURE) },
+        uPaper: { value: new THREE.Color(Ink.PAPER) },
         uNavy: { value: new THREE.Color(Ink.NAVY) }
       },
       vertexShader: [
@@ -557,14 +558,17 @@
         "varying vec3 vNormal;",
         "varying vec3 vWorld;",
         "uniform vec3 uFigure;",
+        "uniform vec3 uPaper;",
         "uniform vec3 uNavy;",
         "void main() {",
         "  vec3 N = normalize(vNormal);",
         "  vec3 V = normalize(cameraPosition - vWorld);",
-        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 2.6);",
-        "  float hatch = abs(sin(vWorld.y * 16.0 + vWorld.x * 3.4 + vWorld.z * 2.2));",
-        "  float mark = smoothstep(0.86, 0.98, hatch) * 0.28;",
-        "  vec3 c = mix(uFigure, uNavy, mark + rim * 0.42);",
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 2.1);",
+        "  float hatch = abs(sin(vWorld.y * 22.0 + vWorld.x * 5.2 + vWorld.z * 3.1));",
+        "  float cross = abs(sin(vWorld.x * 14.0 - vWorld.y * 9.0));",
+        "  float mark = smoothstep(0.78, 0.96, hatch) * 0.38 + smoothstep(0.88, 0.98, cross) * 0.16;",
+        "  vec3 base = mix(uPaper, uFigure, 0.42);",
+        "  vec3 c = mix(base, uNavy, mark + rim * 0.58);",
         "  gl_FragColor = vec4(c, 1.0);",
         "}"
       ].join("\n")
@@ -576,7 +580,7 @@
     const g = new THREE.Group();
     g.add(new THREE.Mesh(geo, figureMat()));
     g.add(new THREE.Mesh(
-      inflate(geo, outlineAmt == null ? 0.008 : outlineAmt),
+      inflate(geo, outlineAmt == null ? 0.014 : outlineAmt),
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     ));
     return g;
@@ -605,7 +609,7 @@
     const len = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z);
     const geo = capsuleGeo(rx, Math.max(0.10, len));
     geo.scale(1, 1, Ink.FIGURE_DEPTH);
-    const g = figureVolume(geo, 0.007);
+    const g = figureVolume(geo, 0.012);
     aimBone(g, from, to);
     return g;
   }
@@ -622,7 +626,7 @@
 
     const hipGeo = latheFrom(Ink.womanHips(), 16);
     hipGeo.scale(1.12, 0.96, Ink.FIGURE_DEPTH);
-    const hips = figureVolume(hipGeo, 0.010);
+    const hips = figureVolume(hipGeo, 0.016);
     hips.position.set(w.hip.x + 0.02, w.hip.y - 0.05, w.hip.z);
     hips.rotation.z = -0.78;
     hips.rotation.x = 0.28;
@@ -630,7 +634,7 @@
 
     const torsoGeo = latheFrom(Ink.womanTorso(), 16);
     torsoGeo.scale(1.08, 1.0, Ink.FIGURE_DEPTH);
-    const torso = figureVolume(torsoGeo, 0.010);
+    const torso = figureVolume(torsoGeo, 0.016);
     aimBone(torso, w.hip, w.chest);
     torso.rotation.z -= 0.38;
     torso.rotation.x += 0.10;
@@ -647,12 +651,12 @@
 
     const neckGeo = latheFrom(Ink.womanNeck(), 12);
     neckGeo.scale(1, 1, Ink.FIGURE_DEPTH);
-    const neck = figureVolume(neckGeo, 0.006);
+    const neck = figureVolume(neckGeo, 0.010);
     aimBone(neck, w.chest, w.head);
 
     const headGeo = latheFrom(Ink.womanHead(), 16);
     headGeo.scale(1.04, 1.06, 0.90);
-    const head = figureVolume(headGeo, 0.008);
+    const head = figureVolume(headGeo, 0.014);
     head.position.set(w.head.x - 0.02, w.head.y - 0.06, w.head.z);
     head.rotation.x = 0.82;
     head.rotation.z = -0.48;
@@ -674,7 +678,7 @@
     const shinL = limbBetween(w.kneeL, w.footL, r.shin);
     const shinR = limbBetween(w.kneeR, w.footR, r.shin);
 
-    const hand = figureVolume(capsuleGeo(r.hand, 0.09), 0.006);
+    const hand = figureVolume(capsuleGeo(r.hand, 0.09), 0.010);
     hand.position.set(w.handDip.x, w.handDip.y, w.handDip.z);
     hand.rotation.x = 0.55;
     hand.name = "hand-dip";
