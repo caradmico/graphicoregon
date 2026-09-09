@@ -95,6 +95,9 @@ strands.forEach((pts) => {
 const torso = Ink.womanTorso();
 assert.ok(torso[0][0] < 0.03 && torso.some((p) => p[0] < 0.055), "torso lathe stays thin");
 assert.ok(Ink.capsuleProfile(0.03, 0.2)[2][0] <= 0.03, "limbs are capsules, not ellipsoids");
+const outline = Ink.womanOutline();
+assert.ok(outline.reach[outline.reach.length - 1].y < Ink.waterY(), "outline reach enters the creek");
+assert.ok(outline.spine.length >= 3, "spine stroke leans over the rock");
 
 const fall = Ink.waterfall();
 assert.ok(Math.abs(fall.x - b.x) < 0.8, "the fall lives on the boulder, not as a side sheet");
@@ -143,6 +146,7 @@ assert.ok(study.indexOf('"woman"') !== -1, "woman is a named scene object");
 assert.ok(study.indexOf("hand-dip") !== -1, "one hand is named as the dip");
 assert.ok(study.indexOf("capsuleGeo") !== -1, "limbs are capsules");
 assert.ok(study.indexOf("womanTorso") !== -1, "torso is a lathe silhouette");
+assert.ok(study.indexOf("womanOutline") !== -1, "figure reads as pen strokes");
 assert.ok(study.indexOf("buildWaterfall") === -1, "no separate sheet waterfall is built");
 assert.ok(study.indexOf("waterfallSheets") === -1, "study does not draw a second fall");
 assert.ok(study.indexOf("buildTree") !== -1, "tree is built");

@@ -86,22 +86,46 @@
   /* Woman perched on the boulder — slender profile, lean, one hand in the creek. */
   function woman() {
     return {
-      hip: { x: -0.04, y: 1.56, z: -0.22 },
-      chest: { x: 0.14, y: 1.78, z: 0.00 },
-      neck: { x: 0.22, y: 1.90, z: 0.08 },
-      head: { x: 0.28, y: 2.02, z: 0.12 },
-      headR: 0.086,
-      shoulderL: { x: 0.00, y: 1.80, z: 0.16 },
-      shoulderR: { x: 0.26, y: 1.74, z: -0.12 },
-      elbowDip: outsideBoulder({ x: 0.55, y: 1.04, z: 0.70 }, 0.055),
-      handDip: { x: 0.58, y: 0.024, z: 1.06 },
-      elbowRest: { x: 0.34, y: 1.48, z: 0.00 },
-      handRest: { x: 0.42, y: 1.34, z: 0.18 },
-      kneeL: { x: -0.20, y: 1.42, z: 0.02 },
-      kneeR: { x: 0.16, y: 1.40, z: -0.02 },
-      footL: { x: -0.10, y: 1.34, z: 0.26 },
-      footR: { x: 0.20, y: 1.32, z: 0.22 },
-      tear: { x: 0.34, y: 1.98, z: 0.18 }
+      hip: { x: -0.38, y: 1.50, z: -0.18 },
+      chest: { x: -0.12, y: 1.74, z: 0.06 },
+      neck: { x: 0.02, y: 1.88, z: 0.14 },
+      head: { x: 0.12, y: 2.00, z: 0.20 },
+      headR: 0.092,
+      shoulderL: { x: -0.18, y: 1.76, z: 0.22 },
+      shoulderR: { x: 0.02, y: 1.70, z: -0.08 },
+      elbowDip: outsideBoulder({ x: 0.42, y: 1.02, z: 0.68 }, 0.055),
+      handDip: { x: 0.52, y: 0.024, z: 1.08 },
+      elbowRest: { x: -0.02, y: 1.46, z: 0.04 },
+      handRest: { x: 0.12, y: 1.32, z: 0.22 },
+      kneeL: { x: -0.52, y: 1.38, z: 0.04 },
+      kneeR: { x: -0.18, y: 1.36, z: -0.04 },
+      footL: { x: -0.38, y: 1.30, z: 0.28 },
+      footR: { x: -0.08, y: 1.28, z: 0.22 },
+      tear: { x: 0.18, y: 1.96, z: 0.26 }
+    };
+  }
+
+  /* Primary read: navy pen strokes, not a chain of volumes. */
+  function womanOutline() {
+    const w = woman();
+    const r = w.headR;
+    const head = [];
+    let i;
+    for (i = 0; i <= 14; i++) {
+      const a = (i / 14) * Math.PI * 1.7 + 0.6;
+      head.push({
+        x: w.head.x + Math.cos(a) * r * 0.78,
+        y: w.head.y + Math.sin(a) * r,
+        z: w.head.z + Math.sin(a * 0.5) * r * 0.18
+      });
+    }
+    return {
+      head: head,
+      spine: [head[0], w.neck, w.chest, w.hip],
+      reach: [w.neck, w.shoulderL, w.elbowDip, w.handDip],
+      rest: [w.chest, w.shoulderR, w.elbowRest, w.handRest],
+      legL: [w.hip, w.kneeL, w.footL],
+      legR: [w.hip, w.kneeR, w.footR]
     };
   }
 
@@ -145,11 +169,10 @@
     const head = woman().head;
     const count = n == null ? FALL_N : n;
     const lane = laneOf(i, count);
-    const a = lane * 1.15;
     return {
-      x: head.x + Math.sin(a) * 0.09 - 0.02,
-      y: head.y + 0.08 + Math.cos(a * 1.3) * 0.03,
-      z: head.z - 0.12 + Math.cos(a) * 0.05
+      x: head.x + lane * 0.05 + 0.04,
+      y: head.y + 0.06 + hash(i * 2.2) * 0.03,
+      z: head.z - 0.04 + Math.abs(lane) * 0.02
     };
   }
 
@@ -782,6 +805,7 @@
     reeds: reeds,
     hills: hills,
     woman: woman,
+    womanOutline: womanOutline,
     womanTorso: womanTorso,
     womanHead: womanHead,
     capsuleProfile: capsuleProfile,
