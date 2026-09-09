@@ -1,0 +1,354 @@
+/* Hair and river — the creek around the boulder, as pen math. */
+(function (root, factory) {
+  if (typeof module === "object" && module.exports) module.exports = factory();
+  else root.WaterInk = factory();
+})(typeof self !== "undefined" ? self : this, function () {
+  const NAVY = 0x1a2744;
+  const RED = 0xa3262b;
+  const PAPER = 0xf4efe6;
+  const NAVY_RGB = [26, 39, 68];
+  const RED_RGB = [163, 38, 43];
+  const PAPER_RGB = [244, 239, 230];
+
+  const SPAWN = { az: 0.62, el: 0.16, dist: 7.15, targetX: 0.12, targetY: 0.52, targetZ: 0.78 };
+  const DIST = { min: 3.5, max: 13.2 };
+  const EL = { min: -0.06, max: 1.06 };
+
+  const FALL_N = 28;
+  const RIPPLE_N = 14;
+
+  function clamp(v, lo, hi) {
+    return v < lo ? lo : v > hi ? hi : v;
+  }
+
+  function hash(n) {
+    const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function boulder() {
+    return {
+      x: 0,
+      y: 0.82,
+      z: 0,
+      rx: 1.38,
+      ry: 0.82,
+      rz: 1.15
+    };
+  }
+
+  function insideBoulder(p, scale) {
+    const b = boulder();
+    const s = scale == null ? 1 : scale;
+    const nx = (p.x - b.x) / (b.rx * s);
+    const ny = (p.y - b.y) / (b.ry * s);
+    const nz = (p.z - b.z) / (b.rz * s);
+    return nx * nx + ny * ny + nz * nz < 1;
+  }
+
+  function outsideBoulder(p, lift) {
+    const b = boulder();
+    const pad = lift == null ? 0.045 : lift;
+    const nx = (p.x - b.x) / b.rx;
+    const ny = (p.y - b.y) / b.ry;
+    const nz = (p.z - b.z) / b.rz;
+    const d = Math.sqrt(nx * nx + ny * ny + nz * nz);
+    if (d >= 1 + pad) return { x: p.x, y: p.y, z: p.z };
+    const k = (1 + pad) / Math.max(d, 1e-5);
+    return {
+      x: b.x + nx * b.rx * k,
+      y: b.y + ny * b.ry * k,
+      z: b.z + nz * b.rz * k
+    };
+  }
+
+  function strandColor(i) {
+    return i % 3 === 0 ? "navy" : "red";
+  }
+
+  function rippleColor(i) {
+    return i % 4 === 0 ? "red" : "navy";
+  }
+
+  function laneOf(i, n) {
+    const u = n <= 1 ? 0.5 : i / (n - 1);
+    const wobble = (hash(i * 9.1) - 0.5) * 0.08;
+    return clamp((u - 0.5) * 2 + wobble, -1, 1);
+  }
+
+  function waterStrand(i, n) {
+    const count = n == null ? FALL_N : n;
+    const lane = laneOf(i, count);
+    const wrap = Math.abs(lane) > 0.28 ? Math.sign(lane) : lane * 0.35;
+    const crestY = 2.04 + hash(i * 3.1) * 0.1;
+    const crestX = lane * 0.42;
+    const crestZ = -0.22 + hash(i * 5.2) * 0.16;
+
+    const around = Math.abs(wrap);
+    const faceX = lane * (0.32 + around * 0.95);
+    const faceZ = 0.72 - around * 1.12;
+
+    const bendX = faceX * 1.12 + wrap * 0.22;
+    const bendZ = 1.02 + around * 0.22;
+
+    const pts = [
+      { x: crestX * 0.35, y: crestY + 0.38, z: crestZ - 0.28 },
+      { x: crestX, y: crestY, z: crestZ },
+      { x: faceX * 0.62, y: 1.48, z: faceZ * 0.42 + crestZ * 0.18 },
+      { x: faceX, y: 0.92, z: faceZ },
+      { x: faceX * 1.04, y: 0.34, z: faceZ * 1.02 },
+      { x: bendX, y: 0.075, z: bendZ },
+      { x: bendX - 0.42 - lane * 0.18, y: 0.055, z: bendZ + 1.05 },
+      { x: bendX - 1.05 - Math.max(0, -wrap) * 0.35, y: 0.045, z: bendZ + 2.15 },
+      { x: bendX - 1.72 - lane * 0.22, y: 0.038, z: bendZ + 3.35 }
+    ];
+
+    return pts.map((p, idx) => {
+      if (idx >= 5) return wavePoint(p, i, idx);
+      return outsideBoulder(p, 0.05 + hash(i * 2.7 + idx) * 0.025);
+    });
+  }
+
+  function wavePoint(p, seed, idx) {
+    const w = Math.sin(p.z * 2.15 + seed * 0.7) * 0.055;
+    const v = Math.sin(p.z * 3.4 + seed * 1.3) * 0.012;
+    return { x: p.x + w, y: p.y + v, z: p.z };
+  }
+
+  function rippleStrand(i, n) {
+    const count = n == null ? RIPPLE_N : n;
+    const u = count <= 1 ? 0.5 : i / (count - 1);
+    const side = (u - 0.5) * 2.4;
+    const b = boulder();
+    const r0 = b.rx + 0.22 + hash(i * 4.4) * 0.18;
+    const pts = [];
+    let k;
+    for (k = 0; k < 9; k++) {
+      const t = k / 8;
+      const a = -0.15 + t * 2.35 + side * 0.22;
+      const r = r0 + t * 1.85 + Math.abs(side) * 0.12;
+      const x = Math.sin(a) * r * 0.72 - t * 1.15 - side * 0.08;
+      const z = Math.cos(a) * r * 0.18 + t * 3.05 + 0.55;
+      pts.push(wavePoint({ x: x, y: 0.042 + hash(i + k) * 0.01, z: z }, i + 30, k));
+    }
+    return pts;
+  }
+
+  function allStrands() {
+    const fall = [];
+    let i;
+    for (i = 0; i < FALL_N; i++) fall.push(waterStrand(i, FALL_N));
+    return fall;
+  }
+
+  function allRipples() {
+    const rip = [];
+    let i;
+    for (i = 0; i < RIPPLE_N; i++) rip.push(rippleStrand(i, RIPPLE_N));
+    return rip;
+  }
+
+  function strandTravel(pts) {
+    const first = pts[0];
+    const bend = pts[5] || pts[Math.floor(pts.length / 2)];
+    const last = pts[pts.length - 1];
+    let drop = 0;
+    let i;
+    for (i = 1; i < pts.length; i++) {
+      if (pts[i].y < pts[i - 1].y) drop += pts[i - 1].y - pts[i].y;
+    }
+    return {
+      drop: drop,
+      falls: first.y - bend.y > 1.2,
+      flattens: last.y < 0.16 && first.y > 1.6,
+      towardViewer: last.z > first.z,
+      leftward: last.x < bend.x
+    };
+  }
+
+  function wrapStats(strands) {
+    const b = boulder();
+    let left = 0;
+    let right = 0;
+    let over = 0;
+    let coreHits = 0;
+    let points = 0;
+    strands.forEach((pts) => {
+      const bend = pts[5] || pts[Math.floor(pts.length / 2)];
+      if (bend.x < b.x - 0.55) left += 1;
+      else if (bend.x > b.x + 0.55) right += 1;
+      else if (bend.z > 0.55) over += 1;
+      pts.forEach((p) => {
+        points += 1;
+        if (insideBoulder(p, 0.88)) coreHits += 1;
+      });
+    });
+    return {
+      left: left,
+      right: right,
+      over: over,
+      splits: left > 0 && right > 0,
+      coreHits: coreHits,
+      points: points
+    };
+  }
+
+  function reeds() {
+    return [
+      { x: -2.15, z: 1.72, h: 0.34 },
+      { x: -1.68, z: 2.28, h: 0.28 },
+      { x: 1.42, z: 1.48, h: 0.26 },
+      { x: -2.48, z: 3.05, h: 0.3 },
+      { x: 1.18, z: 2.15, h: 0.22 }
+    ];
+  }
+
+  function hills() {
+    return [
+      { x: 2.6, z: -8.8, w: 6.4, h: 2.35 },
+      { x: -1.8, z: -9.6, w: 5.2, h: 1.85 }
+    ];
+  }
+
+  function strokePixels(w, h, rgb) {
+    const data = new Uint8ClampedArray(w * h * 4);
+    let i;
+    for (i = 0; i < w * h; i++) {
+      const n = hash(i * 0.19);
+      const k = (n - 0.5) * 6;
+      const p = i * 4;
+      data[p] = PAPER_RGB[0] + k;
+      data[p + 1] = PAPER_RGB[1] + k * 0.8;
+      data[p + 2] = PAPER_RGB[2] + k * 0.5;
+      data[p + 3] = 255;
+    }
+    const rows = Math.floor(h / 2.6);
+    let r;
+    for (r = 0; r < rows; r++) {
+      if (hash(r * 1.07) < 0.08) continue;
+      const y0 = (r + 0.3 + hash(r * 2.8) * 0.4) * (h / rows);
+      const thick = 0.7 + hash(r * 7.4) * 1.5;
+      const amp = 0.8 + hash(r * 3.3) * 1.8;
+      const freq = 1.2 + hash(r * 6.1) * 2.2;
+      const phase = hash(r * 8.8) * Math.PI * 2;
+      let x;
+      for (x = 0; x < w; x++) {
+        if (hash(r * 14 + Math.floor(x / 18) * 2.4) < 0.1) continue;
+        const y = y0 + Math.sin((x / w) * Math.PI * 2 * freq + phase) * amp;
+        const y1 = Math.max(0, Math.floor(y - thick));
+        const y2 = Math.min(h - 1, Math.ceil(y + thick));
+        let yy;
+        for (yy = y1; yy <= y2; yy++) {
+          const d = Math.abs(yy - y);
+          if (d > thick) continue;
+          const a = 1 - d / thick;
+          const press = Math.min(1, 0.58 + a * 0.52);
+          const q = (yy * w + x) * 4;
+          const jitter = hash(r * 4.1 + x * 0.07) * 8 - 4;
+          data[q] = data[q] * (1 - press) + (rgb[0] + jitter) * press;
+          data[q + 1] = data[q + 1] * (1 - press) + rgb[1] * press;
+          data[q + 2] = data[q + 2] * (1 - press) + rgb[2] * press;
+        }
+      }
+    }
+    return data;
+  }
+
+  function strokeStats(data, w, h, rgb) {
+    let ink = 0;
+    let paperish = 0;
+    let n = 0;
+    let i;
+    for (i = 0; i < w * h; i += 3) {
+      const p = i * 4;
+      n += 1;
+      const dr = Math.abs(data[p] - rgb[0]);
+      const dg = Math.abs(data[p + 1] - rgb[1]);
+      const db = Math.abs(data[p + 2] - rgb[2]);
+      if (dr + dg + db < 90) ink += 1;
+      if (data[p] > 220 && data[p + 1] > 210 && data[p + 2] > 200) paperish += 1;
+    }
+    return { ink: ink / n, paperish: paperish / n };
+  }
+
+  function applyOrbit(az, el, dx, dy, sens) {
+    const s = sens == null ? 0.0052 : sens;
+    return {
+      az: az + dx * s,
+      el: clamp(el - dy * s, EL.min, EL.max)
+    };
+  }
+
+  function dollyDist(dist, deltaY, deltaMode, scale) {
+    let d = deltaY;
+    if (deltaMode === 1) d *= 16;
+    if (deltaMode === 2) d *= 800;
+    const unit = clamp(d / 80, -1, 1);
+    const step = -unit * (scale == null ? 0.55 : scale);
+    return clamp(dist - step, DIST.min, DIST.max);
+  }
+
+  function pinchDist(dist, scale) {
+    return clamp(dist / Math.max(0.35, Math.min(2.6, scale)), DIST.min, DIST.max);
+  }
+
+  function cameraPos(az, el, dist, target) {
+    const t = target || { x: SPAWN.targetX, y: SPAWN.targetY, z: SPAWN.targetZ };
+    const ce = Math.cos(el);
+    return {
+      x: t.x + Math.sin(az) * ce * dist,
+      y: t.y + Math.sin(el) * dist,
+      z: t.z + Math.cos(az) * ce * dist
+    };
+  }
+
+  function isLawn(rgb) {
+    return rgb[1] > rgb[0] + 12 && rgb[1] > rgb[2] + 8;
+  }
+
+  function isGlassWord(src) {
+    return /MeshPhysicalMaterial|MeshStandardMaterial|MeshPhongMaterial|transmission|ior\s*[:=]/.test(src);
+  }
+
+  return {
+    NAVY: NAVY,
+    RED: RED,
+    PAPER: PAPER,
+    NAVY_RGB: NAVY_RGB,
+    RED_RGB: RED_RGB,
+    PAPER_RGB: PAPER_RGB,
+    SPAWN: SPAWN,
+    DIST: DIST,
+    EL: EL,
+    FALL_N: FALL_N,
+    RIPPLE_N: RIPPLE_N,
+    clamp: clamp,
+    hash: hash,
+    lerp: lerp,
+    boulder: boulder,
+    insideBoulder: insideBoulder,
+    outsideBoulder: outsideBoulder,
+    strandColor: strandColor,
+    rippleColor: rippleColor,
+    waterStrand: waterStrand,
+    rippleStrand: rippleStrand,
+    allStrands: allStrands,
+    allRipples: allRipples,
+    strandTravel: strandTravel,
+    wrapStats: wrapStats,
+    reeds: reeds,
+    hills: hills,
+    strokePixels: strokePixels,
+    strokeStats: strokeStats,
+    applyOrbit: applyOrbit,
+    dollyDist: dollyDist,
+    pinchDist: pinchDist,
+    cameraPos: cameraPos,
+    isLawn: isLawn,
+    isGlassWord: isGlassWord
+  };
+});
