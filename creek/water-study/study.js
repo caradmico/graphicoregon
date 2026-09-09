@@ -1,4 +1,4 @@
-/* Graphic Oregon — woman on the boulder, hair into the creek, waterfall, tree. */
+/* Graphic Oregon — Hair and river as pen marks: hair is the fall. */
 (function () {
   const Ink = window.WaterInk;
   const PIXEL_RATIO = 1.25;
@@ -131,10 +131,13 @@
         "void main() {",
         "  vec2 suv = vec2(vUv.x * 3.6 - uTime * 0.16, vUv.y);",
         "  vec3 stroke = texture2D(uStroke, suv).rgb;",
-        "  float press = 0.88 + 0.12 * sin(vUv.x * 34.0 - uTime * 2.4);",
-        "  float skip = step(0.06, hash(vec2(floor(vUv.x * 48.0), 3.4)));",
-        "  vec3 c = mix(uPaper, uInk, skip * press);",
-        "  c = mix(c, stroke, 0.28);",
+        "  float press = 0.72 + 0.22 * sin(vUv.x * 34.0 - uTime * 2.4);",
+        "  float skip = step(0.16, hash(vec2(floor(vUv.x * 56.0), floor(vUv.y * 5.0))));",
+        "  float edge = smoothstep(0.0, 0.18, vUv.y) * smoothstep(1.0, 0.82, vUv.y);",
+        "  float mark = skip * press * edge;",
+        "  if (mark < 0.12) discard;",
+        "  vec3 c = mix(uPaper, uInk, mark);",
+        "  c = mix(c, stroke, 0.22);",
         "  gl_FragColor = vec4(c, 1.0);",
         "}"
       ].join("\n")
@@ -236,49 +239,86 @@
     addNamed(floor, "ground");
   }
 
+  function rockHatchTexture() {
+    const w = 256;
+    const h = 256;
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d");
+    const img = ctx.createImageData(w, h);
+    img.data.set(Ink.rockHatchPixels(w, h));
+    ctx.putImageData(img, 0, 0);
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1.6, 1.4);
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  function rockMat() {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uHatch: { value: rockHatchTexture() },
+        uPaper: { value: new THREE.Color(Ink.PAPER) },
+        uNavy: { value: new THREE.Color(Ink.NAVY) }
+      },
+      vertexShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "varying vec2 vUv;",
+        "void main() {",
+        "  vUv = uv;",
+        "  vNormal = normalize(mat3(modelMatrix) * normal);",
+        "  vec4 wp = modelMatrix * vec4(position, 1.0);",
+        "  vWorld = wp.xyz;",
+        "  gl_Position = projectionMatrix * viewMatrix * wp;",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "varying vec2 vUv;",
+        "uniform sampler2D uHatch;",
+        "uniform vec3 uPaper;",
+        "uniform vec3 uNavy;",
+        "void main() {",
+        "  vec3 N = normalize(vNormal);",
+          "  float face = smoothstep(0.22, 0.58, N.z);",
+        "  vec3 hatch = texture2D(uHatch, vUv * vec2(1.8, 1.5)).rgb;",
+        "  vec3 c = mix(uPaper, hatch, face * 0.38);",
+        "  float rim = pow(1.0 - max(dot(N, normalize(cameraPosition - vWorld)), 0.0), 3.6);",
+        "  c = mix(c, uNavy, rim * 0.12);",
+        "  gl_FragColor = vec4(c, 1.0);",
+        "}"
+      ].join("\n")
+    });
+  }
+
   function buildBoulder() {
     const spec = Ink.boulder();
     const geo = rumple(new THREE.IcosahedronGeometry(1, 1), 0.18);
     geo.scale(spec.rx, spec.ry, spec.rz);
     const rock = new THREE.Group();
-    rock.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: Ink.PAPER })));
+    rock.add(new THREE.Mesh(geo, rockMat()));
     rock.add(new THREE.Mesh(
-      inflate(geo, 0.018),
+      inflate(geo, 0.016),
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     ));
     rock.add(new THREE.LineSegments(
-      new THREE.EdgesGeometry(geo, 32),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.42 })
+      new THREE.EdgesGeometry(geo, 26),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.55 })
     ));
-    const cracks = [
-      [
-        { x: 0.82, y: 0.55, z: 0.42 },
-        { x: 0.98, y: 0.72, z: 0.18 },
-        { x: 1.05, y: 1.02, z: -0.08 }
-      ],
-      [
-        { x: -0.55, y: 1.18, z: 0.62 },
-        { x: -0.22, y: 1.32, z: 0.48 },
-        { x: 0.18, y: 1.38, z: 0.22 }
-      ],
-      [
-        { x: -1.05, y: 0.42, z: 0.28 },
-        { x: -0.72, y: 0.68, z: 0.62 },
-        { x: -0.28, y: 0.82, z: 0.88 }
-      ],
-      [
-        { x: 0.42, y: 1.42, z: -0.35 },
-        { x: 0.68, y: 1.18, z: -0.55 },
-        { x: 0.92, y: 0.88, z: -0.62 }
-      ]
-    ];
-    const crackMat = new THREE.LineBasicMaterial({ color: Ink.NAVY });
-    cracks.forEach((pts) => {
+    const crackMat = new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.78 });
+    Ink.rockCracks().forEach((pts) => {
       const draped = pts.map((p) => Ink.outsideBoulder({
         x: spec.x + p.x,
-        y: spec.y + p.y - spec.y,
+        y: p.y,
         z: spec.z + p.z
-      }, 0.012));
+      }, 0.014));
       const geoLine = new THREE.BufferGeometry().setFromPoints(
         draped.map((p) => new THREE.Vector3(p.x - spec.x, p.y - spec.y, p.z - spec.z))
       );
@@ -295,12 +335,12 @@
     const navy = inkStrandMat("navy");
     Ink.allStrands().forEach((pts, i) => {
       const kind = Ink.strandColor(i);
-      const rad = 0.022 + (i % 5) * 0.005;
+      const rad = 0.007 + (i % 5) * 0.0024;
       g.add(tubeFrom(pts, rad, kind === "red" ? red : navy));
     });
     Ink.allRipples().forEach((pts, i) => {
       const kind = Ink.rippleColor(i);
-      g.add(tubeFrom(pts, 0.01 + (i % 3) * 0.002, kind === "red" ? red : navy));
+      g.add(tubeFrom(pts, 0.004 + (i % 3) * 0.0012, kind === "red" ? red : navy));
     });
     addNamed(g, "hair");
   }
@@ -327,7 +367,7 @@
     const g = new THREE.Group();
     const bed = new THREE.Mesh(
       new THREE.PlaneGeometry(patch.w * 0.9, patch.d * 0.86),
-      new THREE.MeshBasicMaterial({ color: 0xd9d2c2 })
+      new THREE.MeshBasicMaterial({ color: Ink.PAPER })
     );
     bed.rotation.x = -Math.PI / 2;
     bed.position.set(patch.x, 0.006, patch.z);
@@ -399,20 +439,18 @@
         "  vec3 V = normalize(cameraPosition - vWorld);",
         "  float ndotv = clamp(dot(N, V), 0.0, 1.0);",
         "  float fresnel = pow(1.0 - ndotv, 2.4);",
-        "  vec3 sheen = mix(uPaper, uNavy, 0.48);",
-        "  vec3 col = mix(mix(uPaper, uNavy, 0.04), sheen, fresnel);",
-        "  float wavy = vWorld.z * 2.8 + sin(vWorld.x * 1.35 + uTime * 0.22) * 0.85;",
-        "  float w1 = sin(wavy - uTime * 0.18);",
-        "  float w2 = sin(vWorld.z * 4.2 + sin(vWorld.x * 2.1) * 0.55 - uTime * 0.12);",
-        "  float line = smoothstep(0.93, 0.988, abs(w1)) * 0.85 + smoothstep(0.97, 0.996, abs(w2)) * 0.4;",
-        "  float skip = step(0.28, hash(vec2(floor(vWorld.z * 1.6), floor(vWorld.x * 0.35))));",
-        "  float mark = line * skip * mix(0.55, 0.22, fresnel);",
-        "  col = mix(col, uNavy, mark);",
+        "  float wavy = vWorld.z * 3.4 + sin(vWorld.x * 1.15 + uTime * 0.16) * 0.7;",
+        "  float w1 = sin(wavy - uTime * 0.12);",
+        "  float w2 = sin(vWorld.z * 5.1 + sin(vWorld.x * 1.8) * 0.45 - uTime * 0.08);",
+        "  float line = smoothstep(0.965, 0.995, abs(w1)) + smoothstep(0.982, 0.998, abs(w2)) * 0.45;",
+        "  float skip = step(0.38, hash(vec2(floor(vWorld.z * 1.35), floor(vWorld.x * 0.28))));",
+        "  float mark = line * skip;",
+        "  vec3 col = mix(uPaper, uNavy, 0.78);",
         "  float edge = smoothstep(0.0, 0.07, vUv.x) * smoothstep(1.0, 0.93, vUv.x);",
         "  edge *= smoothstep(0.0, 0.05, vUv.y) * smoothstep(1.0, 0.88, vUv.y);",
-        "  float alpha = mix(0.14, 0.62, fresnel) + mark * 0.22;",
+        "  float alpha = mark * 0.62 + fresnel * 0.03;",
         "  alpha *= edge * rock;",
-        "  if (alpha < 0.012) discard;",
+        "  if (alpha < 0.03) discard;",
         "  gl_FragColor = vec4(col, alpha);",
         "}"
       ].join("\n")
@@ -428,6 +466,15 @@
     const mesh = new THREE.Mesh(geo, waterMat());
     mesh.position.set(patch.x, Ink.waterY(), patch.z);
     addNamed(mesh, "water");
+    Ink.waterMarks().forEach((mark) => {
+      const color = mark.ink === "red" ? Ink.RED : Ink.NAVY;
+      scene.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(
+          mark.pts.map((p) => new THREE.Vector3(p.x, p.y, p.z))
+        ),
+        new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.42 })
+      ));
+    });
   }
 
   function buildReeds() {
@@ -442,35 +489,34 @@
     });
   }
 
+  function hillRidge(h, i) {
+    const peaks = i === 0
+      ? [[0, 0], [0.18, 0.42], [0.34, 1.0], [0.48, 0.52], [0.68, 0.82], [0.86, 0.28], [1, 0]]
+      : [[0, 0], [0.22, 0.55], [0.40, 0.92], [0.58, 0.38], [0.78, 0.70], [1, 0]];
+    return peaks.map((p) => new THREE.Vector3(-h.w / 2 + p[0] * h.w, p[1] * h.h, 0));
+  }
+
   function buildHills() {
-    const mat = new THREE.MeshBasicMaterial({
-      color: Ink.PAPER,
-      side: THREE.DoubleSide
-    });
     const line = new THREE.LineBasicMaterial({ color: Ink.NAVY });
+    const hatch = new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.35 });
     Ink.hills().forEach((h, i) => {
-      const shape = new THREE.Shape();
-      shape.moveTo(-h.w / 2, 0);
-      const steps = 10;
-      for (let s = 0; s <= steps; s++) {
-        const t = s / steps;
-        const x = -h.w / 2 + t * h.w;
-        const y = Math.sin(t * Math.PI) * h.h * (0.72 + Math.sin(t * 7.2 + i) * 0.12);
-        shape.lineTo(x, y);
+      const g = new THREE.Group();
+      const pts = hillRidge(h, i);
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), line));
+      if (i === 0) {
+        const shade = [];
+        for (let s = 0; s < 7; s++) {
+          const t = 0.28 + s * 0.04;
+          shade.push(new THREE.Vector3(
+            -h.w / 2 + t * h.w,
+            (0.72 - s * 0.07) * h.h,
+            0.01
+          ));
+        }
+        g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(shade), hatch));
       }
-      shape.lineTo(h.w / 2, 0);
-      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), mat);
-      mesh.position.set(h.x, 0, h.z);
-      const pts = [];
-      for (let s = 0; s <= steps; s++) {
-        const t = s / steps;
-        const x = -h.w / 2 + t * h.w;
-        const y = Math.sin(t * Math.PI) * h.h * (0.72 + Math.sin(t * 7.2 + i) * 0.12);
-        pts.push(new THREE.Vector3(x, y, 0));
-      }
-      const ridge = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), line);
-      mesh.add(ridge);
-      addNamed(mesh, "hill-" + i);
+      g.position.set(h.x, 0, h.z);
+      addNamed(g, "hill-" + i);
     });
   }
 
@@ -482,187 +528,110 @@
       new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
     ));
     g.add(new THREE.LineSegments(
-      new THREE.EdgesGeometry(geo, 22),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.55 })
+      new THREE.EdgesGeometry(geo, 18),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.78 })
     ));
     return g;
   }
 
-  function ball(rx, ry, rz, seg) {
-    const geo = new THREE.SphereGeometry(1, seg || 10, (seg || 10) - 2);
-    geo.scale(rx, ry, rz);
-    return geo;
+  function latheFrom(profile, segs) {
+    return new THREE.LatheGeometry(
+      profile.map((p) => new THREE.Vector2(p[0], p[1])),
+      segs || 9
+    );
+  }
+
+  function capsuleGeo(r, len) {
+    return latheFrom(Ink.capsuleProfile(r, len), 8);
   }
 
   function aimBone(group, from, to) {
-    const mid = {
-      x: (from.x + to.x) * 0.5,
-      y: (from.y + to.y) * 0.5,
-      z: (from.z + to.z) * 0.5
-    };
     const dir = new THREE.Vector3(to.x - from.x, to.y - from.y, to.z - from.z);
     if (dir.lengthSq() < 1e-8) return;
     dir.normalize();
-    group.position.set(mid.x, mid.y, mid.z);
+    group.position.set(from.x, from.y, from.z);
     group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
   }
 
-  function limbBetween(from, to, rx, fill) {
+  function limbBetween(from, to, rx) {
     const len = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z);
-    const g = inkVolume(ball(rx, Math.max(0.04, len * 0.5), rx, 8), fill, 0.01);
+    const geo = capsuleGeo(rx, Math.max(0.06, len));
+    geo.scale(0.72, 1, 0.42);
+    const g = inkVolume(geo, Ink.PAPER, 0.008);
     aimBone(g, from, to);
     return g;
   }
 
+  function strokeLine(pts, radius) {
+    return tubeFrom(pts, radius == null ? 0.007 : radius, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
+  }
+
   function buildWoman() {
     const w = Ink.woman();
+    const ink = Ink.womanOutline();
     const g = new THREE.Group();
-    const flesh = Ink.FIGURE;
-    const hip = inkVolume(ball(0.13, 0.08, 0.10, 10), flesh, 0.016);
-    hip.position.set(w.hip.x, w.hip.y, w.hip.z);
-    hip.rotation.z = -0.55;
-    hip.rotation.x = 0.22;
 
-    const torso = inkVolume(ball(0.14, 0.19, 0.10, 10), flesh, 0.016);
+    const torsoGeo = latheFrom(Ink.womanTorso(), 10);
+    torsoGeo.scale(1.15, 1.15, 0.38);
+    const torso = inkVolume(torsoGeo, Ink.PAPER, 0.012);
     aimBone(torso, w.hip, w.chest);
-    torso.rotation.z -= 0.15;
+    torso.rotation.z -= 0.55;
+    torso.rotation.x += 0.12;
 
-    const neck = inkVolume(ball(0.042, 0.05, 0.038, 8), flesh, 0.01);
-    aimBone(neck, w.chest, w.head);
+    const hatch = [];
+    for (let i = 0; i < 4; i++) {
+      hatch.push(new THREE.Vector3(-0.01, 0.10 + i * 0.07, 0.028));
+      hatch.push(new THREE.Vector3(0.03, 0.13 + i * 0.07, 0.012));
+    }
+    torso.add(new THREE.LineSegments(
+      new THREE.BufferGeometry().setFromPoints(hatch),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.4 })
+    ));
 
-    const head = inkVolume(ball(w.headR * 0.82, w.headR, w.headR * 0.88, 12), flesh, 0.016);
-    head.position.set(w.head.x, w.head.y, w.head.z);
-    head.rotation.x = 0.85;
-    head.rotation.z = -0.28;
-    const brow = new THREE.Mesh(
-      ball(0.028, 0.01, 0.008, 6),
-      new THREE.MeshBasicMaterial({ color: Ink.NAVY })
-    );
-    brow.position.set(0.02, 0.02, w.headR * 0.72);
-    head.add(brow);
+    const headGeo = latheFrom(Ink.womanHead(), 10);
+    headGeo.scale(0.88, 1, 0.42);
+    const head = inkVolume(headGeo, Ink.PAPER, 0.01);
+    head.position.set(w.head.x - 0.03, w.head.y - 0.03, w.head.z - 0.01);
+    head.rotation.x = 0.72;
+    head.rotation.z = -0.55;
+    head.rotation.y = 0.55;
 
-    const dipUpper = limbBetween(w.shoulderL, w.elbowDip, 0.038, flesh);
-    const dipFore = limbBetween(w.elbowDip, w.handDip, 0.03, flesh);
-    const hand = inkVolume(ball(0.042, 0.02, 0.032, 8), flesh, 0.01);
+    const tearGeo = latheFrom(Ink.capsuleProfile(0.005, 0.016), 6);
+    const tear = new THREE.Mesh(tearGeo, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
+    tear.position.set(w.tear.x, w.tear.y, w.tear.z);
+    g.add(tear);
+
+    const hand = inkVolume(capsuleGeo(0.014, 0.048), Ink.PAPER, 0.007);
     hand.position.set(w.handDip.x, w.handDip.y, w.handDip.z);
-    hand.rotation.x = 0.4;
+    hand.rotation.x = 0.55;
     hand.name = "hand-dip";
 
-    const restUpper = limbBetween(w.shoulderR, w.elbowRest, 0.034, flesh);
-    const restFore = limbBetween(w.elbowRest, w.handRest, 0.028, flesh);
-
-    const thighL = limbBetween(w.hip, w.kneeL, 0.048, flesh);
-    const thighR = limbBetween(w.hip, w.kneeR, 0.048, flesh);
-    const shinL = limbBetween(w.kneeL, w.footL, 0.034, flesh);
-    const shinR = limbBetween(w.kneeR, w.footR, 0.034, flesh);
+    g.add(strokeLine(ink.head, 0.010));
+    g.add(strokeLine(ink.spine, 0.014));
+    g.add(strokeLine(ink.reach, 0.012));
+    g.add(strokeLine(ink.rest, 0.008));
+    g.add(strokeLine(ink.legL, 0.011));
+    g.add(strokeLine(ink.legR, 0.008));
 
     const splash = [];
-    for (let i = 0; i <= 16; i++) {
-      const a = (i / 16) * Math.PI * 2;
+    for (let i = 0; i <= 8; i++) {
+      const a = (i / 8) * Math.PI * 1.1 - 0.25;
       splash.push(new THREE.Vector3(
-        w.handDip.x + Math.cos(a) * 0.12,
+        w.handDip.x + Math.cos(a) * 0.09,
         Ink.waterY() + 0.002,
-        w.handDip.z + Math.sin(a) * 0.09
+        w.handDip.z + Math.sin(a) * 0.06
       ));
     }
     g.add(new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(splash),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.45 })
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.38 })
     ));
 
-    g.add(hip, torso, neck, head, dipUpper, dipFore, hand, restUpper, restFore, thighL, thighR, shinL, shinR);
+    g.add(torso, head, hand);
     addNamed(g, "woman");
   }
 
-  function fallMat() {
-    const mat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      uniforms: {
-        uTime: { value: 0 },
-        uPaper: { value: new THREE.Color(Ink.PAPER) },
-        uNavy: { value: new THREE.Color(Ink.NAVY) }
-      },
-      vertexShader: [
-        "varying vec2 vUv;",
-        "varying vec3 vWorld;",
-        "varying vec3 vNormal;",
-        "uniform float uTime;",
-        "void main() {",
-        "  vUv = uv;",
-        "  vec3 pos = position;",
-        "  pos.x += sin(uv.y * 18.0 + uTime * 2.2) * 0.008 * (1.0 - uv.y);",
-        "  vNormal = normalize(mat3(modelMatrix) * normal);",
-        "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
-        "  vWorld = wp.xyz;",
-        "  gl_Position = projectionMatrix * viewMatrix * wp;",
-        "}"
-      ].join("\n"),
-      fragmentShader: [
-        "varying vec2 vUv;",
-        "varying vec3 vWorld;",
-        "varying vec3 vNormal;",
-        "uniform vec3 uPaper;",
-        "uniform vec3 uNavy;",
-        "uniform float uTime;",
-        "float hash(vec2 p) {",
-        "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
-        "}",
-        "void main() {",
-        "  vec3 N = normalize(vNormal);",
-        "  vec3 V = normalize(cameraPosition - vWorld);",
-        "  float fresnel = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 1.8);",
-        "  float streak = abs(sin(vUv.x * 22.0 + sin(vUv.y * 9.0 + uTime * 1.8) * 0.6));",
-        "  float line = smoothstep(0.82, 0.97, streak);",
-        "  float skip = step(0.22, hash(vec2(floor(vUv.x * 18.0), floor(vUv.y * 6.0 - uTime))));",
-        "  float foam = smoothstep(0.12, 0.0, vUv.y) * (0.45 + 0.55 * hash(vec2(floor(vUv.x * 20.0), 2.2)));",
-        "  vec3 col = mix(uPaper, uNavy, 0.22 + line * skip * 0.55 + foam * 0.35);",
-        "  col = mix(col, uNavy, fresnel * 0.28);",
-        "  float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);",
-        "  float alpha = (0.18 + line * skip * 0.5 + foam * 0.34 + fresnel * 0.24) * edge;",
-        "  if (alpha < 0.02) discard;",
-        "  gl_FragColor = vec4(col, alpha);",
-        "}"
-      ].join("\n")
-    });
-    waterMats.push(mat);
-    return mat;
-  }
-
-  function buildWaterfall() {
-    const g = new THREE.Group();
-    const mat = fallMat();
-    Ink.waterfallSheets().forEach((s) => {
-      const sheet = new THREE.Mesh(new THREE.PlaneGeometry(s.w, s.h, 8, 16), mat);
-      sheet.position.set(s.x, s.y, s.z);
-      sheet.rotation.y = s.yaw;
-      g.add(sheet);
-    });
-    const lineMat = new THREE.LineBasicMaterial({
-      color: Ink.NAVY,
-      transparent: true,
-      opacity: 0.62
-    });
-    Ink.waterfallFilaments().forEach((pts) => {
-      g.add(new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints(pts.map((p) => new THREE.Vector3(p.x, p.y, p.z))),
-        lineMat
-      ));
-    });
-    const plunge = Ink.waterfallPlunge();
-    const ring = [];
-    for (let i = 0; i <= 22; i++) {
-      const a = (i / 22) * Math.PI * 2;
-      ring.push(new THREE.Vector3(
-        plunge.x + Math.cos(a) * 0.22,
-        plunge.y,
-        plunge.z + Math.sin(a) * 0.16
-      ));
-    }
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ring), lineMat));
-    addNamed(g, "waterfall");
-  }
+  /* Hair cascade is the fall. No second grey sheet beside the rock. */
 
   function hatchTexture() {
     const w = 256;
@@ -741,22 +710,25 @@
   }
 
   function starLeaf(spec) {
-    const geo = new THREE.CircleGeometry(spec.r, 5);
     const color = spec.ink === "navy" ? Ink.NAVY : Ink.RED;
     const g = new THREE.Group();
-    g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
-      color: color,
-      side: THREE.DoubleSide
-    })));
-    const loop = [];
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
-      loop.push(new THREE.Vector3(Math.cos(a) * spec.r, Math.sin(a) * spec.r, 0.002));
+    const star = [];
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+      const rad = i % 2 === 0 ? spec.r : spec.r * 0.38;
+      star.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0));
     }
     g.add(new THREE.LineLoop(
-      new THREE.BufferGeometry().setFromPoints(loop),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.7 })
+      new THREE.BufferGeometry().setFromPoints(star),
+      new THREE.LineBasicMaterial({ color: color })
     ));
+    const faint = new THREE.CircleGeometry(spec.r * 0.42, 5);
+    g.add(new THREE.Mesh(faint, new THREE.MeshBasicMaterial({
+      color: color,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.22
+    })));
     g.position.set(spec.x, spec.y, spec.z);
     g.rotation.y = spec.spin;
     g.rotation.x = spec.tilt || 0.15;
@@ -914,7 +886,6 @@
     buildWoman();
     buildWater();
     buildHair();
-    buildWaterfall();
     buildReeds();
   }
 
@@ -955,7 +926,7 @@
     hasWater: () => names.indexOf("water") !== -1,
     hasBed: () => names.indexOf("creek-bed") !== -1,
     hasWoman: () => names.indexOf("woman") !== -1,
-    hasWaterfall: () => names.indexOf("waterfall") !== -1,
+    hasWaterfall: () => names.indexOf("hair") !== -1,
     hasTree: () => names.indexOf("tree") !== -1,
     hasCrown: () => names.indexOf("crown") !== -1,
     waterClear: () => {
