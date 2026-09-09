@@ -6,9 +6,11 @@
   const NAVY = 0x1a2744;
   const RED = 0xa3262b;
   const PAPER = 0xf4efe6;
+  const FIGURE = 0xe2d4c0;
   const NAVY_RGB = [26, 39, 68];
   const RED_RGB = [163, 38, 43];
   const PAPER_RGB = [244, 239, 230];
+  const FIGURE_RGB = [226, 212, 192];
 
   const SPAWN = { az: 0.38, el: 0.20, dist: 6.85, targetX: 0.05, targetY: 0.62, targetZ: 0.55 };
   const DIST = { min: 3.5, max: 13.2 };
@@ -81,8 +83,48 @@
     return clamp((u - 0.5) * 2 + wobble, -1, 1);
   }
 
-  /* Hair ribbons from the (still-absent) head, draped over the boulder, then
-     flattening into the creek. Kept as the previous flowing-over-stone form. */
+  /* Woman perched on the boulder — crouched, bowed, one hand in the creek. */
+  function woman() {
+    return {
+      hip: { x: 0.10, y: 1.64, z: -0.16 },
+      chest: { x: 0.22, y: 1.92, z: 0.02 },
+      neck: { x: 0.28, y: 2.04, z: 0.10 },
+      head: { x: 0.32, y: 2.16, z: 0.14 },
+      headR: 0.155,
+      shoulderL: { x: 0.04, y: 1.96, z: 0.18 },
+      shoulderR: { x: 0.38, y: 1.88, z: -0.10 },
+      elbowDip: outsideBoulder({ x: 0.72, y: 1.02, z: 0.82 }, 0.06),
+      handDip: { x: 0.68, y: 0.026, z: 1.02 },
+      elbowRest: { x: 0.48, y: 1.58, z: 0.12 },
+      handRest: { x: 0.58, y: 1.42, z: 0.32 },
+      kneeL: { x: -0.12, y: 1.50, z: 0.10 },
+      kneeR: { x: 0.32, y: 1.48, z: 0.06 },
+      footL: { x: -0.02, y: 1.38, z: 0.36 },
+      footR: { x: 0.38, y: 1.36, z: 0.32 }
+    };
+  }
+
+  function hairRoot(i, n) {
+    const head = woman().head;
+    const count = n == null ? FALL_N : n;
+    const lane = laneOf(i, count);
+    const a = lane * 1.15;
+    return {
+      x: head.x + Math.sin(a) * 0.09 - 0.02,
+      y: head.y + 0.08 + Math.cos(a * 1.3) * 0.03,
+      z: head.z - 0.12 + Math.cos(a) * 0.05
+    };
+  }
+
+  function hairAttached(pts, head, max) {
+    const p = pts[0];
+    const h = head || woman().head;
+    const d = Math.hypot(p.x - h.x, p.y - h.y, p.z - h.z);
+    return d < (max == null ? 0.42 : max);
+  }
+
+  /* Hair ribbons from her head, draped over the boulder, then flattening
+     into the creek. Same flowing-over-stone form; roots now live on the scalp. */
   function hairStrand(i, n) {
     const count = n == null ? FALL_N : n;
     const lane = laneOf(i, count);
@@ -96,10 +138,11 @@
 
     const bendX = faceX * 1.08 + (shoulder || lane) * 0.55;
     const bendZ = 1.08 + Math.abs(shoulder) * 0.18;
+    const root = hairRoot(i, count);
 
     const pts = [
-      { x: crestX * 0.28, y: crestY + 0.32, z: crestZ - 0.08 },
-      { x: crestX, y: crestY, z: crestZ },
+      root,
+      { x: root.x * 0.35 + crestX * 0.65, y: (root.y + crestY) * 0.5, z: root.z * 0.35 + crestZ * 0.65 },
       { x: faceX * 0.55, y: 1.52, z: faceZ * 0.72 },
       { x: faceX, y: 0.96, z: faceZ },
       { x: faceX * 1.02, y: 0.32, z: faceZ * 1.02 },
@@ -110,6 +153,7 @@
     ];
 
     return pts.map((p, idx) => {
+      if (idx === 0) return p;
       if (idx >= 5) return wavePoint(p, i, idx);
       return outsideBoulder(p, 0.05 + hash(i * 2.7 + idx) * 0.025);
     });
@@ -252,6 +296,221 @@
     ];
   }
 
+  /* Falling water to the right of the boulder — sheets and filaments, not hair. */
+  function waterfall() {
+    return {
+      x: 1.58,
+      z: 0.22,
+      topY: 1.88,
+      botY: WATER_Y,
+      width: 0.92
+    };
+  }
+
+  function waterfallSheets() {
+    const w = waterfall();
+    const h = w.topY - w.botY;
+    return [
+      { x: w.x - 0.04, y: w.botY + h * 0.5, z: w.z, w: 0.86, h: h, yaw: 0.28 },
+      { x: w.x + 0.16, y: w.botY + h * 0.46, z: w.z + 0.16, w: 0.58, h: h * 0.92, yaw: -0.12 },
+      { x: w.x - 0.12, y: w.botY + h * 0.48, z: w.z - 0.12, w: 0.48, h: h * 0.84, yaw: 0.55 }
+    ];
+  }
+
+  function waterfallFilaments() {
+    const w = waterfall();
+    const n = 9;
+    const out = [];
+    let i;
+    for (i = 0; i < n; i++) {
+      const u = n <= 1 ? 0.5 : i / (n - 1);
+      const x = w.x + (u - 0.5) * w.width * 0.86 + (hash(i * 4.1) - 0.5) * 0.08;
+      const z = w.z + (hash(i * 2.7) - 0.5) * 0.22;
+      const top = w.topY - hash(i * 3.3) * 0.18;
+      out.push([
+        { x: x, y: top, z: z },
+        { x: x + 0.03, y: top * 0.62 + w.botY * 0.38, z: z + 0.02 },
+        { x: x - 0.02, y: top * 0.28 + w.botY * 0.72, z: z + 0.04 },
+        { x: x + 0.04, y: w.botY + 0.01, z: z + 0.08 }
+      ]);
+    }
+    return out;
+  }
+
+  function waterfallPlunge() {
+    const w = waterfall();
+    return { x: w.x + 0.04, y: WATER_Y + 0.003, z: w.z + 0.14 };
+  }
+
+  /* Left-bank tree: hatched trunk (tree-study bark language) plus a readable crown. */
+  function tree() {
+    return {
+      x: -2.72,
+      z: 0.42,
+      height: 3.28,
+      rBase: 0.34,
+      rMid: 0.24,
+      rTop: 0.11,
+      lean: 0.03,
+      profile: [
+        [0.04, 0.00],
+        [0.38, 0.02],
+        [0.32, 0.24],
+        [0.28, 0.72],
+        [0.25, 1.35],
+        [0.22, 1.95],
+        [0.18, 2.48],
+        [0.14, 2.88],
+        [0.11, 3.12],
+        [0.05, 3.22],
+        [0.03, 3.28]
+      ],
+      roots: [
+        {
+          name: "root-left",
+          r0: 0.18,
+          r1: 0.048,
+          pts: [
+            { x: -0.20, y: 0.38, z: 0.10 },
+            { x: -0.72, y: 0.14, z: 0.16 },
+            { x: -1.22, y: 0.04, z: -0.08 }
+          ]
+        },
+        {
+          name: "root-right",
+          r0: 0.11,
+          r1: 0.034,
+          pts: [
+            { x: 0.18, y: 0.30, z: 0.06 },
+            { x: 0.48, y: 0.12, z: -0.04 },
+            { x: 0.78, y: 0.03, z: -0.08 }
+          ]
+        }
+      ],
+      branches: [
+        {
+          name: "branch-low-right",
+          r: 0.024,
+          pts: [
+            { x: 0.20, y: 1.72, z: 0.06 },
+            { x: 0.52, y: 1.92, z: 0.14 },
+            { x: 0.82, y: 1.84, z: 0.06 }
+          ]
+        },
+        {
+          name: "branch-mid-left",
+          r: 0.02,
+          pts: [
+            { x: -0.18, y: 2.28, z: 0.04 },
+            { x: -0.52, y: 2.55, z: 0.12 },
+            { x: -0.82, y: 2.72, z: 0.04 }
+          ]
+        },
+        {
+          name: "branch-high",
+          r: 0.016,
+          pts: [
+            { x: -0.08, y: 2.92, z: 0.02 },
+            { x: -0.28, y: 3.12, z: 0.10 },
+            { x: -0.42, y: 3.22, z: 0.04 }
+          ]
+        }
+      ]
+    };
+  }
+
+  function treeCrown() {
+    const leaves = [];
+    const n = 22;
+    let i;
+    for (i = 0; i < n; i++) {
+      const a = i * 2.05 + hash(i * 3.1) * 0.7;
+      const h = 2.42 + hash(i * 2.4) * 0.78;
+      const rad = 0.22 + hash(i * 5.1) * 0.58;
+      leaves.push({
+        x: Math.cos(a) * rad,
+        y: h,
+        z: Math.sin(a) * rad * 0.7,
+        r: 0.13 + hash(i * 7.2) * 0.09,
+        spin: hash(i * 4.4) * 6.2,
+        tilt: (hash(i * 1.9) - 0.5) * 0.9,
+        ink: i % 5 === 0 ? "navy" : "red"
+      });
+    }
+    const tips = tree().branches;
+    tips.forEach((br, bi) => {
+      const tip = br.pts[br.pts.length - 1];
+      leaves.push({
+        x: tip.x + 0.05,
+        y: tip.y + 0.10,
+        z: tip.z,
+        r: 0.14,
+        spin: 0.4 + bi * 0.7,
+        tilt: 0.25,
+        ink: "red"
+      });
+    });
+    return leaves;
+  }
+
+  function hatchPixels(w, h) {
+    const data = new Uint8ClampedArray(w * h * 4);
+    let i;
+    for (i = 0; i < w * h; i++) {
+      const n = hash(i * 0.17);
+      const k = (n - 0.5) * 7;
+      const p = i * 4;
+      data[p] = PAPER_RGB[0] + k;
+      data[p + 1] = PAPER_RGB[1] + k * 0.8;
+      data[p + 2] = PAPER_RGB[2] + k * 0.5;
+      data[p + 3] = 255;
+    }
+    const rows = Math.floor(h / 3.2);
+    let r;
+    for (r = 0; r < rows; r++) {
+      if (hash(r * 1.13) < 0.07) continue;
+      const y0 = (r + 0.28 + hash(r * 3.1) * 0.45) * (h / rows);
+      const thick = 0.65 + hash(r * 8.2) * 1.35;
+      const amp = 1.1 + hash(r * 2.4) * 2.4;
+      const freq = 1.4 + hash(r * 5.5) * 2.6;
+      const phase = hash(r * 9.9) * Math.PI * 2;
+      let x;
+      for (x = 0; x < w; x++) {
+        if (hash(r * 17 + Math.floor((x / w) * 12) * 3.2) < 0.13) continue;
+        const y = y0 + Math.sin((x / w) * Math.PI * 2 * freq + phase) * amp;
+        const y1 = Math.max(0, Math.floor(y - thick));
+        const y2 = Math.min(h - 1, Math.ceil(y + thick));
+        let yy;
+        for (yy = y1; yy <= y2; yy++) {
+          const d = Math.abs(yy - y);
+          if (d > thick) continue;
+          const a = 1 - d / thick;
+          const press = Math.min(1, 0.52 + a * 0.58);
+          const q = (yy * w + x) * 4;
+          const jitter = hash(r * 4.4 + x * 0.08) * 10 - 5;
+          data[q] = data[q] * (1 - press) + (RED_RGB[0] + jitter) * press;
+          data[q + 1] = data[q + 1] * (1 - press) + RED_RGB[1] * press;
+          data[q + 2] = data[q + 2] * (1 - press) + RED_RGB[2] * press;
+        }
+      }
+    }
+    return data;
+  }
+
+  function hatchStats(data, w, h) {
+    let redInk = 0;
+    let paperish = 0;
+    let n = 0;
+    let i;
+    for (i = 0; i < w * h; i += 3) {
+      const p = i * 4;
+      n += 1;
+      if (data[p] > data[p + 1] + 40 && data[p] > data[p + 2] + 30) redInk += 1;
+      if (data[p] > 220 && data[p + 1] > 210 && data[p + 2] > 200) paperish += 1;
+    }
+    return { redInk: redInk / n, paperish: paperish / n };
+  }
+
   function strokePixels(w, h, rgb) {
     const data = new Uint8ClampedArray(w * h * 4);
     let i;
@@ -356,9 +615,11 @@
     NAVY: NAVY,
     RED: RED,
     PAPER: PAPER,
+    FIGURE: FIGURE,
     NAVY_RGB: NAVY_RGB,
     RED_RGB: RED_RGB,
     PAPER_RGB: PAPER_RGB,
+    FIGURE_RGB: FIGURE_RGB,
     SPAWN: SPAWN,
     DIST: DIST,
     EL: EL,
@@ -387,6 +648,17 @@
     wrapStats: wrapStats,
     reeds: reeds,
     hills: hills,
+    woman: woman,
+    hairRoot: hairRoot,
+    hairAttached: hairAttached,
+    waterfall: waterfall,
+    waterfallSheets: waterfallSheets,
+    waterfallFilaments: waterfallFilaments,
+    waterfallPlunge: waterfallPlunge,
+    tree: tree,
+    treeCrown: treeCrown,
+    hatchPixels: hatchPixels,
+    hatchStats: hatchStats,
     strokePixels: strokePixels,
     strokeStats: strokeStats,
     applyOrbit: applyOrbit,

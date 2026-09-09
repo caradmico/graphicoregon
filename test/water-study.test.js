@@ -9,6 +9,7 @@ assert.strictEqual(Ink.PAPER, 0xf4efe6, "ground stays paper, not lawn");
 assert.ok(!Ink.isLawn(Ink.PAPER_RGB), "paper is not green");
 assert.ok(!Ink.isLawn(Ink.RED_RGB), "red ink is not lawn");
 assert.ok(!Ink.isLawn(Ink.NAVY_RGB), "navy ink is not lawn");
+assert.ok(!Ink.isLawn(Ink.FIGURE_RGB), "figure fill is paper-warm, not lawn");
 
 const b = Ink.boulder();
 assert.ok(b.rx > b.ry, "boulder is wider than it is tall");
@@ -78,6 +79,46 @@ assert.ok(spawn.z > 2, "spawn sits downstream of the boulder");
 assert.ok(Ink.reeds().length >= 3, "bank reeds exist");
 assert.ok(Ink.hills().length >= 2, "distant hills stay as ink ridges");
 
+const w = Ink.woman();
+assert.ok(w.head.y > b.y + b.ry * 0.35, "head sits above the boulder mass");
+assert.ok(w.head.y < 2.55, "head stays on the rock, not in the sky");
+assert.ok(w.hip.y > b.y, "hips perch on the boulder");
+assert.ok(w.handDip.y < Ink.waterY(), "dipping hand enters the creek");
+assert.ok(!Ink.insideBoulder(w.handDip, 0.88), "hand is in the water, not inside the rock");
+assert.ok(w.handDip.z > w.head.z, "the reaching arm goes toward the creek");
+assert.ok(Ink.hairAttached(mid, w.head), "hair starts at her head");
+strands.forEach((pts) => {
+  assert.ok(Ink.hairAttached(pts, w.head, 0.5), "every fall strand is rooted on the scalp");
+});
+
+const fall = Ink.waterfall();
+assert.ok(fall.x > b.x + 0.6, "waterfall stands to the right of the boulder");
+assert.ok(fall.topY > 1.2, "fall has height");
+assert.ok(fall.botY <= Ink.waterY() + 0.01, "fall meets the creek");
+assert.ok(Ink.waterfallSheets().length >= 2, "waterfall is sheets, not hair tubes");
+assert.ok(Ink.waterfallFilaments().length >= 6, "ink filaments mark the falling water");
+Ink.waterfallFilaments().forEach((pts) => {
+  assert.ok(pts[0].y - pts[pts.length - 1].y > 1.0, "filaments fall");
+  assert.ok(pts[pts.length - 1].y < 0.2, "filaments reach the pool");
+});
+const plunge = Ink.waterfallPlunge();
+assert.ok(Math.abs(plunge.y - Ink.waterY()) < 0.03, "plunge sits on the film");
+
+const tr = Ink.tree();
+assert.ok(tr.x < -2.2, "tree stands on the left bank");
+assert.ok(tr.rBase > tr.rTop, "trunk tapers");
+assert.ok(tr.height > 2.8 && tr.height < 4.2, "tree is tall enough to read, short enough for the spawn view");
+assert.ok(tr.roots.length >= 2, "roots stay in the bark language");
+assert.ok(tr.branches.length >= 2, "branches hold a crown");
+const crown = Ink.treeCrown();
+assert.ok(crown.length >= 12, "crown has enough ink leaves to read as a canopy");
+assert.ok(crown.filter((leaf) => leaf.y > tr.height * 0.7).length >= 10, "canopy clusters at the top");
+assert.ok(crown.some((leaf) => leaf.ink === "red"), "crown keeps the drawing’s red");
+const hx = Ink.hatchPixels(128, 128);
+const hs = Ink.hatchStats(hx, 128, 128);
+assert.ok(hs.redInk > 0.12, "bark hatch holds enough red pen");
+assert.ok(hs.paperish > 0.08, "paper shows through the bark");
+
 const html = fs.readFileSync(path.join(__dirname, "../creek/water-study/index.html"), "utf8");
 assert.ok(html.indexOf("../vendor/three.min.js") !== -1, "shares creek’s vendored THREE");
 assert.ok(html.indexOf("cdnjs") === -1, "no cdnjs stub");
@@ -89,6 +130,20 @@ assert.ok(study.indexOf("ShaderMaterial") !== -1, "ink is a stroke shader, not a
 assert.ok(study.indexOf("uTime") !== -1, "strands travel — hair is not a still blob");
 assert.ok(study.indexOf("buildHair") !== -1, "previous flowing tubes are built as hair");
 assert.ok(study.indexOf('"hair"') !== -1, "hair is a named scene object");
+assert.ok(study.indexOf("buildWoman") !== -1, "woman is sculpted into the scene");
+assert.ok(study.indexOf('"woman"') !== -1, "woman is a named scene object");
+assert.ok(study.indexOf("hand-dip") !== -1, "one hand is named as the dip");
+assert.ok(study.indexOf("buildWaterfall") !== -1, "waterfall is built");
+assert.ok(study.indexOf('"waterfall"') !== -1, "waterfall is a named scene object");
+assert.ok(study.indexOf("waterfallSheets") !== -1, "fall is sheets, distinct from hair tubes");
+assert.ok(study.indexOf("buildTree") !== -1, "tree is built");
+assert.ok(study.indexOf('"tree"') !== -1, "tree is a named scene object");
+assert.ok(study.indexOf('"crown"') !== -1, "tree has a named crown");
+assert.ok(study.indexOf("CircleGeometry") !== -1, "crown uses star/maple ink leaves");
+assert.ok(study.indexOf("LatheGeometry") !== -1, "trunk is a lathed volume, not a marble cylinder");
+assert.ok(study.indexOf("SphereGeometry") !== -1, "woman is ellipsoid volumes, not a photo plane");
+assert.ok(study.indexOf("artImg") === -1, "drawing is not mapped onto the woman");
+assert.ok(study.indexOf("sampleTex") === -1, "no sampled photo planes");
 assert.ok(study.indexOf("fresnel") !== -1, "clear water uses angle-dependent fresnel");
 assert.ok(study.indexOf("cameraPosition") !== -1, "water shader reads the view angle");
 assert.ok(/transparent:\s*true/.test(study), "water surface is transparent");
