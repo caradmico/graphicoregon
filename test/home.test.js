@@ -37,7 +37,6 @@ assert.ok(!/Weather Report|weather-report\.jpg/i.test(html), "Weather Report is 
 assert.ok(!/ai-space\.jpg|AI Space/i.test(html), "AI Space dropped — not a website screenshot");
 assert.ok(!/Hueca Omeyocan|hueca-omeyocan\.jpg/i.test(html), "Hueca Omeyocan video work is off the strip");
 assert.ok(!/Farm to Table|farm-to-table\.jpg/i.test(html), "Farm to Table video work is off the strip");
-assert.ok(!/talent-features\.jpg|<strong>Stories<\/strong>/i.test(html), "Stories / Features video work is off the strip");
 assert.ok(!/Recent made site/i.test(html), "Gold Silver is not captioned Recent made site");
 assert.ok(!/<video\b/i.test(html), "no video elements");
 assert.ok(!/<iframe\b/i.test(html), "no iframes");
@@ -47,7 +46,7 @@ assert.ok(!/No invented clients/i.test(html), "no disclaimer tone");
 assert.ok(!/handoff and teach|Email Cara/i.test(html), "VOID copy is gone");
 
 const tiles = html.match(/class="tile"/g) || [];
-assert.ok(tiles.length >= 16, "screenshots-only strip keeps website work after video tiles drop");
+assert.ok(tiles.length >= 17, "screenshots-only strip keeps website work after video tiles drop");
 assert.ok(html.includes("class=\"strip\""), "tiles live in a hover-scroll strip");
 
 const names = [
@@ -61,6 +60,7 @@ const names = [
   "Manzanita Beach Company",
   "Housable",
   "Color Outside the Lines",
+  "Stories",
   "Grant Desk",
   "Fine Art",
   "Watershed",
@@ -86,6 +86,7 @@ assert.deepStrictEqual(titleOrder, names, "tiles stay in the selling order");
   "assets/work/manzanita-beach.jpg",
   "assets/work/housable.jpg",
   "assets/work/color-outside-the-lines.jpg",
+  "assets/work/talent-features.jpg",
   "assets/work/grant-desk.jpg",
   "assets/work/fine-art.jpg",
   "assets/work/watershed.jpg",
