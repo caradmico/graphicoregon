@@ -12,7 +12,7 @@
   const PAPER_RGB = [244, 239, 230];
   const FIGURE_RGB = [226, 212, 192];
 
-  const SPAWN = { az: 0.62, el: 0.18, dist: 6.2, targetX: -0.15, targetY: 0.78, targetZ: 0.45 };
+  const SPAWN = { az: 0.18, el: 0.16, dist: 5.9, targetX: -0.22, targetY: 0.92, targetZ: 0.58 };
   const DIST = { min: 3.5, max: 13.2 };
   const EL = { min: -0.06, max: 1.06 };
 
@@ -86,11 +86,11 @@
   /* Woman perched on the boulder — slender profile, lean, one hand in the creek. */
   function woman() {
     return {
-      hip: { x: -0.38, y: 1.50, z: -0.18 },
-      chest: { x: -0.12, y: 1.74, z: 0.06 },
-      neck: { x: 0.02, y: 1.88, z: 0.14 },
-      head: { x: 0.12, y: 2.00, z: 0.20 },
-      headR: 0.092,
+      hip: { x: -0.48, y: 1.52, z: -0.08 },
+      chest: { x: -0.22, y: 1.78, z: 0.10 },
+      neck: { x: -0.08, y: 1.92, z: 0.16 },
+      head: { x: 0.02, y: 2.04, z: 0.20 },
+      headR: 0.10,
       shoulderL: { x: -0.18, y: 1.76, z: 0.22 },
       shoulderR: { x: 0.02, y: 1.70, z: -0.08 },
       elbowDip: outsideBoulder({ x: 0.42, y: 1.02, z: 0.68 }, 0.055),
@@ -101,7 +101,7 @@
       kneeR: { x: -0.18, y: 1.36, z: -0.04 },
       footL: { x: -0.38, y: 1.30, z: 0.28 },
       footR: { x: -0.08, y: 1.28, z: 0.22 },
-      tear: { x: 0.18, y: 1.96, z: 0.26 }
+      tear: { x: 0.10, y: 2.00, z: 0.26 }
     };
   }
 
