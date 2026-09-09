@@ -534,6 +534,58 @@
     return g;
   }
 
+  /* Paper-warm fill + sparse hatch + navy rim. No edge cage — that read as sticks. */
+  let figureShared;
+  function figureMat() {
+    if (figureShared) return figureShared;
+    figureShared = new THREE.ShaderMaterial({
+      uniforms: {
+        uFigure: { value: new THREE.Color(Ink.FIGURE) },
+        uPaper: { value: new THREE.Color(Ink.PAPER) },
+        uNavy: { value: new THREE.Color(Ink.NAVY) }
+      },
+      vertexShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "void main() {",
+        "  vNormal = normalize(mat3(modelMatrix) * normal);",
+        "  vec4 wp = modelMatrix * vec4(position, 1.0);",
+        "  vWorld = wp.xyz;",
+        "  gl_Position = projectionMatrix * viewMatrix * wp;",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "varying vec3 vNormal;",
+        "varying vec3 vWorld;",
+        "uniform vec3 uFigure;",
+        "uniform vec3 uPaper;",
+        "uniform vec3 uNavy;",
+        "void main() {",
+        "  vec3 N = normalize(vNormal);",
+        "  vec3 V = normalize(cameraPosition - vWorld);",
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 2.1);",
+        "  float hatch = abs(sin(vWorld.y * 22.0 + vWorld.x * 5.2 + vWorld.z * 3.1));",
+        "  float cross = abs(sin(vWorld.x * 14.0 - vWorld.y * 9.0));",
+        "  float mark = smoothstep(0.78, 0.96, hatch) * 0.38 + smoothstep(0.88, 0.98, cross) * 0.16;",
+        "  vec3 base = mix(uPaper, uFigure, 0.42);",
+        "  vec3 c = mix(base, uNavy, mark + rim * 0.58);",
+        "  gl_FragColor = vec4(c, 1.0);",
+        "}"
+      ].join("\n")
+    });
+    return figureShared;
+  }
+
+  function figureVolume(geo, outlineAmt) {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, figureMat()));
+    g.add(new THREE.Mesh(
+      inflate(geo, outlineAmt == null ? 0.014 : outlineAmt),
+      new THREE.MeshBasicMaterial({ color: Ink.NAVY, side: THREE.BackSide })
+    ));
+    return g;
+  }
+
   function latheFrom(profile, segs) {
     return new THREE.LatheGeometry(
       profile.map((p) => new THREE.Vector2(p[0], p[1])),
@@ -542,7 +594,7 @@
   }
 
   function capsuleGeo(r, len) {
-    return latheFrom(Ink.capsuleProfile(r, len), 8);
+    return latheFrom(Ink.capsuleProfile(r, len), 14);
   }
 
   function aimBone(group, from, to) {
@@ -555,71 +607,92 @@
 
   function limbBetween(from, to, rx) {
     const len = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z);
-    const geo = capsuleGeo(rx, Math.max(0.06, len));
-    geo.scale(0.72, 1, 0.42);
-    const g = inkVolume(geo, Ink.PAPER, 0.008);
+    const geo = capsuleGeo(rx, Math.max(0.10, len));
+    geo.scale(1, 1, Ink.FIGURE_DEPTH);
+    const g = figureVolume(geo, 0.012);
     aimBone(g, from, to);
     return g;
   }
 
   function strokeLine(pts, radius) {
-    return tubeFrom(pts, radius == null ? 0.007 : radius, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
+    return tubeFrom(pts, radius == null ? 0.005 : radius, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
   }
 
   function buildWoman() {
     const w = Ink.woman();
     const ink = Ink.womanOutline();
+    const r = Ink.womanLimbR();
     const g = new THREE.Group();
 
-    const torsoGeo = latheFrom(Ink.womanTorso(), 10);
-    torsoGeo.scale(1.15, 1.15, 0.38);
-    const torso = inkVolume(torsoGeo, Ink.PAPER, 0.012);
+    const hipGeo = latheFrom(Ink.womanHips(), 16);
+    hipGeo.scale(1.12, 0.96, Ink.FIGURE_DEPTH);
+    const hips = figureVolume(hipGeo, 0.016);
+    hips.position.set(w.hip.x + 0.02, w.hip.y - 0.05, w.hip.z);
+    hips.rotation.z = -0.78;
+    hips.rotation.x = 0.28;
+    hips.rotation.y = 0.22;
+
+    const torsoGeo = latheFrom(Ink.womanTorso(), 16);
+    torsoGeo.scale(1.08, 1.0, Ink.FIGURE_DEPTH);
+    const torso = figureVolume(torsoGeo, 0.016);
     aimBone(torso, w.hip, w.chest);
-    torso.rotation.z -= 0.55;
-    torso.rotation.x += 0.12;
+    torso.rotation.z -= 0.38;
+    torso.rotation.x += 0.10;
 
     const hatch = [];
-    for (let i = 0; i < 4; i++) {
-      hatch.push(new THREE.Vector3(-0.01, 0.10 + i * 0.07, 0.028));
-      hatch.push(new THREE.Vector3(0.03, 0.13 + i * 0.07, 0.012));
+    for (let i = 0; i < 5; i++) {
+      hatch.push(new THREE.Vector3(-0.06, 0.12 + i * 0.08, 0.10));
+      hatch.push(new THREE.Vector3(0.07, 0.16 + i * 0.08, 0.07));
     }
     torso.add(new THREE.LineSegments(
       new THREE.BufferGeometry().setFromPoints(hatch),
-      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.4 })
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.32 })
     ));
 
-    const headGeo = latheFrom(Ink.womanHead(), 10);
-    headGeo.scale(0.88, 1, 0.42);
-    const head = inkVolume(headGeo, Ink.PAPER, 0.01);
-    head.position.set(w.head.x - 0.03, w.head.y - 0.03, w.head.z - 0.01);
-    head.rotation.x = 0.72;
-    head.rotation.z = -0.55;
-    head.rotation.y = 0.55;
+    const neckGeo = latheFrom(Ink.womanNeck(), 12);
+    neckGeo.scale(1, 1, Ink.FIGURE_DEPTH);
+    const neck = figureVolume(neckGeo, 0.010);
+    aimBone(neck, w.chest, w.head);
 
-    const tearGeo = latheFrom(Ink.capsuleProfile(0.005, 0.016), 6);
+    const headGeo = latheFrom(Ink.womanHead(), 16);
+    headGeo.scale(1.04, 1.06, 0.90);
+    const head = figureVolume(headGeo, 0.014);
+    head.position.set(w.head.x - 0.02, w.head.y - 0.06, w.head.z);
+    head.rotation.x = 0.82;
+    head.rotation.z = -0.48;
+    head.rotation.y = 0.42;
+
+    const tearGeo = latheFrom(Ink.capsuleProfile(0.007, 0.022), 6);
     const tear = new THREE.Mesh(tearGeo, new THREE.MeshBasicMaterial({ color: Ink.NAVY }));
     tear.position.set(w.tear.x, w.tear.y, w.tear.z);
     g.add(tear);
 
-    const hand = inkVolume(capsuleGeo(0.014, 0.048), Ink.PAPER, 0.007);
+    const shL = limbBetween(w.chest, w.shoulderL, r.upperArm * 0.9);
+    const shR = limbBetween(w.chest, w.shoulderR, r.upperArm * 0.85);
+    const dipUpper = limbBetween(w.shoulderL, w.elbowDip, r.upperArm);
+    const dipFore = limbBetween(w.elbowDip, w.handDip, r.forearm);
+    const restUpper = limbBetween(w.shoulderR, w.elbowRest, r.upperArm * 0.94);
+    const restFore = limbBetween(w.elbowRest, w.handRest, r.forearm * 0.92);
+    const thighL = limbBetween(w.hip, w.kneeL, r.thigh);
+    const thighR = limbBetween(w.hip, w.kneeR, r.thigh * 0.94);
+    const shinL = limbBetween(w.kneeL, w.footL, r.shin);
+    const shinR = limbBetween(w.kneeR, w.footR, r.shin);
+
+    const hand = figureVolume(capsuleGeo(r.hand, 0.09), 0.010);
     hand.position.set(w.handDip.x, w.handDip.y, w.handDip.z);
     hand.rotation.x = 0.55;
     hand.name = "hand-dip";
 
-    g.add(strokeLine(ink.head, 0.010));
-    g.add(strokeLine(ink.spine, 0.014));
-    g.add(strokeLine(ink.reach, 0.012));
-    g.add(strokeLine(ink.rest, 0.008));
-    g.add(strokeLine(ink.legL, 0.011));
-    g.add(strokeLine(ink.legR, 0.008));
+    g.add(strokeLine(ink.head, 0.006));
+    g.add(strokeLine(ink.spine, 0.005));
 
     const splash = [];
     for (let i = 0; i <= 8; i++) {
       const a = (i / 8) * Math.PI * 1.1 - 0.25;
       splash.push(new THREE.Vector3(
-        w.handDip.x + Math.cos(a) * 0.09,
+        w.handDip.x + Math.cos(a) * 0.12,
         Ink.waterY() + 0.002,
-        w.handDip.z + Math.sin(a) * 0.06
+        w.handDip.z + Math.sin(a) * 0.08
       ));
     }
     g.add(new THREE.Line(
@@ -627,7 +700,7 @@
       new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.38 })
     ));
 
-    g.add(torso, head, hand);
+    g.add(hips, torso, neck, head, shL, shR, dipUpper, dipFore, restUpper, restFore, thighL, thighR, shinL, shinR, hand);
     addNamed(g, "woman");
   }
 
