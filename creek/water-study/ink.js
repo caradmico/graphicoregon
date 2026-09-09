@@ -83,14 +83,14 @@
     return clamp((u - 0.5) * 2 + wobble, -1, 1);
   }
 
-  /* Woman perched on the boulder — slender profile, lean, one hand in the creek. */
+  /* Woman perched on the boulder — seated mass, lean, one hand in the creek. */
   function woman() {
     return {
       hip: { x: -0.92, y: 1.40, z: 0.32 },
       chest: { x: -0.52, y: 1.86, z: 0.42 },
       neck: { x: -0.32, y: 2.10, z: 0.40 },
       head: { x: -0.16, y: 2.30, z: 0.36 },
-      headR: 0.11,
+      headR: 0.15,
       shoulderL: { x: -0.62, y: 1.84, z: 0.58 },
       shoulderR: { x: -0.38, y: 1.78, z: 0.18 },
       elbowDip: outsideBoulder({ x: -0.08, y: 1.00, z: 0.82 }, 0.055),
@@ -105,7 +105,7 @@
     };
   }
 
-  /* Primary read: navy pen strokes, not a chain of volumes. */
+  /* Navy pen strokes sit ON the volumes — they are not the body. */
   function womanOutline() {
     const w = woman();
     const r = w.headR;
@@ -129,32 +129,91 @@
     };
   }
 
-  /* Thin lathe profiles — paper fill, navy outline. Not snowman ellipsoids. */
+  function profileMaxR(pts) {
+    let m = 0;
+    let i;
+    for (i = 0; i < pts.length; i++) {
+      if (pts[i][0] > m) m = pts[i][0];
+    }
+    return m;
+  }
+
+  /* Lathed body of mass — warm paper fill, navy outline.
+     Not snowman ellipsoids, not ink-stroke sticks. */
   function womanTorso() {
     return [
-      [0.010, 0.00],
-      [0.046, 0.03],
-      [0.040, 0.12],
-      [0.034, 0.20],
-      [0.048, 0.32],
-      [0.038, 0.40],
-      [0.016, 0.48]
+      [0.055, 0.00],
+      [0.118, 0.04],
+      [0.128, 0.12],
+      [0.122, 0.20],
+      [0.136, 0.30],
+      [0.108, 0.40],
+      [0.058, 0.50]
+    ];
+  }
+
+  function womanHips() {
+    return [
+      [0.040, 0.00],
+      [0.132, 0.04],
+      [0.168, 0.10],
+      [0.152, 0.16],
+      [0.088, 0.22],
+      [0.032, 0.26]
+    ];
+  }
+
+  function womanNeck() {
+    return [
+      [0.028, 0.00],
+      [0.040, 0.03],
+      [0.038, 0.08],
+      [0.030, 0.12]
     ];
   }
 
   function womanHead() {
     return [
-      [0.006, 0.00],
-      [0.036, 0.018],
-      [0.052, 0.055],
-      [0.054, 0.092],
-      [0.038, 0.138],
-      [0.012, 0.164]
+      [0.012, 0.00],
+      [0.062, 0.028],
+      [0.092, 0.072],
+      [0.098, 0.128],
+      [0.078, 0.188],
+      [0.032, 0.228]
     ];
   }
 
+  function womanLimbR() {
+    return {
+      upperArm: 0.048,
+      forearm: 0.038,
+      thigh: 0.062,
+      shin: 0.042,
+      hand: 0.028
+    };
+  }
+
+  /* Slight drawing flatten — volume, not a paper-thin card. */
+  const FIGURE_DEPTH = 0.82;
+
+  function womanMass() {
+    const r = womanLimbR();
+    return {
+      torsoMaxR: profileMaxR(womanTorso()),
+      hipMaxR: profileMaxR(womanHips()),
+      headMaxR: profileMaxR(womanHead()),
+      neckMaxR: profileMaxR(womanNeck()),
+      thighR: r.thigh,
+      upperArmR: r.upperArm,
+      forearmR: r.forearm,
+      shinR: r.shin,
+      handR: r.hand,
+      depth: FIGURE_DEPTH
+    };
+  }
+
   function capsuleProfile(r, len) {
-    const rad = r == null ? 0.028 : r;
+    const rad = r == null ? 0.055 : r;
     const l = len == null ? 0.22 : len;
     return [
       [0.003, 0.00],
@@ -807,7 +866,12 @@
     woman: woman,
     womanOutline: womanOutline,
     womanTorso: womanTorso,
+    womanHips: womanHips,
+    womanNeck: womanNeck,
     womanHead: womanHead,
+    womanLimbR: womanLimbR,
+    womanMass: womanMass,
+    FIGURE_DEPTH: FIGURE_DEPTH,
     capsuleProfile: capsuleProfile,
     hairRoot: hairRoot,
     hairAttached: hairAttached,
