@@ -309,12 +309,27 @@
     const g = new THREE.Group();
     const bed = new THREE.Mesh(
       new THREE.PlaneGeometry(patch.w * 0.9, patch.d * 0.86),
-      new THREE.MeshBasicMaterial({ color: 0xe8e2d4 })
+      new THREE.MeshBasicMaterial({ color: 0xd9d2c2 })
     );
     bed.rotation.x = -Math.PI / 2;
     bed.position.set(patch.x, 0.006, patch.z);
     g.add(bed);
     Ink.bedStones().forEach((s) => g.add(stoneMesh(s)));
+    const b = Ink.boulder();
+    const ringPts = [];
+    for (let i = 0; i <= 64; i++) {
+      const a = (i / 64) * Math.PI * 2;
+      const p = Ink.outsideBoulder({
+        x: b.x + Math.cos(a) * b.rx,
+        y: Ink.waterY(),
+        z: b.z + Math.sin(a) * b.rz
+      }, 0.02);
+      ringPts.push(new THREE.Vector3(p.x, Ink.waterY() - 0.004, p.z));
+    }
+    g.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(ringPts),
+      new THREE.LineBasicMaterial({ color: Ink.NAVY, transparent: true, opacity: 0.38 })
+    ));
     addNamed(g, "creek-bed");
   }
 
@@ -339,13 +354,8 @@
         "void main() {",
         "  vUv = uv;",
         "  vec3 pos = position;",
-        "  float hx = sin(pos.x * 1.65 + uTime * 0.52) * 0.0055;",
-        "  float hz = sin(pos.z * 2.35 - uTime * 0.38) * 0.0038;",
-        "  pos.y += hx + hz;",
-        "  float dHdx = cos(pos.x * 1.65 + uTime * 0.52) * 1.65 * 0.0055;",
-        "  float dHdz = cos(pos.z * 2.35 - uTime * 0.38) * 2.35 * 0.0038;",
-        "  vec3 n = normalize(vec3(-dHdx, 1.0, -dHdz));",
-        "  vNormal = normalize(mat3(modelMatrix) * n);",
+        "  pos.y += sin(pos.x * 1.4 + pos.z * 1.1 + uTime * 0.35) * 0.0012;",
+        "  vNormal = normalize(mat3(modelMatrix) * vec3(0.0, 1.0, 0.0));",
         "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
         "  vWorld = wp.xyz;",
         "  gl_Position = projectionMatrix * viewMatrix * wp;",
@@ -370,18 +380,19 @@
         "  vec3 N = normalize(vNormal);",
         "  vec3 V = normalize(cameraPosition - vWorld);",
         "  float ndotv = clamp(dot(N, V), 0.0, 1.0);",
-        "  float fresnel = pow(1.0 - ndotv, 2.8);",
-        "  vec3 sheen = mix(uPaper, uNavy, 0.34);",
-        "  vec3 col = mix(mix(uPaper, uNavy, 0.035), sheen, fresnel);",
-        "  float w1 = sin(vWorld.z * 3.55 - uTime * 0.42 + sin(vWorld.x * 1.7) * 1.05);",
-        "  float w2 = sin(vWorld.z * 5.1 + vWorld.x * 0.55 - uTime * 0.28);",
-        "  float line = smoothstep(0.968, 0.996, abs(w1)) + smoothstep(0.982, 0.998, abs(w2)) * 0.55;",
-        "  float skip = step(0.38, hash(floor(vWorld.xz * 1.15)));",
-        "  float mark = line * skip * (0.22 + fresnel * 0.18);",
+        "  float fresnel = pow(1.0 - ndotv, 2.4);",
+        "  vec3 sheen = mix(uPaper, uNavy, 0.48);",
+        "  vec3 col = mix(mix(uPaper, uNavy, 0.04), sheen, fresnel);",
+        "  float wavy = vWorld.z * 2.8 + sin(vWorld.x * 1.35 + uTime * 0.22) * 0.85;",
+        "  float w1 = sin(wavy - uTime * 0.18);",
+        "  float w2 = sin(vWorld.z * 4.2 + sin(vWorld.x * 2.1) * 0.55 - uTime * 0.12);",
+        "  float line = smoothstep(0.93, 0.988, abs(w1)) * 0.85 + smoothstep(0.97, 0.996, abs(w2)) * 0.4;",
+        "  float skip = step(0.28, hash(vec2(floor(vWorld.z * 1.6), floor(vWorld.x * 0.35))));",
+        "  float mark = line * skip * mix(0.55, 0.22, fresnel);",
         "  col = mix(col, uNavy, mark);",
-        "  float edge = smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x);",
-        "  edge *= smoothstep(0.0, 0.08, vUv.y) * smoothstep(1.0, 0.84, vUv.y);",
-        "  float alpha = mix(0.08, 0.54, fresnel) + mark * 0.2;",
+        "  float edge = smoothstep(0.0, 0.07, vUv.x) * smoothstep(1.0, 0.93, vUv.x);",
+        "  edge *= smoothstep(0.0, 0.05, vUv.y) * smoothstep(1.0, 0.88, vUv.y);",
+        "  float alpha = mix(0.14, 0.62, fresnel) + mark * 0.22;",
         "  alpha *= edge * rock;",
         "  if (alpha < 0.012) discard;",
         "  gl_FragColor = vec4(col, alpha);",
@@ -582,6 +593,15 @@
     hasHair: () => names.indexOf("hair") !== -1,
     hasWater: () => names.indexOf("water") !== -1,
     hasBed: () => names.indexOf("creek-bed") !== -1,
+    waterClear: () => {
+      const w = scene && scene.getObjectByName("water");
+      return !!(w && w.material && w.material.transparent && w.material.depthWrite === false);
+    },
+    setLook: (a, e, d) => {
+      if (a != null) az = a;
+      if (e != null) el = Ink.clamp(e, Ink.EL.min, Ink.EL.max);
+      if (d != null) dist = Ink.clamp(d, Ink.DIST.min, Ink.DIST.max);
+    },
     pointLights: () => scene ? scene.children.filter((o) => o.isPointLight).length : 0,
     threeOk: () => hasThree(window.THREE),
     usesCdnjs: () => false,

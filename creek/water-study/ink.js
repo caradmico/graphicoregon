@@ -215,12 +215,12 @@
   /* Looking straight down (ndotv ~ 1) is see-through; grazing is reflective. */
   function fresnelWeight(ndotv, power) {
     const n = clamp(ndotv, 0, 1);
-    const p = power == null ? 2.8 : power;
+    const p = power == null ? 2.4 : power;
     return Math.pow(1 - n, p);
   }
 
   function waterAlpha(ndotv) {
-    return lerp(0.08, 0.54, fresnelWeight(ndotv));
+    return lerp(0.14, 0.62, fresnelWeight(ndotv, 2.4));
   }
 
   function bedStones() {
