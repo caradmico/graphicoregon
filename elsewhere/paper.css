@@ -47,6 +47,17 @@ a:hover { text-decoration-thickness: 2px; }
 .folio a:hover { color: var(--spot); }
 .folio nav { display: flex; flex-wrap: wrap; gap: 0.85rem; }
 
+.folio a.desk-link {
+  color: var(--spot);
+  margin-left: 0.25rem;
+  padding-left: 0.85rem;
+  border-left: 1px solid var(--rule);
+}
+
+.folio a.desk-link:hover { color: var(--ink); }
+
+footer.colophon a.desk-link { color: var(--spot); }
+
 .sheet {
   max-width: 72rem;
   margin: 0 auto;
