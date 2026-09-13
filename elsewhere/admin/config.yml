@@ -19,28 +19,39 @@ collections:
   - name: articles
     label: Articles
     label_singular: Article
-    files:
-      - label: Paper articles
-        name: paper_articles
-        file: elsewhere/articles.json
-        fields:
-          - name: articles
-            label: Articles
-            widget: list
-            summary: "{{fields.title}} · {{fields.section}}"
-            add_to_top: true
-            fields:
-              - { name: slug, label: Slug, widget: string, hint: "salty-heifer-diner" }
-              - { name: title, label: Title, widget: string }
-              - name: section
-                label: Section
-                widget: select
-                options: [food, coast, science, civic, arts, notes, essays]
-              - { name: tags, label: Tags, widget: list, allow_add: true, hint: "diner, connecticut, steak" }
-              - { name: date, label: Date, widget: string, hint: "2026-08-08" }
-              - { name: place, label: Place, widget: string, required: false }
-              - { name: dek, label: Dek, widget: text }
-              - { name: maps, label: Maps URL, widget: string, required: false }
-              - { name: photo, label: Photo, widget: image, required: false }
-              - { name: draft, label: Draft, widget: boolean, default: true }
-              - { name: body, label: Body, widget: markdown }
+    folder: elsewhere/articles
+    extension: json
+    format: json
+    create: true
+    identifier_field: slug
+    slug: "{{slug}}"
+    summary: "{{title}} · {{section}}"
+    sortable_fields:
+      - title
+      - date
+      - section
+    view_filters:
+      - { label: Food, field: section, pattern: food }
+      - { label: Coast, field: section, pattern: coast }
+      - { label: Science, field: section, pattern: science }
+      - { label: Civic, field: section, pattern: civic }
+      - { label: Arts, field: section, pattern: arts }
+      - { label: Notes, field: section, pattern: notes }
+      - { label: Essays, field: section, pattern: essays }
+    view_groups:
+      - { label: Section, field: section }
+    fields:
+      - { name: slug, label: Slug, widget: string, hint: "salty-heifer-diner" }
+      - { name: title, label: Title, widget: string }
+      - name: section
+        label: Section
+        widget: select
+        options: [food, coast, science, civic, arts, notes, essays]
+      - { name: tags, label: Tags, widget: list, allow_add: true, hint: "diner, connecticut, steak" }
+      - { name: date, label: Date, widget: string, hint: "2026-08-08" }
+      - { name: place, label: Place, widget: string, required: false }
+      - { name: dek, label: Dek, widget: text }
+      - { name: maps, label: Maps URL, widget: string, required: false }
+      - { name: photo, label: Photo, widget: image, required: false }
+      - { name: draft, label: Draft, widget: boolean, default: true }
+      - { name: body, label: Body, widget: markdown }

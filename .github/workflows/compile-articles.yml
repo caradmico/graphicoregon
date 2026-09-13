@@ -1,0 +1,27 @@
+name: compile-articles
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "elsewhere/articles/*.json"
+      - "elsewhere/scripts/compile-articles.py"
+      - ".github/workflows/compile-articles.yml"
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile articles.json
+        run: python3 elsewhere/scripts/compile-articles.py
+      - name: Commit if changed
+        run: |
+          git config user.name "elsewhere-desk"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add elsewhere/articles.json
+          git diff --cached --quiet && echo "no change" && exit 0
+          git commit -m "elsewhere: compile articles.json"
+          git push

@@ -70,14 +70,21 @@
     location.replace('./#section-food');
     return;
   }
-  fetch('articles.json', { cache: 'no-cache' })
-    .then(function(r){ if (!r.ok) throw new Error('missing'); return r.json(); })
-    .then(function(json){
-      var list = (json && json.articles) || [];
-      var a = null;
-      for (var i=0;i<list.length;i++){
-        if (list[i] && list[i].slug === slug){ a = list[i]; break; }
-      }
+  fetch('articles/' + encodeURIComponent(slug) + '.json', { cache: 'no-cache' })
+    .then(function(r){
+      if (r.ok) return r.json();
+      return fetch('articles.json', { cache: 'no-cache' }).then(function(r2){
+        if (!r2.ok) throw new Error('missing');
+        return r2.json();
+      }).then(function(json){
+        var list = (json && json.articles) || [];
+        for (var i=0;i<list.length;i++){
+          if (list[i] && list[i].slug === slug) return list[i];
+        }
+        return null;
+      });
+    })
+    .then(function(a){
       if (!a){
         missing.textContent = 'No piece with that slug. Back to Food.';
         setTimeout(function(){ location.replace('./#section-food'); }, 1200);
