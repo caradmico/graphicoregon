@@ -2,7 +2,8 @@ backend:
   name: github
   repo: caradmico/graphicoregon
   branch: main
-  auth_methods: [token]
+  base_url: https://sveltia-cms-auth.small-meadow-355a.workers.dev
+  auth_methods: [oauth]
 
 local_backend: false
 
