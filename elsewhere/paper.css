@@ -588,6 +588,17 @@ footer.colophon {
   height: auto;
 }
 
+.article-page .body figure.inline-photo {
+  margin: 0 0 1.15rem;
+}
+.article-page .body figure.inline-photo img,
+.article-page .body p img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
 .article-page .body figure.photo-slot figcaption {
   margin: 0.4rem 0 0;
   color: var(--mute);

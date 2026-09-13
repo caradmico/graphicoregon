@@ -44,11 +44,39 @@
   function escAttr(s){
     return esc(s).replace(/"/g, String.fromCharCode(38) + '#34;');
   }
+  function publicSrc(src){
+    src = String(src || '').trim().replace(/^['"]|['"]$/g, '');
+    if (/^https?:\/\//i.test(src)) return src;
+    src = src.replace(/^\/+/, '');
+    src = src.replace(/^elsewhere\//, '');
+    return src;
+  }
+  function isLive(a){
+    if (!a) return false;
+    if (a.status === 'published') return true;
+    if (a.status === 'draft') return false;
+    return a.draft === false;
+  }
   function inline(s){
+    var out = '';
+    var re = /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\((https?:[^)]+)\)/g;
+    var last = 0, m;
+    while ((m = re.exec(s))){
+      out += textBits(s.slice(last, m.index));
+      if (m[2]){
+        out += '<img src="'+escAttr(publicSrc(m[2]))+'" alt="'+esc(m[1])+'" loading="lazy">';
+      } else {
+        out += '<a href="'+escAttr(m[4])+'" rel="noopener">'+esc(m[3])+'</a>';
+      }
+      last = m.index + m[0].length;
+    }
+    out += textBits(s.slice(last));
+    return out;
+  }
+  function textBits(s){
     s = esc(s);
     s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
     s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
-    s = s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" rel="noopener">$1</a>');
     return s;
   }
   function md(src){
@@ -59,6 +87,9 @@
       if (/^>\s?/.test(t)){
         var q = t.replace(/^>\s?/gm,'');
         return '<blockquote><p>'+inline(q)+'</p></blockquote>';
+      }
+      if (/^!\[[^\]]*\]\([^)]+\)$/.test(t)){
+        return '<figure class="inline-photo">'+inline(t)+'</figure>';
       }
       return '<p>'+inline(t).replace(/\n/g,'<br>')+'</p>';
     }).join('');
@@ -94,15 +125,16 @@
       document.title = a.title + ' · Elsewhere';
       var canon = document.querySelector('link[rel="canonical"]');
       if (canon) canon.href = 'https://elsewhere.graphicoregon.com/article.html?slug='+encodeURIComponent(a.slug);
-      var photo = a.photo || ('images/'+a.slug+'.jpg');
-      var photoHtml = '<figure class="photo-slot"><div class="photo-frame" id="photo-frame">Photo</div></figure>';
+      var live = isLive(a);
+      var photo = a.photo ? publicSrc(a.photo) : '';
+      var photoHtml = photo ? '<figure class="photo-slot"><div class="photo-frame" id="photo-frame">Photo</div></figure>' : '';
       var maps = a.maps ? '<a class="maps" href="'+escAttr(a.maps)+'" target="_blank" rel="noopener">Open in Maps →</a>' : '';
       var place = a.place ? esc(a.place) : '';
       var date = a.date ? esc(a.date) : '';
       var meta = [place, date].filter(Boolean).join(' · ');
       root.innerHTML =
         '<p class="back"><a href="./#section-food">← The paper</a></p>'+
-        '<p class="kicker">'+(a.section ? esc(a.section) : 'Food')+(a.draft ? ' · Draft' : '')+'</p>'+
+        '<p class="kicker">'+(a.section ? esc(a.section) : 'Food')+(live ? '' : ' · Draft')+'</p>'+
         '<h1>'+esc(a.title)+'</h1>'+
         (a.dek ? '<p class="dek">'+esc(a.dek)+'</p>' : '')+
         (meta ? '<p class="byline">Cara Mico · '+meta+'</p>' : '<p class="byline">Cara Mico · Elsewhere</p>')+
@@ -116,7 +148,10 @@
           img.alt = a.title;
           frame.appendChild(img);
         };
-        img.onerror = function(){ frame.textContent = 'Photo — drop the image in Desk'; };
+        img.onerror = function(){
+          var fig = frame.closest('figure');
+          if (fig) fig.remove();
+        };
         img.src = photo;
       }
     })

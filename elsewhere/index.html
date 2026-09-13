@@ -370,11 +370,18 @@
     })
     .then(function(json){
       var rows = ((json && json.articles) || []).filter(function(a){
-        return a && a.section === 'food' && a.title && a.slug;
+        if (!a || a.section !== 'food' || !a.title || !a.slug) return false;
+        if (a.status === 'published') return true;
+        if (a.status === 'draft') return false;
+        return a.draft === false;
       });
       fillSlot('slot-food', rows.map(function(a){
         return { title: a.title, url: 'article.html?slug=' + encodeURIComponent(a.slug) };
       }));
+      if (!rows.length){
+        var emptyFood = document.getElementById('slot-food');
+        if (emptyFood) emptyFood.innerHTML = '<li class="empty-zone">Nothing published in Food yet.</li>';
+      }
     })
     .catch(function(){
       var ol = document.getElementById('slot-food');

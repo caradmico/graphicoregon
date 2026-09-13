@@ -8,7 +8,7 @@ backend:
 local_backend: false
 
 media_folder: elsewhere/images
-public_folder: images
+public_folder: /images
 
 slug:
   encoding: ascii
@@ -25,12 +25,15 @@ collections:
     create: true
     identifier_field: slug
     slug: "{{slug}}"
-    summary: "{{title}} · {{section}}"
+    summary: "{{title}} · {{status}}"
     sortable_fields:
       - title
       - date
       - section
+      - status
     view_filters:
+      - { label: Draft, field: status, pattern: draft }
+      - { label: Published, field: status, pattern: published }
       - { label: Food, field: section, pattern: food }
       - { label: Coast, field: section, pattern: coast }
       - { label: Science, field: section, pattern: science }
@@ -39,10 +42,21 @@ collections:
       - { label: Notes, field: section, pattern: notes }
       - { label: Essays, field: section, pattern: essays }
     view_groups:
+      - { label: Status, field: status }
       - { label: Section, field: section }
+    media_folder: elsewhere/images
+    public_folder: /images
     fields:
       - { name: slug, label: Slug, widget: string, hint: "salty-heifer-diner" }
       - { name: title, label: Title, widget: string }
+      - name: status
+        label: Status
+        widget: select
+        default: draft
+        hint: "Draft = Desk only, off the paper. Published = live. Set back to Draft to revert."
+        options:
+          - { label: "Draft — Desk only", value: draft }
+          - { label: "Published — on the paper", value: published }
       - name: section
         label: Section
         widget: select
@@ -52,6 +66,10 @@ collections:
       - { name: place, label: Place, widget: string, required: false }
       - { name: dek, label: Dek, widget: text }
       - { name: maps, label: Maps URL, widget: string, required: false }
-      - { name: photo, label: Photo, widget: image, required: false }
-      - { name: draft, label: Draft, widget: boolean, default: true }
+      - name: photo
+        label: Photo
+        widget: image
+        required: false
+        media_folder: elsewhere/images
+        public_folder: /images
       - { name: body, label: Body, widget: markdown }
