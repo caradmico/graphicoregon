@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elsewhere</title>
+<meta name="description" content="A paper from Graphic Oregon.">
+<link rel="canonical" href="https://coast.graphicoregon.com/article.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="paper.css">
+</head>
+<body>
+<header class="folio">
+  <p><a href="./">Elsewhere</a></p>
+  <nav aria-label="Paper">
+    <a href="./#hero">This week</a>
+    <a href="./#sections">Sections</a>
+    <a href="./#on-file">On file</a>
+    <a href="./#essays">Essays</a>
+    <a href="./#reading">Reading</a>
+    <a href="./#clips">Clips</a>
+    <a href="admin/">Desk</a>
+  </nav>
+</header>
+
+<div class="article-wrap article-page" id="piece">
+  <p class="back"><a href="./#section-food">← The paper</a></p>
+  <p class="empty-zone" id="missing">That piece isn’t on file. Back to Food.</p>
+</div>
+
+<script>
+(function(){
+  function qs(name){
+    var m = location.search.match(new RegExp('[?&]'+name+'=([^&]*)'));
+    return m ? decodeURIComponent(m[1].replace(/\+/g,' ')) : '';
+  }
+  function esc(s){
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s == null ? '' : String(s)));
+    return d.innerHTML;
+  }
+  function escAttr(s){
+    return esc(s).replace(/"/g, String.fromCharCode(38) + '#34;');
+  }
+  function inline(s){
+    s = esc(s);
+    s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+    s = s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" rel="noopener">$1</a>');
+    return s;
+  }
+  function md(src){
+    var blocks = String(src||'').replace(/\r\n/g,'\n').split(/\n{2,}/);
+    return blocks.map(function(block){
+      var t = block.trim();
+      if (!t) return '';
+      if (/^>\s?/.test(t)){
+        var q = t.replace(/^>\s?/gm,'');
+        return '<blockquote><p>'+inline(q)+'</p></blockquote>';
+      }
+      return '<p>'+inline(t).replace(/\n/g,'<br>')+'</p>';
+    }).join('');
+  }
+  var slug = qs('slug');
+  var root = document.getElementById('piece');
+  var missing = document.getElementById('missing');
+  if (!slug){
+    location.replace('./#section-food');
+    return;
+  }
+  fetch('articles.json', { cache: 'no-cache' })
+    .then(function(r){ if (!r.ok) throw new Error('missing'); return r.json(); })
+    .then(function(json){
+      var list = (json && json.articles) || [];
+      var a = null;
+      for (var i=0;i<list.length;i++){
+        if (list[i] && list[i].slug === slug){ a = list[i]; break; }
+      }
+      if (!a){
+        missing.textContent = 'No piece with that slug. Back to Food.';
+        setTimeout(function(){ location.replace('./#section-food'); }, 1200);
+        return;
+      }
+      missing.hidden = true;
+      document.title = a.title + ' · Elsewhere';
+      var canon = document.querySelector('link[rel="canonical"]');
+      if (canon) canon.href = 'https://coast.graphicoregon.com/article.html?slug='+encodeURIComponent(a.slug);
+      var photo = a.photo || ('images/'+a.slug+'.jpg');
+      var photoHtml = '<figure class="photo-slot"><div class="photo-frame" id="photo-frame">Photo</div></figure>';
+      var maps = a.maps ? '<a class="maps" href="'+escAttr(a.maps)+'" target="_blank" rel="noopener">Open in Maps →</a>' : '';
+      var place = a.place ? esc(a.place) : '';
+      var date = a.date ? esc(a.date) : '';
+      var meta = [place, date].filter(Boolean).join(' · ');
+      root.innerHTML =
+        '<p class="back"><a href="./#section-food">← The paper</a></p>'+
+        '<p class="kicker">'+(a.section ? esc(a.section) : 'Food')+(a.draft ? ' · Draft' : '')+'</p>'+
+        '<h1>'+esc(a.title)+'</h1>'+
+        (a.dek ? '<p class="dek">'+esc(a.dek)+'</p>' : '')+
+        (meta ? '<p class="byline">Cara Mico · '+meta+'</p>' : '<p class="byline">Cara Mico · Elsewhere</p>')+
+        maps+
+        '<div class="body">'+photoHtml+md(a.body)+'</div>';
+      var frame = document.getElementById('photo-frame');
+      if (frame && photo){
+        var img = new Image();
+        img.onload = function(){
+          frame.innerHTML = '';
+          img.alt = a.title;
+          frame.appendChild(img);
+        };
+        img.onerror = function(){ frame.textContent = 'Photo — drop the image in Desk'; };
+        img.src = photo;
+      }
+    })
+    .catch(function(){
+      missing.textContent = 'articles.json did not load.';
+    });
+})();
+</script>
+</body>
+</html>

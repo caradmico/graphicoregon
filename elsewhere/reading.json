@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "label": "Reading",
+    "dek": "Other writers, other papers — open the link.",
+    "why": "Other writers, other papers — open the link.",
+    "feed": "reading.xml",
+    "rule": "Open originals only. Preview + outbound. No paywall. No full-text republish.",
+    "updated": "2026-09-13"
+  },
+  "sources": [
+    {
+      "name": "Moon Monday",
+      "outlet": "Jatan's Space",
+      "home": "https://jatan.space/tag/moon-monday/",
+      "rss": "https://jatan.space/rss",
+      "note": "Independent lunar newsletter. Free, no ads."
+    },
+    {
+      "name": "Space Calendar",
+      "outlet": "Space Calendar",
+      "home": "https://spacecalendar.com/",
+      "rss": "https://www.spacecalendar.com/events/feed/",
+      "note": "Weekly space-events ledger. Free to read."
+    },
+    {
+      "name": "Universe Today",
+      "outlet": "Universe Today",
+      "home": "https://www.universetoday.com/",
+      "rss": "https://www.universetoday.com/feed",
+      "note": "Ad-free space journalism. CC BY 4.0."
+    },
+    {
+      "name": "The Planetary Society",
+      "outlet": "The Planetary Society",
+      "home": "https://www.planetary.org/articles",
+      "rss": "https://www.planetary.org/rss/articles",
+      "note": "Nonprofit space advocacy. Articles free to read."
+    },
+    {
+      "name": "Astronomy Picture of the Day",
+      "outlet": "NASA APOD",
+      "home": "https://apod.nasa.gov/apod/astropix.html",
+      "rss": "https://apod.nasa.gov/apod.rss",
+      "note": "NASA public-domain daily image + explanation."
+    }
+  ],
+  "picks": [
+    {
+      "outlet": "Moon Monday",
+      "hed": "China is building a lunar navigation and communications network",
+      "preview": "Moon Monday #291 — Jatan Mehta walks through each piece China has demonstrated toward a Queqiao-class lunar navcom stack, including Earth–Moon laser links.",
+      "url": "https://jatan.space/moon-monday-issue-291/",
+      "date": "2026-09-07",
+      "author": "Jatan Mehta"
+    },
+    {
+      "outlet": "Moon Monday",
+      "hed": "The fiery origin of our Moon, tied to Earth",
+      "preview": "Moon Monday #290 — Apollo samples, then Chang’e and Chandrayaan, testing the giant-impact story of how the Moon formed.",
+      "url": "https://jatan.space/origin-of-our-moon-and-earth/",
+      "date": "2026-08-31",
+      "author": "Jatan Mehta"
+    },
+    {
+      "outlet": "Space Calendar",
+      "hed": "Vol 45, Week 37 — this week in space",
+      "preview": "The open weekly ledger: Progress MS-35 to station, UKIRT winding down, JUICE Earth flyby on the 25th, Crew-13 later in the month.",
+      "url": "https://spacecalendar.com/vol-45-week-37/",
+      "date": "2026-09-10",
+      "author": "Space Calendar"
+    },
+    {
+      "outlet": "Universe Today",
+      "hed": "Could clues to ancient alien civilizations hide in a bucket of Moon dust?",
+      "preview": "SETI Institute researchers argue the lunar surface is a long-term collector of artifacts — not because anyone lived there, but because the Moon keeps what hits it.",
+      "url": "https://www.universetoday.com/articles/could-the-clues-to-ancient-alien-civilizations-be-hiding-in-a-bucket-of-moon-dust",
+      "date": "2026-09-13",
+      "author": "Andy Tomaswick"
+    },
+    {
+      "outlet": "Universe Today",
+      "hed": "Scientists are still trying to understand how the Moon formed",
+      "preview": "New impact modeling: depending on how hot Earth and Theia were, you either get a debris disk or an intact Moon in hours.",
+      "url": "https://www.universetoday.com/articles/scientists-are-still-trying-to-understand-how-the-moon-formed",
+      "date": "2026-09-08",
+      "author": "Evan Gough"
+    },
+    {
+      "outlet": "Universe Today",
+      "hed": "China postpones the Chang’e-7 mission",
+      "preview": "The south-pole lander missed its late-August window while already on the pad at Wenchang. Next opening is likely next year.",
+      "url": "https://www.universetoday.com/articles/china-postpones-the-change-7-mission",
+      "date": "2026-09-08",
+      "author": "Andy Tomaswick"
+    },
+    {
+      "outlet": "The Planetary Society",
+      "hed": "What’s up in the night sky: September 2026",
+      "preview": "Crescent Moon with Venus on the 14th, Antares on the 17th, equinox on the 23rd, Harvest Moon on the 26th.",
+      "url": "https://www.planetary.org/night-sky/night-sky-what-to-see-this-month",
+      "date": "2026-09-01",
+      "author": "Bruce Betts"
+    },
+    {
+      "outlet": "NASA APOD",
+      "hed": "Apollo 11 on the lunar surface",
+      "preview": "September 12 picture: sunlight and long shadows on the Moon, photographed July 20, 1969, by Neil Armstrong.",
+      "url": "https://apod.nasa.gov/apod/ap260912.html",
+      "date": "2026-09-12",
+      "author": "NASA APOD"
+    }
+  ]
+}

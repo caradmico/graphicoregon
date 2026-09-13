@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Elsewhere · Reading</title>
+    <link>https://coast.graphicoregon.com/#reading</link>
+    <description>Other writers, other papers — open the link. A curated shelf of no-paywall original space writing the desk is pointing at. Preview only; read the piece at the source.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 13 Sep 2026 15:30:00 GMT</lastBuildDate>
+    <atom:link href="https://coast.graphicoregon.com/reading.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>China is building a lunar navigation and communications network</title>
+      <link>https://jatan.space/moon-monday-issue-291/</link>
+      <guid isPermaLink="true">https://jatan.space/moon-monday-issue-291/</guid>
+      <pubDate>Mon, 07 Sep 2026 14:45:00 GMT</pubDate>
+      <source url="https://jatan.space/rss">Moon Monday</source>
+      <description>Moon Monday #291 — Jatan Mehta walks through each piece China has demonstrated toward a Queqiao-class lunar navcom stack, including Earth–Moon laser links.</description>
+    </item>
+    <item>
+      <title>The fiery origin of our Moon, tied to Earth</title>
+      <link>https://jatan.space/origin-of-our-moon-and-earth/</link>
+      <guid isPermaLink="true">https://jatan.space/origin-of-our-moon-and-earth/</guid>
+      <pubDate>Mon, 31 Aug 2026 15:30:00 GMT</pubDate>
+      <source url="https://jatan.space/rss">Moon Monday</source>
+      <description>Moon Monday #290 — Apollo samples, then Chang’e and Chandrayaan, testing the giant-impact story of how the Moon formed.</description>
+    </item>
+    <item>
+      <title>Vol 45, Week 37 — this week in space</title>
+      <link>https://spacecalendar.com/vol-45-week-37/</link>
+      <guid isPermaLink="true">https://spacecalendar.com/vol-45-week-37/</guid>
+      <pubDate>Thu, 10 Sep 2026 12:00:00 GMT</pubDate>
+      <source url="https://www.spacecalendar.com/events/feed/">Space Calendar</source>
+      <description>The open weekly ledger: Progress MS-35 to station, UKIRT winding down, JUICE Earth flyby on the 25th, Crew-13 later in the month.</description>
+    </item>
+    <item>
+      <title>Could clues to ancient alien civilizations hide in a bucket of Moon dust?</title>
+      <link>https://www.universetoday.com/articles/could-the-clues-to-ancient-alien-civilizations-be-hiding-in-a-bucket-of-moon-dust</link>
+      <guid isPermaLink="true">https://www.universetoday.com/articles/could-the-clues-to-ancient-alien-civilizations-be-hiding-in-a-bucket-of-moon-dust</guid>
+      <pubDate>Sun, 13 Sep 2026 13:09:00 GMT</pubDate>
+      <source url="https://www.universetoday.com/feed">Universe Today</source>
+      <description>SETI Institute researchers argue the lunar surface is a long-term collector of artifacts — not because anyone lived there, but because the Moon keeps what hits it.</description>
+    </item>
+    <item>
+      <title>Scientists are still trying to understand how the Moon formed</title>
+      <link>https://www.universetoday.com/articles/scientists-are-still-trying-to-understand-how-the-moon-formed</link>
+      <guid isPermaLink="true">https://www.universetoday.com/articles/scientists-are-still-trying-to-understand-how-the-moon-formed</guid>
+      <pubDate>Tue, 08 Sep 2026 17:27:00 GMT</pubDate>
+      <source url="https://www.universetoday.com/feed">Universe Today</source>
+      <description>New impact modeling: depending on how hot Earth and Theia were, you either get a debris disk or an intact Moon in hours.</description>
+    </item>
+    <item>
+      <title>China postpones the Chang’e-7 mission</title>
+      <link>https://www.universetoday.com/articles/china-postpones-the-change-7-mission</link>
+      <guid isPermaLink="true">https://www.universetoday.com/articles/china-postpones-the-change-7-mission</guid>
+      <pubDate>Tue, 08 Sep 2026 00:12:00 GMT</pubDate>
+      <source url="https://www.universetoday.com/feed">Universe Today</source>
+      <description>The south-pole lander missed its late-August window while already on the pad at Wenchang. Next opening is likely next year.</description>
+    </item>
+    <item>
+      <title>What’s up in the night sky: September 2026</title>
+      <link>https://www.planetary.org/night-sky/night-sky-what-to-see-this-month</link>
+      <guid isPermaLink="true">https://www.planetary.org/night-sky/night-sky-what-to-see-this-month</guid>
+      <pubDate>Tue, 01 Sep 2026 12:00:00 GMT</pubDate>
+      <source url="https://www.planetary.org/rss/articles">The Planetary Society</source>
+      <description>Crescent Moon with Venus on the 14th, Antares on the 17th, equinox on the 23rd, Harvest Moon on the 26th.</description>
+    </item>
+    <item>
+      <title>Apollo 11 on the lunar surface</title>
+      <link>https://apod.nasa.gov/apod/ap260912.html</link>
+      <guid isPermaLink="true">https://apod.nasa.gov/apod/ap260912.html</guid>
+      <pubDate>Sat, 12 Sep 2026 12:00:00 GMT</pubDate>
+      <source url="https://apod.nasa.gov/apod.rss">NASA APOD</source>
+      <description>September 12 picture: sunlight and long shadows on the Moon, photographed July 20, 1969, by Neil Armstrong.</description>
+    </item>
+  </channel>
+</rss>

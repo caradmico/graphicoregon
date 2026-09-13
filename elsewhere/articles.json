@@ -1,0 +1,177 @@
+{
+  "articles": [
+    {
+      "slug": "ella-grill",
+      "title": "Ella Grill",
+      "section": "food",
+      "tags": [
+        "grill",
+        "illinois",
+        "chicago"
+      ],
+      "date": "2026-07-01",
+      "place": "North Chicago, IL",
+      "dek": "Best in this area.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Ella+Grill+2851+Frontenac+St+North+Chicago+IL",
+      "photo": "images/ella-grill.jpg",
+      "draft": true,
+      "body": "> Best in this area.\n\nBest in this area. That is the whole note, and it is enough.\n\nNorth Chicago. Frontenac Street. When a room is the best around, you say that and you point at the door.\n\n*[Finish here: what you ate, the room, whether you would go back after the Chicago stop.]*"
+    },
+    {
+      "slug": "kaizen-and-coffee",
+      "title": "KAIZEN & COFFEE",
+      "section": "food",
+      "tags": [
+        "coffee",
+        "california",
+        "san-mateo"
+      ],
+      "date": "2024-01-01",
+      "place": "San Mateo, CA",
+      "dek": "Excellent single origin coffee.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=KAIZEN+%26+COFFEE+2337+S+El+Camino+Real+San+Mateo+CA",
+      "photo": "images/kaizen-and-coffee.jpg",
+      "draft": true,
+      "body": "> Excellent single origin coffee.\n\nExcellent single origin coffee. That is the sentence.\n\nSan Mateo, El Camino. You go for the coffee. The origin is the point — a cup that tastes like a place, not a roast hiding behind syrup.\n\n*[Finish here: the cup, the counter, whether this was a work morning or a sit-down.]*"
+    },
+    {
+      "slug": "ledger-restaurant",
+      "title": "Ledger Restaurant",
+      "section": "food",
+      "tags": [
+        "restaurant",
+        "massachusetts",
+        "salem"
+      ],
+      "date": "2026-08-09",
+      "place": "Salem, MA",
+      "dek": "Delicious. Extremely well done. You won’t be disappointed.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Ledger+Restaurant+125+Washington+St+Salem+MA",
+      "photo": "images/ledger-restaurant.jpg",
+      "draft": true,
+      "body": "> Delicious. Extremely well done. You won’t be disappointed.\n\nDelicious. Extremely well done. The cooking held. The plate was worth the seat.\n\nYou won’t be disappointed. That is the sentence I would text someone standing on Washington Street, deciding. Salem. Ledger. Go in.\n\n*[Finish here: which plate, the room on Washington Street, who you would send.]*"
+    },
+    {
+      "slug": "mala-town-express",
+      "title": "Mala Town Express",
+      "section": "food",
+      "tags": [
+        "diner",
+        "california",
+        "san-mateo",
+        "mala"
+      ],
+      "date": "2025-01-01",
+      "place": "San Mateo, CA",
+      "dek": "Excellent diner, pay by pound, fast — an affordable tasty meal.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Mala+Town+Express+77+E+3rd+Ave+San+Mateo+CA",
+      "photo": "images/mala-town-express.jpg",
+      "draft": true,
+      "body": "> Excellent diner, pay by pound, fast, excellent all around for affordable tasty meal.\n\nExcellent diner. Pay by pound. Fast. That is the mechanic and the compliment in the same breath — you choose, they cook, you eat, you leave fed.\n\nExcellent all around for an affordable, tasty meal. The bowl was the point: tasty, priced by weight, no fuss.\n\nThird Avenue, San Mateo. Go when you want dinner without a production.\n\n*[Finish here: what went in the bowl, heat level, whether you ate there or took it.]*"
+    },
+    {
+      "slug": "mountain-house",
+      "title": "The Mountain House",
+      "section": "food",
+      "tags": [
+        "restaurant",
+        "california",
+        "woodside"
+      ],
+      "date": "2025-01-01",
+      "place": "Woodside, CA",
+      "dek": "A delightful restaurant in one of the most beautiful places in the world — and a new midweek happy hour.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=The+Mountain+House+13808+Skyline+Blvd+Woodside+CA",
+      "photo": "images/mountain-house.jpg",
+      "draft": true,
+      "body": "> A delightful restaurant in one of the most beautiful places in the world, they have a new happy hour Wednesdays and Thursdays.\n\nA delightful restaurant in one of the most beautiful places in the world. Skyline Boulevard, Woodside — the drive is part of the meal, and the room does not waste the view.\n\nThey have a new happy hour Wednesdays and Thursdays. That is the practical sentence. Delightful food in a place that already looks like a reason to go, and a midweek hour that makes sitting down easier.\n\nGo up the mountain on a Wednesday or a Thursday if you can.\n\n*[Finish here: the view from the table, what you drank at happy hour, Wednesday or Thursday.]*"
+    },
+    {
+      "slug": "north-40-chophouse",
+      "title": "North 40 Chophouse",
+      "section": "food",
+      "tags": [
+        "steak",
+        "nebraska",
+        "north-platte"
+      ],
+      "date": "2026-07-28",
+      "place": "North Platte, NE",
+      "dek": "Local beef, butchered locally. Wonderful dry-aged cuts.",
+      "maps": "https://www.google.com/maps/place/North+40+Chophouse/data=!4m2!3m1!1s0x8776230259300001:0x13c848b828d013b5",
+      "photo": "images/north-40-chophouse.jpg",
+      "draft": true,
+      "body": "> Delicious. Local beef, butchered locally as well. Wonderful dry-aged cuts.\n\nThe beef is local, and they butcher it locally too. That is the whole point of a chophouse worth sitting down in — the animal did not travel farther than the plate.\n\nThe dry-aged cuts are wonderful. You taste the age and the meat, not a sauce doing the work. Delicious is the right word because the steak does not need a longer one.\n\nNorth Platte. Local beef. Dry-aged. That is the review.\n\n*[Finish here: which cut, how it was cooked, the room after a long drive.]*"
+    },
+    {
+      "slug": "patio-coffee-shop",
+      "title": "Patio Coffee Shop",
+      "section": "food",
+      "tags": [
+        "cafe",
+        "california",
+        "san-mateo",
+        "breakfast"
+      ],
+      "date": "2025-03-08",
+      "place": "San Mateo, CA",
+      "dek": "A lovely simple breakfast and lunch cafe — good Americano, kind people, no wait.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Patio+Coffee+Shop+25+W+25th+Ave+San+Mateo+CA",
+      "photo": "images/patio-coffee-shop.jpg",
+      "draft": true,
+      "body": "> Lovely simple breakfast and lunch cafe, good Americano and nice options at an affordable price, no wait, fast service, kind people.\n\nA lovely, simple breakfast and lunch cafe. That is the job, and they do it. Nice options at an affordable price — you can eat here without making a project of it.\n\nThe Americano is good. No wait. Fast service. Kind people. I keep those four in a row because that is how the morning felt: coffee, then food, then out the door, treated well.\n\nSan Mateo. The simple cafe you actually want.\n\n*[Finish here: what you ate with the Americano, morning or lunch, whether this was a regular table.]*"
+    },
+    {
+      "slug": "pauls-pasta-shop",
+      "title": "Paul’s Pasta Shop",
+      "section": "food",
+      "tags": [
+        "pasta",
+        "connecticut",
+        "groton"
+      ],
+      "date": "2026-09-07",
+      "place": "Groton, CT",
+      "dek": "A quiet hole in the wall with exceptional authentic Italian and generous portions.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Paul%27s+Pasta+Shop+223+Thames+St+Groton+CT",
+      "photo": "images/pauls-pasta-shop.jpg",
+      "draft": true,
+      "body": "> A quiet hole in the wall with exceptional authentic Italian, generous portions.\n\nA quiet hole in the wall. That is a compliment. You find it on Thames Street in Groton and the room does not need to perform.\n\nThe Italian is exceptional and authentic. The portions are generous. Pasta cooked like someone still cares about the water and the sauce.\n\nGroton. Quiet. Generous. Go hungry.\n\n*[Finish here: which pasta, whether you took any home, weeknight or weekend.]*"
+    },
+    {
+      "slug": "salty-heifer-diner",
+      "title": "The Salty Heifer Diner",
+      "section": "food",
+      "tags": [
+        "diner",
+        "connecticut",
+        "ledyard",
+        "steak"
+      ],
+      "date": "2026-08-08",
+      "place": "Ledyard, CT",
+      "dek": "Farm to table without the pretense — steak and eggs, then local coconut ice cream.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=The+Salty+Heifer+Diner+678+Colonel+Ledyard+Hwy+Ledyard+CT",
+      "photo": "images/salty-heifer-diner.jpg",
+      "draft": true,
+      "body": "> Incredible farm to table without the pretense. Great prices, delicious perfectly cooked food. Had the steak and eggs — best steak I’ve had on the East Coast, fresh from their farm. Had the local coconut ice cream, amazing. Eggs were perfect.\n\nFarm to table without the pretense. That is a rare sentence that still means something. The food is delicious and perfectly cooked, and the prices are great — a diner doing the work, not a lecture about the farm.\n\nI had the steak and eggs. Best steak I’ve had on the East Coast, fresh from their farm. I am not hedging that. The plate was the plate: steak, eggs, cooked right. The eggs were perfect.\n\nThen the local coconut ice cream. Amazing. That is the dessert note, and it belongs next to the steak.\n\nLedyard. Colonel Ledyard Highway. Go for that steak.\n\n*[Finish here: time of day, how the farm plate landed after Groton duty food, whether you’d take someone.]*"
+    },
+    {
+      "slug": "shipwrights-daughter",
+      "title": "The Shipwright’s Daughter",
+      "section": "food",
+      "tags": [
+        "seafood",
+        "connecticut",
+        "mystic"
+      ],
+      "date": "2026-09-07",
+      "place": "Mystic, CT",
+      "dek": "A vibrant gem — local seafood, perfectly prepared, with local farm ingredients.",
+      "maps": "https://www.google.com/maps/search/?api=1&query=The+Shipwright%27s+Daughter+20+E+Main+St+Mystic+CT",
+      "photo": "images/shipwrights-daughter.jpg",
+      "draft": true,
+      "body": "> A vibrant gem, includes perfectly prepared local seafood and local farm ingredients.\n\nA vibrant gem. Mystic has rooms that try too hard. This one is alive without the costume.\n\nThe seafood is local and perfectly prepared. The farm ingredients are local too. That pairing is the whole promise of a coastal kitchen — water and field on the same plate, cooked like both mattered.\n\nEast Main. Sit down for the seafood.\n\n*[Finish here: which fish, the room, whether this was a treat night or a regular table.]*"
+    }
+  ]
+}
