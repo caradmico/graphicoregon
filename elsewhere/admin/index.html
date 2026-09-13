@@ -5,30 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Elsewhere · Desk</title>
   <meta name="robots" content="noindex, nofollow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Libre+Baskerville:ital,wght@0,700&display=swap" rel="stylesheet">
   <style>
     html, body { margin: 0; min-height: 100%; background: #141414; color: #f3eee6; }
-    .boot {
-      max-width: 28rem;
-      margin: 18vh auto 0;
-      padding: 0 1.25rem;
-      font: 1.02rem/1.5 "Libre Baskerville", Georgia, serif;
-    }
-    .boot p { color: #9a9288; }
-    .boot strong { color: #f3eee6; }
-    .boot code {
-      font: 600 0.78rem/1.4 "IBM Plex Mono", ui-monospace, monospace;
-      color: #c45c4a;
-    }
   </style>
+  <script>
+    (function () {
+      var q = location.search;
+      if (q.indexOf('reset') !== -1) {
+        try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
+        location.replace(location.pathname);
+      }
+    })();
+  </script>
   <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
 </head>
-<body>
-  <div class="boot">
-    <p><strong>Desk</strong></p>
-    <p>Sign in with a GitHub token for <code>caradmico/graphicoregon</code>. Contents: Read and write.</p>
-  </div>
-</body>
+<body></body>
 </html>
