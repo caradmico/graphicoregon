@@ -2,11 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Elsewhere · Reading</title>
-    <link>https://coast.graphicoregon.com/#reading</link>
+    <link>https://elsewhere.graphicoregon.com/#reading</link>
     <description>Other writers, other papers — open the link. A curated shelf of no-paywall original space writing the desk is pointing at. Preview only; read the piece at the source.</description>
     <language>en-us</language>
     <lastBuildDate>Sun, 13 Sep 2026 15:30:00 GMT</lastBuildDate>
-    <atom:link href="https://coast.graphicoregon.com/reading.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://elsewhere.graphicoregon.com/reading.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>China is building a lunar navigation and communications network</title>
       <link>https://jatan.space/moon-monday-issue-291/</link>
