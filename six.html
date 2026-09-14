@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graphic Oregon</title>
+  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art.">
+  <meta name="theme-color" content="#1a1712">
+  <link rel="canonical" href="https://caradmico.github.io/graphicoregon/six.html">
+  <link rel="stylesheet" href="chrome.css">
+</head>
+<body>
+  <div id="loader">
+    <div class="inner">
+      <h1>Graphic Oregon</h1>
+      <p>Research · Mapping · Design · Writing · Fine Art</p>
+    </div>
+  </div>
+  <canvas id="stage" tabindex="0"></canvas>
+  <div id="hud">
+    <header class="top">
+      <h1>Graphic Oregon</h1>
+      <p class="tag">Research, website design, media, and fine art</p>
+    </header>
+    <button type="button" id="back" hidden>Back</button>
+    <nav id="roster" aria-label="Classes">
+      <button type="button" data-class="journalist">Journalist</button>
+      <button type="button" data-class="scientist">Scientist</button>
+      <button type="button" data-class="radio">Radio</button>
+      <button type="button" data-class="artist">Artist</button>
+      <button type="button" data-class="teacher">Teacher</button>
+      <button type="button" data-class="musician">Musician</button>
+    </nav>
+    <aside id="panel" hidden>
+      <div class="meta" id="panel-meta"></div>
+      <h2 id="panel-title"></h2>
+      <p id="panel-body"></p>
+      <figure id="panel-figure" hidden>
+        <img id="panel-img" alt="">
+      </figure>
+      <div id="panel-subs" hidden></div>
+      <div id="panel-links"></div>
+    </aside>
+    <div id="help">Tap a face · Esc returns</div>
+  </div>
+  <div id="paper" hidden>
+    <div class="sheet">
+      <button type="button" id="paper-close">Fold</button>
+      <p class="kicker">a paper from the path</p>
+      <h2 class="mast">Graphic Oregon</h2>
+      <p class="deck">Writing · the coast papers · the studio</p>
+      <div class="spread">
+        <figure>
+          <img src="assets/news/gazette-puffin.jpg" alt="Gazette">
+          <figcaption>Gazette</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/news/hipfish-1016.jpg" alt="Hipfish">
+          <figcaption>Hipfish</figcaption>
+        </figure>
+      </div>
+      <div class="spread folio">
+        <figure>
+          <img src="assets/news/pioneer-archive.jpg" alt="Pioneer">
+          <figcaption>Pioneer</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/news/signal-beach-books.jpg" alt="Signal">
+          <figcaption>Signal</figcaption>
+        </figure>
+      </div>
+      <nav class="cols">
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">graphicoregon.com</a>
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">Writing</a>
+        <a href="https://www.tillamookcountypioneer.net/author/assistant-editor/" target="_blank" rel="noopener">Tillamook County Pioneer</a>
+      </nav>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
+  <script src="field-nav.js"></script>
+  <script src="art-inventory.js"></script>
+  <script src="roster.js"></script>
+  <script src="figures.js"></script>
+</body>
+</html>
