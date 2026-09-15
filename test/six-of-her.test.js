@@ -81,7 +81,8 @@ assert.ok(/depthWrite:\s*true/.test(hook), "dusk writes depth so the six stay in
 assert.ok(!/depthWrite:\s*false/.test(hook), "dusk is not a late overlay");
 assert.ok(/hideLoader\(\)/.test(app) && /display = "none"/.test(app), "JS keeps the loader off first paint");
 assert.ok(/#loader[\s\S]*#loader\[hidden\][\s\S]*display:\s*none\s*!important/.test(css), "loader is not first paint");
-assert.ok(!/src="figures\.js"|src="faces\.js"|src="look\.js"|src="field\.js"|three\.min\.js/i.test(html), "root door does not load the field");
+assert.ok(/src="figures\.js"/.test(html), "root door loads the six field");
+assert.ok(/three\.min\.js/i.test(html), "root door loads three");
 assert.ok(!/\?v=/.test(html), "no cache-buster query on assets");
 assert.ok(/visibility:\s*hidden/.test(css) && /canvas#stage\.ready/.test(css), "canvas stays hidden until maps");
 assert.ok(/function hideStage/.test(app) && /function showStage/.test(app), "JS holds the canvas until the six are dressed");

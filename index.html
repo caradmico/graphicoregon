@@ -3,192 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Graphic Oregon · website design &amp; systems</title>
-  <meta name="description" content="Business is hard. Websites shouldn’t be. Branding, market research, and timeless collateral.">
-  <meta name="theme-color" content="#101618">
+  <title>Graphic Oregon</title>
+  <meta name="description" content="Graphic Oregon — research, website design, media, and fine art.">
+  <meta name="theme-color" content="#1a1712">
   <link rel="canonical" href="https://caradmico.github.io/graphicoregon/">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="chrome.css">
 </head>
 <body>
-  <header class="mast">
-    <div class="wrap">
-      <p class="brand">
-        <strong>Graphic Oregon</strong>
-        <span>website design &amp; systems</span>
-      </p>
-      <a class="nav-contact" href="#contact">Contact</a>
+  <div id="loader">
+    <div class="inner">
+      <h1>Graphic Oregon</h1>
+      <p>Research · Mapping · Design · Writing · Fine Art</p>
     </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="wrap">
-        <h1>Business is hard. Websites shouldn’t be.</h1>
+  </div>
+  <canvas id="stage" tabindex="0"></canvas>
+  <div id="hud">
+    <header class="top">
+      <h1>Graphic Oregon</h1>
+      <p class="tag">Research, website design, media, and fine art</p>
+    </header>
+    <button type="button" id="back" hidden>Back</button>
+    <nav id="roster" aria-label="Classes">
+      <button type="button" data-class="journalist">Journalist</button>
+      <button type="button" data-class="scientist">Scientist</button>
+      <button type="button" data-class="radio">Radio</button>
+      <button type="button" data-class="artist">Artist</button>
+      <button type="button" data-class="teacher">Teacher</button>
+      <button type="button" data-class="musician">Musician</button>
+    </nav>
+    <aside id="panel" hidden>
+      <div class="meta" id="panel-meta"></div>
+      <h2 id="panel-title"></h2>
+      <p id="panel-body"></p>
+      <figure id="panel-figure" hidden>
+        <img id="panel-img" alt="">
+      </figure>
+      <div id="panel-subs" hidden></div>
+      <div id="panel-links"></div>
+    </aside>
+    <div id="help">Tap a face · Esc returns</div>
+  </div>
+  <div id="paper" hidden>
+    <div class="sheet">
+      <button type="button" id="paper-close">Fold</button>
+      <p class="kicker">a paper from the path</p>
+      <h2 class="mast">Graphic Oregon</h2>
+      <p class="deck">Writing · the coast papers · the studio</p>
+      <div class="spread">
+        <figure>
+          <img src="assets/news/gazette-puffin.jpg" alt="Gazette">
+          <figcaption>Gazette</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/news/hipfish-1016.jpg" alt="Hipfish">
+          <figcaption>Hipfish</figcaption>
+        </figure>
       </div>
-    </section>
-
-    <section class="ethos" aria-labelledby="ethos-title">
-      <div class="wrap">
-        <h2 id="ethos-title" class="sr-only">How the work is done</h2>
-        <div class="ethos-grid">
-          <article class="ethos-box">
-            <h3>Branding</h3>
-            <p>A name, mark, and voice that hold still when the week gets loud.</p>
-          </article>
-          <article class="ethos-box">
-            <h3>Market research</h3>
-            <p>Who it’s for, and why it lands — before a pixel is placed.</p>
-          </article>
-          <article class="ethos-box">
-            <h3>Timeless collateral</h3>
-            <p>Sites and pieces built to stay useful, not to chase a season.</p>
-          </article>
-        </div>
+      <div class="spread folio">
+        <figure>
+          <img src="assets/news/pioneer-archive.jpg" alt="Pioneer">
+          <figcaption>Pioneer</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/news/signal-beach-books.jpg" alt="Signal">
+          <figcaption>Signal</figcaption>
+        </figure>
       </div>
-    </section>
-
-    <section class="work" id="work" aria-labelledby="work-title">
-      <div class="wrap">
-        <h2 id="work-title">Selected work</h2>
-        <div class="strip" id="work-strip" tabindex="0" aria-label="Work tiles, scroll sideways">
-          <article class="tile">
-            <img src="assets/work/pete-anderson.jpg" width="1200" height="583" alt="Pete Anderson Realty website" loading="eager">
-            <div class="cap">
-              <strong>Pete Anderson</strong>
-              <span>Realty</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/cougar-ridge.jpg" width="1200" height="559" alt="Cougar Ridge Homes website" loading="lazy">
-            <div class="cap">
-              <strong>Cougar Ridge</strong>
-              <span>Homes</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/gold-silver.jpg" width="1100" height="666" alt="Gold Silver Market Update website" loading="lazy">
-            <div class="cap">
-              <strong>Gold Silver</strong>
-              <span>Market update</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/offshore-grill.jpg" width="1280" height="717" alt="Offshore Grill website" loading="lazy">
-            <div class="cap">
-              <strong>Offshore Grill</strong>
-              <span>Restaurant</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/coast-broadcasting.jpg" width="1100" height="651" alt="Coast Broadcasting Company website" loading="lazy">
-            <div class="cap">
-              <strong>Coast Broadcasting</strong>
-              <span>Pacific News</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/north-tillamook-library.jpg" width="1100" height="711" alt="North Tillamook Library website" loading="lazy">
-            <div class="cap">
-              <strong>North Tillamook Library</strong>
-              <span>Manzanita</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/manzanita-beach.jpg" width="1100" height="675" alt="Manzanita Beach Company website" loading="lazy">
-            <div class="cap">
-              <strong>Manzanita Beach Company</strong>
-              <span>Manzanita</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/housable.jpg" width="1100" height="729" alt="Housable website" loading="lazy">
-            <div class="cap">
-              <strong>Housable</strong>
-              <span>ADU projects</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/color-outside-the-lines.jpg" width="1100" height="743" alt="Color Outside the Lines website" loading="lazy">
-            <div class="cap">
-              <strong>Color Outside the Lines</strong>
-              <span>Community art</span>
-            </div>
-          </article>
-          <article class="tile">
-            <img src="assets/work/talent-features.jpg" width="1100" height="730" alt="Talent features website section" loading="lazy">
-            <div class="cap">
-              <strong>Stories</strong>
-              <span>Features</span>
-            </div>
-          </article>
-          <a class="tile" href="https://caradmico.github.io/company-soup/brands/grant-desk/">
-            <img src="assets/work/grant-desk.jpg" width="1280" height="800" alt="Grant Desk website" loading="lazy">
-            <div class="cap">
-              <strong>Grant Desk</strong>
-              <span>Grants</span>
-            </div>
-          </a>
-          <a class="tile" href="https://caradmico.github.io/company-soup/businesses/fine-art/">
-            <img src="assets/work/fine-art.jpg" width="1280" height="800" alt="Fine Art website" loading="lazy">
-            <div class="cap">
-              <strong>Fine Art</strong>
-              <span>Neahkahnie Atelier</span>
-            </div>
-          </a>
-          <a class="tile" href="https://caradmico.github.io/company-soup/businesses/watershed/">
-            <img src="assets/work/watershed.jpg" width="1280" height="800" alt="Watershed Demeter Design website" loading="lazy">
-            <div class="cap">
-              <strong>Watershed</strong>
-              <span>Demeter</span>
-            </div>
-          </a>
-          <a class="tile" href="https://elsewhere.graphicoregon.com/">
-            <img src="assets/work/coast-desk.jpg" width="1280" height="800" alt="Coast Desk website" loading="lazy">
-            <div class="cap">
-              <strong>Coast Desk</strong>
-              <span>Bylines</span>
-            </div>
-          </a>
-          <a class="tile" href="https://caradmico.github.io/graphicoregon/nccwp/">
-            <img src="assets/work/nccwp.jpg" width="1280" height="800" alt="NCCWP website" loading="lazy">
-            <div class="cap">
-              <strong>NCCWP</strong>
-              <span>North Coast</span>
-            </div>
-          </a>
-          <a class="tile" href="https://sassmeharder.com/">
-            <img src="assets/work/sassmeharder.jpg" width="1280" height="800" alt="Sassmeharder storefront" loading="lazy">
-            <div class="cap">
-              <strong>Sassmeharder</strong>
-              <span>Storefront</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="reach" id="contact">
-    <div class="wrap">
-      <h2>Get in touch</h2>
-      <p class="digits">
-        <a href="mailto:caradmico@gmail.com">caradmico@gmail.com</a>
-        <span aria-hidden="true"> · </span>
-        <a href="tel:+15032778757">503-277-8757</a>
-      </p>
+      <nav class="cols">
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">graphicoregon.com</a>
+        <a href="https://graphicoregon.com/" target="_blank" rel="noopener">Writing</a>
+        <a href="https://www.tillamookcountypioneer.net/author/assistant-editor/" target="_blank" rel="noopener">Tillamook County Pioneer</a>
+      </nav>
     </div>
-  </footer>
-
-  <script>
-    (function () {
-      var strip = document.getElementById("work-strip");
-      if (!strip) return;
-      strip.addEventListener("wheel", function (e) {
-        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-        strip.scrollLeft += e.deltaY;
-        e.preventDefault();
-      }, { passive: false });
-    })();
-  </script>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script>
+  <script src="field-nav.js"></script>
+  <script src="art-inventory.js"></script>
+  <script src="roster.js"></script>
+  <script src="figures.js"></script>
 </body>
 </html>
